@@ -12,8 +12,8 @@
   
   <!-- Marka/Logo alanı -->
   <div class="brand">
-    <img src="/assets/img/favicon.svg" alt="Teftiş Logo" width="24" height="24" />
-    <span class="brand-title">Teftiş - 657.com.tr</span>
+    <img src="/assets/img/favicon.svg" alt="Teftis Logo" width="24" height="24" />
+    <span class="brand-title">Teftis - 657.com.tr</span>
   </div>
   
   <!-- Navbar sağ taraf aksiyonları -->

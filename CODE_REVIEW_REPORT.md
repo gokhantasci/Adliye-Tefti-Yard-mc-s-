@@ -1,5 +1,5 @@
 # Code Review Report
-## Adliye Teftiş Yardımcısı - Comprehensive Code Analysis
+## Adliye Teftis - Comprehensive Code Analysis
 
 **Date:** 2025-11-08  
 **Reviewer:** Automated Code Review System  
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This report provides a comprehensive analysis of the codebase for the "Adliye Teftiş Yardımcısı" (Court Inspection Assistant) application. The application is a PHP-based web application with JavaScript frontend components, designed for managing court inspection workflows.
+This report provides a comprehensive analysis of the codebase for the "Adliye Teftis" (Court Inspection Assistant) application. The application is a PHP-based web application with JavaScript frontend components, designed for managing court inspection workflows.
 
 ### Overall Assessment: ✅ GOOD
 

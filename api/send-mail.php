@@ -114,7 +114,7 @@ $subject   = (string)($payload['subject'] ?? 'Bilgilendirme');
 $textBody  = (string)($payload['body'] ?? '');
 $htmlBody  = isset($payload['html']) ? (string)$payload['html'] : null;
 $replyTo   = isset($payload['reply_to']) ? (string)$payload['reply_to'] : null;
-$fromName  = isset($payload['from_name']) ? (string)$payload['from_name'] : 'Teftiş Sistemi';
+$fromName  = isset($payload['from_name']) ? (string)$payload['from_name'] : 'Teftis Sistemi';
 if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
   http_response_code(400);
   echo json_encode(['ok'=>false,'stage'=>'INPUT','error'=>'Geçerli e-posta adresi değil']);

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kesinleşme Zamanı Kontrol · Teftiş</title>
+  <title>Kesinleşme Zamanı Kontrol · Teftis</title>
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +33,7 @@
     <header class="navbar" role="banner">
       <div class="brand">
         <button id="sidebarToggle" class="icon-btn" aria-label="Menüyü aç/kapat"><span class="material-symbols-rounded">menu</span></button>
-        <span class="brand-title">Teftiş</span>
+        <span class="brand-title">Teftis</span>
       </div>
       <div class="navbar-actions">
         <button id="themeToggle" class="icon-btn" title="Temayı değiştir"><span id="themeIcon" class="material-symbols-rounded">dark_mode</span></button>
@@ -196,7 +196,7 @@
     </main>
 
     <footer class="footer">
-      <div>© <?php echo date('Y'); ?> Teftiş</div>
+      <div>© <?php echo date('Y'); ?> Teftis</div>
       <div class="muted">Kesinleşme Zamanı Kontrol</div>
     </footer>
   </div>

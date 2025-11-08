@@ -1,5 +1,5 @@
 # Code Check Summary Report
-## Adliye Teftiş Yardımcısı - Automated Code Review
+## Adliye Teftis - Automated Code Review
 
 **Date:** November 8, 2025  
 **Repository:** gokhantasci/Adliye-Tefti-Yard-mc-s-  

@@ -15,8 +15,8 @@
       <span class="label">Anasayfa</span>
     </a>
 
-    <!-- TEFTİŞ MODÜLLERI -->
-    <h4 class="menu-group-title">Teftiş</h4>
+    <!-- TEFTİS MODÜLLERI -->
+    <h4 class="menu-group-title">Teftis</h4>
     
     <!-- Karar Defteri -->
     <a class="menu-item <?= ($active ?? '') === 'karar' ? 'active' : '' ?>" href="/karar.php">

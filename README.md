@@ -1,11 +1,11 @@
-# Adliye Teftiş Yardımcısı
+# Adliye Teftis
 
-**Mahkeme Teftiş Asistanı** - Adalet Bakanlığı bünyesinde mahkeme teftiş iş akışlarını ve idari görevleri yönetmek için geliştirilmiş web uygulaması.
+**Mahkeme Teftis Asistanı** - Adalet Bakanlığı bünyesinde mahkeme teftis iş akışlarını ve idari görevleri yönetmek için geliştirilmiş web uygulaması.
 
 ## 🎯 Amaç
 
-Bu uygulama, teftiş personeline aşağıdaki araçları sağlar:
-- Teftiş kayıtlarını yönetme (Teftiş Defterleri)
+Bu uygulama, teftis personeline aşağıdaki araçları sağlar:
+- Teftis kayıtlarını yönetme (Teftis Defterleri)
 - Yasal süreçleri takip etme (Karar, İstinaf, Temyiz)
 - Personel durumu ve terfilerini hesaplama
 - İddianame değerlendirme belgeleri oluşturma

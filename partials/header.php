@@ -1,5 +1,4 @@
-<!-- 
-  Ortak Başlık Şablonu
+  <!-- Ortak Başlık Şablonu
   
   Bu şablon tüm sayfalar için ortak HTML başlık bölümünü sağlar.
   Sayfa başlığı, meta etiketleri, stil dosyaları ve JavaScript dosyaları burada yüklenir.
@@ -16,15 +15,15 @@
   <?php
     /**
      * Sayfa başlığını oluştur
-     * Format: "$pageTitle - Teftiş | 657.com.tr"
-     * Eğer $pageTitle tanımlı değilse sadece "Teftiş | 657.com.tr" kullanılır
+     * Format: "$pageTitle - Teftis | 657.com.tr"
+     * Eğer $pageTitle tanımlı değilse sadece "Teftis | 657.com.tr" kullanılır
      */
     $fullTitle = '';
     if (!empty($pageTitle)) {
       // XSS koruması için htmlspecialchars kullan
-      $fullTitle = htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') . ' - Teftiş | 657.com.tr';
+      $fullTitle = htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') . ' - Teftis | 657.com.tr';
     } else {
-      $fullTitle = 'Teftiş | 657.com.tr';
+      $fullTitle = 'Teftis | 657.com.tr';
     }
   ?>
   

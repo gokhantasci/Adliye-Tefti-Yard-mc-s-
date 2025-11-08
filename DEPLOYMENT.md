@@ -1,5 +1,5 @@
 # Deployment and Setup Guide
-## Adliye Teftiş Yardımcısı
+## Adliye Teftis
 
 ### System Requirements
 
