@@ -1,3 +1,24 @@
+/**
+ * Ana Uygulama JavaScript Dosyası
+ * 
+ * Bu dosya uygulamanın temel JavaScript işlevselliğini sağlar:
+ * - Tema yönetimi (koyu/açık mod)
+ * - Yan menü kontrolü
+ * - Not yönetimi (LocalStorage ve API senkronizasyonu)
+ * - E-posta gönderme
+ * - Haber yönetimi
+ * 
+ * @package AdliyeTeftis
+ * @author  Gökhan TAŞÇI
+ */
+
+/**
+ * Tekrar deneme mesajını formatla
+ * Rate limiting için kullanıcıya ne kadar beklemesi gerektiğini gösterir
+ * 
+ * @param {number} sec Saniye cinsinden bekleme süresi
+ * @returns {string} Formatlanmış mesaj
+ */
 function formatRetryMessage(sec) {
   sec = Number(sec) || 0;
   if (sec <= 0) return 'Bir süre sonra tekrar deneyin.';
@@ -6,23 +27,45 @@ function formatRetryMessage(sec) {
   return sec + ' saniye sonra tekrar deneyin.';
 }
 
-
-(function(){
+/**
+ * Tema ve UI Kontrolleri
+ * 
+ * Koyu/açık tema değiştirme ve yan menü kontrolü
+ * Tema tercihi LocalStorage'da saklanır
+ */
+(function() {
   const root = document.documentElement;
   const themeKey = "minimal-theme";
+  
+  // Kaydedilmiş tema tercihini yükle
   let saved = localStorage.getItem(themeKey);
   if (saved !== "light" && saved !== "dark") {
-    saved = "dark";
+    saved = "dark"; // Varsayılan tema: koyu
     localStorage.setItem(themeKey, saved);
   }
+  
+  // Temayı uygula
   document.documentElement.setAttribute("data-theme", saved);
+  
+  // DOM elementlerini seç
   const themeToggle = document.getElementById("themeToggle");
   const themeIcon = document.getElementById("themeIcon");
   const sidebar = document.getElementById("sidebar");
   const sidebarToggle = document.getElementById("sidebarToggle");
-  function applyIcon(){
+  
+  /**
+   * Tema ikonunu güncelle
+   * Mevcut temaya göre ikonu ve ARIA etiketlerini ayarlar
+   */
+  function applyIcon() {
     const mode = root.getAttribute("data-theme") || "dark";
-    if (themeIcon) themeIcon.textContent = (mode === "dark" ? "dark_mode" : "light_mode");
+    
+    // İkon metnini güncelle
+    if (themeIcon) {
+      themeIcon.textContent = (mode === "dark" ? "dark_mode" : "light_mode");
+    }
+    
+    // ARIA etiketlerini güncelle (erişilebilirlik)
     if (themeToggle) {
       const next = (mode === "dark" ? "light" : "dark");
       themeToggle.setAttribute("aria-pressed", mode === "dark" ? "false" : "true");
@@ -30,123 +73,237 @@ function formatRetryMessage(sec) {
       themeToggle.setAttribute("title", next === "light" ? "Açık tema" : "Koyu tema");
     }
   }
-  function toggleTheme(){
+  
+  /**
+   * Tema değiştir (koyu ⇄ açık)
+   */
+  function toggleTheme() {
     const cur = root.getAttribute("data-theme") || "dark";
     const next = cur === "dark" ? "light" : "dark";
+    
     root.setAttribute("data-theme", next);
     localStorage.setItem(themeKey, next);
     applyIcon();
   }
-  function toggleSidebar(){
+  
+  /**
+   * Yan menüyü aç/kapat
+   */
+  function toggleSidebar() {
     if (!sidebar) return;
     sidebar.classList.toggle("open");
   }
+  
+  // Event listener'ları ekle
   if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
   if (sidebarToggle) sidebarToggle.addEventListener("click", toggleSidebar);
+  
+  // Başlangıçta ikonu ayarla
   applyIcon();
+  
+  /**
+   * Not Yönetimi (LocalStorage)
+   * 
+   * Kullanıcı notlarını tarayıcıda saklar ve görüntüler
+   */
   const notesEl = document.getElementById("notes");
   const notesKey = "minimal-notes";
+  
+  // Notları oku
   const readNotes = () => JSON.parse(localStorage.getItem(notesKey) || "[]");
+  
+  // Notları kaydet
   const writeNotes = (arr) => localStorage.setItem(notesKey, JSON.stringify(arr));
-  function escapeHtml(s){
-    return s.replace(/[&<>"']/g, function(m){
+  
+  /**
+   * HTML'i güvenli hale getir (XSS koruması)
+   * 
+   * @param {string} s HTML içerebilecek metin
+   * @returns {string} Güvenli metin
+   */
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, function(m) {
       return {
-        '&':'&amp;',
-        '<':'&lt;',
-        '>':'&gt;',
-        '"':'&quot;',
-        "'":'&#039;'
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
       }[m];
     });
   }
-  function renderNotes(){
+  
+  /**
+   * Notları ekrana çiz
+   */
+  function renderNotes() {
     if (!notesEl) return;
+    
     const data = readNotes();
     notesEl.innerHTML = "";
+    
+    // Not yoksa bilgi mesajı göster
     if (data.length === 0) {
       notesEl.innerHTML = '<p class="muted">Hic not yok. "Yeni Not" ile baslayin.</p>';
       return;
     }
-    data.forEach(function(text, idx){
+    
+    // Her notu listeye ekle
+    data.forEach(function(text, idx) {
       const item = document.createElement("div");
       item.className = "note";
+      
+      // XSS koruması ile içeriği oluştur
       item.innerHTML =
         '<div class="text">' + escapeHtml(text) + '</div>' +
         '<div class="actions">' +
         '<button class="btn ghost" data-edit="' + idx + '">Duzenle</button>' +
         '<button class="btn" data-del="' + idx + '">Sil</button>' +
         '</div>';
+      
       notesEl.appendChild(item);
     });
+    
+    // Tıklama olaylarını dinle
     notesEl.addEventListener("click", onNoteClick);
   }
-  function onNoteClick(e){
+  
+  /**
+   * Not üzerinde tıklama olayını işle (sil/düzenle)
+   * 
+   * @param {Event} e Tıklama olayı
+   */
+  function onNoteClick(e) {
     const t = e.target;
-    if (t.matches("[data-del]")){
+    
+    // Sil butonu
+    if (t.matches("[data-del]")) {
       const idx = +t.getAttribute("data-del");
-      const arr = readNotes(); arr.splice(idx,1); writeNotes(arr); renderNotes();
-    } else if (t.matches("[data-edit]")){
+      const arr = readNotes();
+      arr.splice(idx, 1);
+      writeNotes(arr);
+      renderNotes();
+    }
+    // Düzenle butonu
+    else if (t.matches("[data-edit]")) {
       const idx = +t.getAttribute("data-edit");
-      const arr = readNotes(); const val = prompt("Notu duzenle:", arr[idx] || "");
-      if (val !== null){ arr[idx] = val.trim(); writeNotes(arr); renderNotes(); }
+      const arr = readNotes();
+      const val = prompt("Notu duzenle:", arr[idx] || "");
+      
+      if (val !== null) {
+        arr[idx] = val.trim();
+        writeNotes(arr);
+        renderNotes();
+      }
     }
   }
-  window.addNote = function(val){
+  
+  /**
+   * Yeni not ekle (global fonksiyon)
+   * 
+   * @param {string} val Not metni (opsiyonel, prompt ile alınır)
+   */
+  window.addNote = function(val) {
     if (!val) {
       val = prompt("Yeni not:");
       if (!val) return;
     }
-    const arr = readNotes(); arr.unshift(String(val).trim()); writeNotes(arr); renderNotes();
+    
+    const arr = readNotes();
+    arr.unshift(String(val).trim());
+    writeNotes(arr);
+    renderNotes();
   };
+  
+  // Sayfa yüklendiğinde notları göster
   renderNotes();
 })();
-(function(){
+
+/**
+ * Not Senkronizasyonu (API ile)
+ * 
+ * LocalStorage notlarını API ile senkronize eder
+ */
+(function() {
   const API = '/api/notes.php';
   const notesKey = "minimal-notes";
-  async function syncDown(){
-    try{
-      const r = await fetch(API, {headers:{'Accept':'application/json'}});
+  
+  /**
+   * Sunucudan notları indir ve LocalStorage'a kaydet
+   */
+  async function syncDown() {
+    try {
+      const r = await fetch(API, {headers: {'Accept': 'application/json'}});
       if (!r.ok) return;
+      
       const j = await r.json();
       const remote = (j && j.data && j.data.items) ? j.data.items : [];
       const local = JSON.parse(localStorage.getItem(notesKey) || "[]");
+      
+      // Eğer local boş ve remote'da veri varsa senkronize et
       if (local.length === 0 && remote.length > 0) {
-        localStorage.setItem(notesKey, JSON.stringify(remote.map(function(x){ return x.text; })));
-        if (typeof window.renderNotes === "function") window.renderNotes();
-        else {
+        localStorage.setItem(notesKey, JSON.stringify(remote.map(function(x) {
+          return x.text;
+        })));
+        
+        // Notları yeniden çiz
+        if (typeof window.renderNotes === "function") {
+          window.renderNotes();
+        } else {
           const ev = document.createEvent('Event');
           ev.initEvent('notes-sync', true, true);
           document.dispatchEvent(ev);
         }
       }
-    } catch(e){ console.error(e); }
+    } catch(e) {
+      console.error(e);
+    }
   }
-  async function pushAdd(text){
+  
+  /**
+   * Sunucuya yeni not ekle
+   * 
+   * @param {string} text Not metni
+   */
+  async function pushAdd(text) {
     try {
       await fetch(API, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({action:'add', text:text})
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: 'add', text: text})
       });
-    } catch(e){  }
+    } catch(e) {
+      // Sessizce başarısız ol (offline durumlar için)
+    }
   }
+  
+  // Orijinal addNote fonksiyonunu sarmalayarak API senkronizasyonu ekle
   const origAdd = window.addNote;
-  if (typeof origAdd === 'function'){
-    window.addNote = function(val){
+  if (typeof origAdd === 'function') {
+    window.addNote = function(val) {
       if (!val) {
         val = prompt("Yeni not:");
         if (!val) return;
       }
+      
+      // Önce local'e ekle
       origAdd(val);
+      
+      // Sonra API'ye gönder
       pushAdd(val);
     };
   }
-  })();
-(function(){
+})();
+
+/**
+ * Ayarlar Paneli Kontrolü
+ */
+(function() {
   const btn = document.getElementById('collapseBtn');
   const det = document.querySelector('details.settings');
+  
   if (btn && det) {
-    btn.addEventListener('click', function(){
+    btn.addEventListener('click', function() {
       det.open = false;
     });
   }
