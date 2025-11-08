@@ -122,6 +122,82 @@ $xml = str_replace('${YER}-${TARIH}', $xmlEnt($yerWord.'-'.$year), $xml);
 $xml = str_replace('${YER}', $xmlEnt($yerWord), $xml);
 $xml = str_replace('${TARIH}', $year, $xml);
 
+// --- content control ile değiştirme için güvenli fonksiyon ---
+// --- content control ile değiştirme: formatı koruyan güvenli fonksiyon ---
+function replaceContentControlByTag(DOMXPath $xp, DOMDocument $doc, string $nsW, string $tag, string $text): void {
+  $nodes = $xp->query("//w:sdt[w:sdtPr/w:tag[@w:val='{$tag}']]");
+  if (!$nodes || $nodes->length === 0) return;
+
+  foreach ($nodes as $sdt) {
+    // sdtContent alt düğümünü bul
+    $content = null;
+    foreach ($sdt->childNodes as $c) {
+      if ($c instanceof DOMElement && $c->localName === 'sdtContent' && $c->namespaceURI === $nsW) {
+        $content = $c;
+        break;
+      }
+    }
+    if (!$content) continue;
+
+    // İçerikte ilk paragrafı bulmaya çalış
+    $pNodeList = $xp->query('.//w:p', $content);
+    if ($pNodeList && $pNodeList->length > 0) {
+      $p = $pNodeList->item(0);
+
+      // İlk run'ı bul (varsa) ve onun rPr'sini koruyarak yeni bir run oluştur
+      $firstRList = $xp->query('.//w:r', $p);
+      if ($firstRList && $firstRList->length > 0) {
+        $firstR = $firstRList->item(0);
+        // Klonla (rPr ve diğer özellikleri kalsın)
+        $newR = $firstR->cloneNode(true);
+
+        // İçindeki tüm w:t düğümlerini kaldır
+        $tNodes = $xp->query('.//w:t', $newR);
+        foreach ($tNodes as $tn) {
+          $tn->parentNode->removeChild($tn);
+        }
+        // Yeni tek w:t ekle (xml:space preserve gerektiğinde ayarla)
+        $t = $doc->createElementNS($nsW, 'w:t');
+        if (preg_match('/^\s|\s$/', $text)) {
+          $t->setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
+        }
+        $t->appendChild($doc->createTextNode($text));
+        $newR->appendChild($t);
+
+        // Paragraftaki var olan w:r'ları kaldır ve tek yeni run ekle
+        $oldR = [];
+        foreach ($xp->query('./w:r', $p) as $rnode) { $oldR[] = $rnode; }
+        foreach ($oldR as $rnode) { $p->removeChild($rnode); }
+        $p->appendChild($newR);
+      } else {
+        // Paragraf var ama run yoksa: sadece bir run+t ekle (pPr korunur)
+        $r = $doc->createElementNS($nsW, 'w:r');
+        $t = $doc->createElementNS($nsW, 'w:t');
+        if (preg_match('/^\s|\s$/', $text)) {
+          $t->setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
+        }
+        $t->appendChild($doc->createTextNode($text));
+        $r->appendChild($t);
+        // Mevcut run'lar zaten yoksa append
+        $p->appendChild($r);
+      }
+    } else {
+      // sdtContent içinde paragraf yoksa: temizle ve yeni p->r->t ekle
+      while ($content->firstChild) { $content->removeChild($content->firstChild); }
+      $p = $doc->createElementNS($nsW, 'w:p');
+      $r = $doc->createElementNS($nsW, 'w:r');
+      $t = $doc->createElementNS($nsW, 'w:t');
+      if (preg_match('/^\s|\s$/', $text)) {
+        $t->setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
+      }
+      $t->appendChild($doc->createTextNode($text));
+      $r->appendChild($t);
+      $p->appendChild($r);
+      $content->appendChild($p);
+    }
+  }
+}
+
 // DOM yükle
 $doc = new DOMDocument();
 $doc->preserveWhiteSpace = true;
@@ -131,6 +207,18 @@ if (!@$doc->loadXML($xml)) { $zip->close(); jerr(500,'Şablon document.xml okuna
 $xp  = new DOMXPath($doc);
 $nsW = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
 $xp->registerNamespace('w', $nsW);
+
+// YER_TARIH content control'ünü güncelle
+$firstWord = '';
+$trimBirim = trim($birim);
+if ($trimBirim !== '') {
+  $parts = preg_split('/\s+/', $trimBirim);
+  $firstWord = isset($parts[0]) ? (string)$parts[0] : '';
+}
+$yerWord = tr_ucfirst(mb_strtolower($firstWord, 'UTF-8'));
+$yerText = $yerWord . '-' . date('d/m/Y');
+
+replaceContentControlByTag($xp, $doc, $nsW, 'TARIH_ZAMAN', $yerText);
 
 // Yardımcılar
 $createTextCell = function(string $text) use ($doc, $nsW): DOMElement {
@@ -210,23 +298,14 @@ if ($tplNodes && $tplNodes->length > 0) {
   if ($sect) { $body->insertBefore($tbl, $sect); } else { $body->appendChild($tbl); }
 }
 
-// Paragraf bazlı daha güvenilir güncelleme:
-// Yeni şablonunuzda "Kayıtlara uygun olduğu tasdik olunur." satırından hemen sonra
-// ayrı bir paragrafta ${YER}-${TARIH} geliyor. Word run'ları (w:t) parçalara ayırabildiği
-// için önce tüm paragraf metinlerini birleştirip arama yapıyoruz; eşleşme bulursak
-// bir sonraki paragrafı (w:p) Yer-DD-MM-YYYY şeklinde yazıyoruz.
+// Yeni şablon: "Kayıtlara uygun olduğu tasdik olunur." satırından sonra ayrı bir paragrafta
+// doğrudan ${YER}-${TARIH} placeholder'ı olacak. Bu durumda, ilgili w:t düğümünü bulup yerine
+// Yer-DD-MM-YYYY formatında metin koyuyoruz. (Önceki davranışı koruyoruz: ilk kelime, ilk harfi büyük.)
 try {
-  // normalize eden yardımcı
-  $normalize = function(string $s): string {
-    $s = strtr($s, ['İ'=>'i','I'=>'i','ı'=>'i','ğ'=>'g','Ğ'=>'g','ü'=>'u','Ü'=>'u','ş'=>'s','Ş'=>'s','ö'=>'o','Ö'=>'o','ç'=>'c','Ç'=>'c']);
-    return mb_strtolower($s, 'UTF-8');
-  };
-
-  // 1) Eğer DOCX içinde doğrudan ${YER}-${TARIH} placeholder'ı tek tırnaklı bir w:t içinde duruyorsa,
-  //    önce onu bulup paragrafını güncelleyelim (bu durumda paragrafın içindeki runs da temizlenir).
-  $found = false;
+  // Bulacağımız placeholder metni XPath içinde kullanırken PHP string interpolation olmasın diye tek tırnak kullanalım
   $placeholderNodes = $xp->query('//w:t[contains(., "${YER}-${TARIH}")]');
   if ($placeholderNodes && $placeholderNodes->length > 0) {
+    // Hazırlık: yer kelimesini hesapla (ilk kelimenin ilk harfi büyük, kalan küçük)
     $firstWord = '';
     $trimBirim = trim($birim);
     if ($trimBirim !== '') { $parts = preg_split('/\s+/', $trimBirim); $firstWord = isset($parts[0]) ? (string)$parts[0] : ''; }
@@ -234,6 +313,7 @@ try {
     $targetText = $yerWord . '-' . date('d-m-Y');
 
     foreach ($placeholderNodes as $pn) {
+      // parent paragraph'ı bul
       $p = $pn->parentNode;
       while ($p && !($p instanceof DOMElement && $p->namespaceURI === $nsW && $p->localName === 'p')) {
         $p = $p->parentNode;
@@ -241,56 +321,63 @@ try {
       if ($p instanceof DOMElement) {
         $tNodes = $xp->query('.//w:t', $p);
         if ($tNodes && $tNodes->length > 0) {
+          // İlk w:t'ye hedef metni koy, diğerlerini temizle (ör. placeholder parçalansa bile düzgün olur)
           $tNodes->item(0)->textContent = $targetText;
           for ($i=1; $i<$tNodes->length; $i++) { $tNodes->item($i)->textContent = ''; }
         } else {
+          // Hiç w:t yoksa yeni bir run ve t ekle
           $r = $doc->createElementNS($nsW, 'w:r');
           $t = $doc->createElementNS($nsW, 'w:t');
           $t->appendChild($doc->createTextNode($targetText));
           $r->appendChild($t); $p->appendChild($r);
         }
-        $found = true;
+      } else {
+        // Eğer paragraph bulunamadıysa, sadece bu t düğümünü güncelle
+        $pn->textContent = $targetText;
       }
     }
-  }
-
-  // 2) Eğer 1. yol işlememişse, "Kayıtlara uygun olduğu tasdik olunur." paragrafını ara
-  //    ve onun hemen sonraki w:p paragrafını (hangi run/parça halinde olursa olsun)
-  //    Yer-DD-MM-YYYY ile değiştir.
-  if (!$found) {
-    $paras = $xp->query('//w:p');
-    for ($pi = 0; $pi < $paras->length; $pi++) {
-      $p = $paras->item($pi);
-      // Paragraf içindeki tüm w:t'leri birleştir
-      $txt = '';
-      foreach ($xp->query('.//w:t', $p) as $tn) { $txt .= $tn->textContent; }
-      $norm = $normalize($txt);
-      if (strpos($norm, 'kayitlara uygun oldugu tasdik olunur') !== false) {
-        // bir sonraki gerçek paragrafı bul
-        $next = $p->nextSibling;
-        $steps = 0;
-        while ($next && !($next instanceof DOMElement && $next->namespaceURI === $nsW && $next->localName === 'p') && $steps < 12) {
-          $next = $next->nextSibling; $steps++;
+  } else {
+    // Eğer placeholder yoksa, önceki mantık (eski template'ler için) çalışmaya devam eder:
+    $bodyAfter = $xp->query('/w:document/w:body')->item(0);
+    if ($bodyAfter) {
+      $tbls = $xp->query('./w:tbl', $bodyAfter);
+      if ($tbls && $tbls->length > 0) {
+        $lastTbl = $tbls->item($tbls->length - 1);
+        // Tablodan sonra "Kayıtlara uygun olduğu tasdik olunur." metnini içeren ilk paragrafı bul
+        $p = $lastTbl->nextSibling; $tasdikPara = null; $scan = 12;
+        while ($p && $scan-- > 0) {
+          if ($p instanceof DOMElement && $p->namespaceURI === $nsW && $p->localName === 'p') {
+            $txt = '';
+            foreach ($xp->query('.//w:t', $p) as $tn) { $txt .= $tn->textContent; }
+            $norm = mb_strtolower(strtr($txt, ['İ'=>'i','I'=>'i','ı'=>'i','ğ'=>'g','Ğ'=>'g','ü'=>'u','Ü'=>'u','ş'=>'s','Ş'=>'s','ö'=>'o','Ö'=>'o','ç'=>'c','Ç'=>'c']), 'UTF-8');
+            if (strpos($norm, 'kayitlara uygun oldugu tasdik olunur') !== false) { $tasdikPara = $p; break; }
+          }
+          $p = $p->nextSibling;
         }
-        if ($next instanceof DOMElement) {
-          $firstWord = '';
-          $trimBirim = trim($birim);
-          if ($trimBirim !== '') { $parts = preg_split('/\s+/', $trimBirim); $firstWord = isset($parts[0]) ? (string)$parts[0] : ''; }
-          $yerWord = tr_ucfirst(mb_strtolower($firstWord, 'UTF-8'));
-          $targetText = $yerWord . '-' . date('d/m/Y');
-          $tNodes = $xp->query('.//w:t', $next);
-          if ($tNodes && $tNodes->length > 0) {
-            $tNodes->item(0)->textContent = $targetText;
-            for ($i=1; $i<$tNodes->length; $i++) { $tNodes->item($i)->textContent = ''; }
-          } else {
-            $r = $doc->createElementNS($nsW, 'w:r');
-            $t = $doc->createElementNS($nsW, 'w:t');
-            $t->appendChild($doc->createTextNode($targetText));
-            $r->appendChild($t); $next->appendChild($r);
+        if ($tasdikPara) {
+          // Sonraki paragrafı güncelle: Yer-YYYY
+          $targetPara = $tasdikPara->nextSibling; $steps=4;
+          while ($targetPara && $steps-- > 0 && !($targetPara instanceof DOMElement && $targetPara->namespaceURI === $nsW && $targetPara->localName === 'p')) {
+            $targetPara = $targetPara->nextSibling;
+          }
+          if ($targetPara instanceof DOMElement) {
+            $firstWord = '';
+            $trimBirim = trim($birim);
+            if ($trimBirim !== '') { $parts = preg_split('/\s+/', $trimBirim); $firstWord = isset($parts[0]) ? (string)$parts[0] : ''; }
+            $yerWord = tr_ucfirst(mb_strtolower($firstWord, 'UTF-8'));
+            $targetText = $yerWord . '-' . date('d-m-Y');
+            $tNodes = $xp->query('.//w:t', $targetPara);
+            if ($tNodes && $tNodes->length > 0) {
+              $tNodes->item(0)->textContent = $targetText;
+              for ($i=1; $i<$tNodes->length; $i++) { $tNodes->item($i)->textContent = ''; }
+            } else {
+              $r = $doc->createElementNS($nsW, 'w:r');
+              $t = $doc->createElementNS($nsW, 'w:t');
+              $t->appendChild($doc->createTextNode($targetText));
+              $r->appendChild($t); $targetPara->appendChild($r);
+            }
           }
         }
-        // Bir eşleşmeyle işimiz bitti — genelde tek bir "tasdik olunur" olur.
-        break;
       }
     }
   }

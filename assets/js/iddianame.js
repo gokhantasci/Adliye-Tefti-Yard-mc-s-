@@ -2,9 +2,11 @@
   "use strict";
   if (window.__iddianameBooted) return;
   window.__iddianameBooted = true;
+  
 
   const $ = (s, r=document) => r.querySelector(s);
   const PAGE_SIZE = 20;
+  const fmtInt = n => new Intl.NumberFormat("tr-TR").format(n || 0);
 
   // ---------- helpers
   function toast(type, title, body){
@@ -363,6 +365,21 @@
     if (!f){ setChosenText(""); return; }
     setChosenText(`Seçilen: ${f.name}`);
     processExcel(f).catch(err => { console.error(err); toast('danger','Okuma Hatası','Excel okunurken sorun oluştu.'); });
+	if (window.jQuery && typeof window.jQuery.getJSON === "function") {
+		  window.jQuery.getJSON("https://sayac.657.com.tr/arttirkarar", function(response) {
+			try {
+			  const adetRaw = (response && typeof response.adet !== "undefined") ? Number(response.adet) : 0;
+			  if (adetRaw > 0) {
+				const msg = `28/10/2025 tarihinden bugüne kadar ${fmtInt(adetRaw)} adet işlem yaptık.`;
+				window.toast?.({ type: "info", title: "Başarılı", body: msg, delay : 9000 });
+			  }
+			} catch (e) {
+			  console.warn("Sayaç verisi okunamadı:", e);
+			}
+		  }).fail(function() {
+			console.warn("Sayaç servisine ulaşılamadı.");
+		  });
+		}
   }
 
   if (elDrop){
