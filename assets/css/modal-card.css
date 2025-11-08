@@ -1,0 +1,18 @@
+/* === Case Modal: modal-card version === */
+.cmodal{position:fixed;inset:0;display:none;z-index:9999}
+.cmodal.is-open{display:block}
+.cm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px)}
+.modal-card{position:relative;margin:6vh auto 0;max-width:860px;background:var(--card-bg,#111);color:var(--fg,#fff);border-radius:16px;border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+[data-theme="light"] .modal-card{background:#fff;color:#111;border-color:rgba(0,0,0,.08)}
+.modal-head,.modal-foot{padding:12px 16px;display:flex;align-items:center;gap:12px}
+.modal-head{justify-content:space-between}
+.modal-head>span.material-symbols-rounded{opacity:.85}
+.modal-actions{display:flex;gap:8px;align-items:center;margin-left:auto}
+.modal-body{padding:10px 16px 16px;max-height:70vh;overflow:auto}
+.input{padding:8px 10px;border:1px solid rgba(127,127,127,.35);border-radius:10px;background:transparent;color:inherit}
+.btn{padding:8px 12px;border-radius:10px;border:0;cursor:pointer;background:var(--md-sys-color-primary,#4f46e5);color:#fff;font-weight:600}
+.btn:hover{filter:brightness(.96)}
+.btn.ghost{background:transparent;border:1px solid rgba(127,127,127,.35);color:inherit}
+.table th,.table td{padding:8px;border-bottom:1px solid rgba(0,0,0,.08)}
+[data-theme="dark"] .table th,[data-theme="dark"] .table td{border-bottom:1px solid rgba(255,255,255,.08)}
+.table thead th{font-weight:700;text-align:left;position:sticky;top:0;background:inherit}
