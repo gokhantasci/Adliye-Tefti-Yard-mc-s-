@@ -199,6 +199,37 @@ Adliye-Teftis-Yardimcisi/
 3. Otomatik hesaplamalar yapılacaktır
 4. Dökümü kopyalayabilirsiniz
 
+## 🔗 Temiz URL'ler ve Feed Desteği
+
+### Temiz URL'ler
+
+Uygulama artık `.htaccess` ile temiz URL'leri desteklemektedir:
+
+```
+Eski: https://teftis.657.com.tr/iddianame.php
+Yeni: https://teftis.657.com.tr/iddianame
+
+Eski: https://teftis.657.com.tr/istinaf.php
+Yeni: https://teftis.657.com.tr/istinaf
+```
+
+Tüm sayfalara `.php` uzantısı olmadan erişilebilir.
+
+### RSS/Atom Feed Desteği
+
+Uygulama güncellemeleri ve duyurularını takip etmek için RSS veya Atom feed kullanabilirsiniz:
+
+- **RSS Feed**: `https://teftis.657.com.tr/feed` veya `https://teftis.657.com.tr/rss`
+- **Atom Feed**: `https://teftis.657.com.tr/atom`
+
+RSS okuyucunuza bu adresleri ekleyerek güncel duyurulardan haberdar olabilirsiniz.
+
+#### Popüler RSS Okuyucular
+- Feedly (Web, Mobil)
+- Inoreader (Web, Mobil)
+- NewsBlur (Web, Mobil)
+- Outlook (Masaüstü - RSS klasörü)
+
 ## 🎨 Tema ve Tasarım
 
 Uygulama, modern ve kullanıcı dostu bir arayüze sahiptir:
@@ -238,6 +269,58 @@ Uygulama, modern ve kullanıcı dostu bir arayüze sahiptir:
 - **Kütüphaneler:**
   - SheetJS (xlsx.js) - Excel dosya işleme
   - JSZip - Zip dosya işleme
+  - TeftisUtils (utils.js) - Merkezi yardımcı fonksiyonlar
+
+### Yeni Özellikler (v1.1)
+
+#### Merkezi Yardımcı Kütüphaneler
+
+**JavaScript Utilities (`assets/js/utils.js`)**
+- `letterToIndex(col)` - Excel sütun harfini indekse çevirir
+- `escapeHtml(str)` - XSS koruması için HTML escape
+- `normalizeTurkish(str)` - Türkçe metin normalizasyonu
+- `showToast(opts)` - Bildirim gösterme
+- `toastWithIcon(type, title, msg)` - İkonlu bildirim
+- `formatNumber(n)` - Türkçe sayı formatlama
+- `formatDate(d)` - Türkçe tarih formatlama
+- `debounce(fn, delay)` - Fonksiyon debounce
+- `isExcelFile(file)` - Excel dosya kontrolü
+- `isValidAdaletEmail(email)` - @adalet.gov.tr email kontrolü
+- `extractEmail(text)` - Metinden email çıkarma
+- `formatRetryMessage(sec)` - Bekleme mesajı formatlama
+- `createElement(tag, attrs, html)` - DOM element oluşturma
+
+**PHP API Utilities (`api/utils.php`)**
+- `api_respond($ok, $data, $code)` - JSON yanıt gönder
+- `api_error($error, $code)` - Hata yanıtı gönder
+- `api_read_json($path)` - JSON dosya oku (kilit ile)
+- `api_write_json($path, $data)` - JSON dosya yaz (atomik)
+- `api_get_json_body()` - İstek gövdesinden JSON al
+- `api_generate_id($length)` - Benzersiz ID üret
+- `api_validate_required($data, $required)` - Zorunlu alanları kontrol et
+- `api_sanitize($str)` - Güvenli string temizleme
+- `api_check_method($method)` - HTTP metod kontrolü
+- `api_require_method($method)` - HTTP metod zorunluluğu
+- `api_get_client_ip()` - İstemci IP adresi al
+- `api_log($message, $level)` - API loglama
+- `api_enable_cors($origins)` - CORS başlıkları ekle
+
+#### .htaccess Performans Optimizasyonları
+
+- **Gzip Sıkıştırma**: HTML, CSS, JS, JSON, XML ve fontlar için otomatik sıkıştırma
+- **Tarayıcı Önbelleği**:
+  - HTML/PHP: 10 dakika
+  - CSS/JS: 1 hafta
+  - Görseller: 1 ay
+  - Fontlar: 1 yıl
+  - JSON/Feed: 10 dakika - 1 saat
+- **Güvenlik Başlıkları**:
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: SAMEORIGIN
+  - X-XSS-Protection: 1; mode=block
+  - Referrer-Policy: strict-origin-when-cross-origin
+- **Dizin Listelemesi**: Kapalı
+- **Hassas Dosya Koruması**: `.git`, `.env`, `.log` dosyaları korumalı
 
 ### Tarayıcı Desteği
 
@@ -300,7 +383,18 @@ Bu uygulama, adliye teftiş süreçlerini kolaylaştırmak için tüm meslektaş
 
 ## 🔄 Sürüm Geçmişi
 
-### v1.0 (Mevcut)
+### v1.1 (Güncel - 2025-11-08)
+- ✅ Merkezi JavaScript yardımcı kütüphanesi (`utils.js`)
+- ✅ Merkezi PHP API yardımcı kütüphanesi (`api/utils.php`)
+- ✅ RSS/Atom feed desteği (`/api/feed.php`, `/feed`, `/rss`, `/atom`)
+- ✅ .htaccess ile temiz URL'ler (`.php` uzantısı olmadan)
+- ✅ Performans optimizasyonları:
+  - Gzip sıkıştırma
+  - Tarayıcı önbelleği (caching)
+  - Güvenlik başlıkları
+- ✅ Kod tekrarlarının azaltılması ve okunabilirlik iyileştirmeleri
+
+### v1.0 (Önceki)
 - ✅ Tüm temel modüller
 - ✅ Excel dosya işleme
 - ✅ Tema desteği
