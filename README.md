@@ -17,6 +17,7 @@
    - Excel dosyası yükleme ve işleme
    - Zaman kontrolü ve denetim cetveli oluşturma
    - Otomatik analiz ve raporlama
+   - Word belgesi oluşturma
 
 3. **İstinaf İşlemleri**
    - İstinaf dosyalarının yönetimi
@@ -38,45 +39,127 @@
    - Tarih hesaplamaları
    - Resmi tatil günleri entegrasyonu
 
-7. **Karar Yönetimi**
+7. **Kesinleştirme**
+   - Karar kesinleştirme işlemleri
+   - Tarih ve süre hesaplamaları
+   - İtiraz süreleri takibi
+
+8. **Karar Yönetimi**
    - Karar dosyalarının yüklenmesi
    - Excel tabanlı analiz
    - KPI göstergeleri
 
-8. **Harç Tahsil Kontrolü**
+9. **Harç Tahsil Kontrolü**
    - Harç işlemlerinin kontrolü
    - Excel dosya işleme
    - Özet raporlar
 
-9. **Yargılama Gideri**
-   - Yargılama gideri hesaplamaları
-   - Detaylı form girişleri
-   - Otomatik toplam hesaplama
+10. **Yargılama Gideri**
+    - Yargılama gideri hesaplamaları
+    - Detaylı form girişleri
+    - Otomatik toplam hesaplama
 
-10. **Kanun Yolu**
+11. **Kanun Yolu**
     - Kanun yolu işlemleri
     - Görsel arayüz
     - Bilgilendirme ekranı
 
-11. **J-Robot**
+12. **J-Robot**
     - JSON dosya yükleme ve işleme
     - Vaka listesi yönetimi
     - Hatırlatma sistemi
 
-12. **Personel Hesap**
+13. **Personel Hesap**
     - Personel bilgilerinin yönetimi
     - Hesap işlemleri
     - Kullanıcı profili
+
+14. **BYU (Büro Yönetim Usulü)**
+    - BYU işlemlerinin yönetimi
+    - Excel veri analizi
+    - Rapor oluşturma
+
+15. **Duruşma Kaçağı**
+    - Duruşma kaçağı takibi
+    - Veri analizi ve raporlama
+
+16. **Tensip**
+    - Tensip işlemlerinin yönetimi
+    - Excel dosya işleme
+    - Detaylı analiz
+
+17. **Gerekçeli Karar**
+    - Gerekçeli karar takibi
+    - Excel veri analizi
+    - Word belgesi oluşturma
 
 ## 🚀 Kurulum
 
 ### Gereksinimler
 
-- PHP 7.4 veya üzeri
-- Web sunucusu (Apache/Nginx)
-- Modern web tarayıcısı (Chrome, Edge, Firefox önerilir)
+- **Geleneksel Kurulum İçin:**
+  - PHP 7.4 veya üzeri
+  - Web sunucusu (Apache/Nginx)
+  - Modern web tarayıcısı (Chrome, Edge, Firefox önerilir)
 
-### Kurulum Adımları
+- **Docker Kurulumu İçin:**
+  - Docker 20.10 veya üzeri
+  - Docker Compose 2.0 veya üzeri
+
+### 🐳 Docker ile Kurulum (Önerilen)
+
+Docker ile uygulamayı tek komutta çalıştırabilirsiniz:
+
+1. **Projeyi İndirin**
+   ```bash
+   git clone https://github.com/gokhantasci/Adliye-Teftis-Yardimcisi.git
+   cd Adliye-Teftis-Yardimcisi
+   ```
+
+2. **Environment Dosyasını Hazırlayın**
+   ```bash
+   cp .env.example .env
+   # .env dosyasını düzenleyip Gmail bilgilerinizi girin
+   ```
+
+3. **Uygulamayı Başlatın**
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Tarayıcınızda Açın**
+   - `http://localhost:8080` adresine gidin
+   - Uygulama hazır!
+
+#### Docker Komutları
+
+```bash
+# Uygulamayı başlat
+docker-compose up -d
+
+# Logları görüntüle
+docker-compose logs -f
+
+# Uygulamayı durdur
+docker-compose down
+
+# Uygulamayı yeniden başlat
+docker-compose restart
+
+# Container'a bağlan
+docker exec -it adliye-teftis bash
+```
+
+#### Docker Avantajları
+
+✅ Tek komut ile kurulum  
+✅ Tüm bağımlılıklar otomatik yüklenir  
+✅ PHP, Apache, tüm extensions hazır  
+✅ İzolasyonlu çalışma ortamı  
+✅ Port çakışması yok (8080 portu kullanılır)  
+✅ Kolay yedekleme ve taşıma  
+
+### 💻 Geleneksel Kurulum
 
 1. **Projeyi İndirin**
    ```bash
@@ -94,7 +177,14 @@
    chmod 777 data/
    ```
 
-4. **Uygulamayı Başlatın**
+4. **Environment Variables Ayarlayın**
+   - Gmail SMTP için environment variables tanımlayın:
+   ```bash
+   export GMAIL_USER="your-email@gmail.com"
+   export GMAIL_APP_PASSWORD="your-app-password"
+   ```
+
+5. **Uygulamayı Başlatın**
    - Tarayıcınızda `http://localhost/Adliye-Teftis-Yardimcisi` adresine gidin
    - veya doğrudan `teftis.657.com.tr` adresini kullanın
 
@@ -104,15 +194,21 @@
 Adliye-Teftis-Yardimcisi/
 ├── index.php                 # Ana sayfa
 ├── iddianame.php            # İddianame modülü
+├── gerekcelikarar.php       # Gerekçeli karar modülü
 ├── istinaf.php              # İstinaf modülü
 ├── temyiz.php               # Temyiz modülü
 ├── kesinlesme.php           # Kesinleşme modülü
 ├── kesinlesmek.php          # Kesinleşmek modülü
 ├── kesinlesme-kontrol.php   # Kesinleşme kontrolü
+├── kesinlestirme.php        # Kesinleştirme modülü
 ├── karar.php                # Karar yönetimi
 ├── harctahsilkontrol.php    # Harç tahsil kontrolü
 ├── yargilamagideri.php      # Yargılama gideri
+├── kanunyolu.php            # Kanun yolu modülü
 ├── jrobot.php               # J-Robot modülü
+├── byu.php                  # BYU modülü
+├── durusmakacagi.php        # Duruşma kaçağı modülü
+├── tensip.php               # Tensip modülü
 ├── personel_hesap.php       # Personel hesap modülü
 ├── assets/                  # Statik dosyalar
 │   ├── css/                 # Stil dosyaları
@@ -123,16 +219,22 @@ Adliye-Teftis-Yardimcisi/
 │   └── js/                  # JavaScript dosyaları
 │       ├── app.js           # Ana uygulama scripti
 │       ├── g-global.js      # Global fonksiyonlar
+│       ├── utils.js         # Merkezi yardımcı fonksiyonlar
 │       ├── iddianame.js     # İddianame işlemleri
+│       ├── gerekcelikarar.js # Gerekçeli karar işlemleri
 │       ├── istinaf.js       # İstinaf işlemleri
 │       ├── temyiz.js        # Temyiz işlemleri
 │       ├── kesinlesme.js    # Kesinleşme işlemleri
 │       ├── kesinlesme-kontrol.js
+│       ├── kesinlestirme.js # Kesinleştirme işlemleri
 │       ├── karar-upload.js  # Karar yükleme
 │       ├── karar-excel-kpis.js
 │       ├── harc-tahsil.js   # Harç tahsil
 │       ├── yargilamagideri.js
 │       ├── kanunyolu.js     # Kanun yolu
+│       ├── byu.js           # BYU işlemleri
+│       ├── durusmakacagi.js # Duruşma kaçağı
+│       ├── tensip.js        # Tensip işlemleri
 │       ├── jrobot.js        # J-Robot
 │       ├── modal-card.js    # Modal yönetimi
 │       ├── modal-click.js   # Modal etkileşimler
@@ -322,6 +424,47 @@ Uygulama, modern ve kullanıcı dostu bir arayüze sahiptir:
 - **Dizin Listelemesi**: Kapalı
 - **Hassas Dosya Koruması**: `.git`, `.env`, `.log` dosyaları korumalı
 
+### Kod Kalitesi ve Standartları
+
+#### ESLint Konfigürasyonu
+
+Proje artık ESLint ile kod kalitesi kontrolü yapmaktadır:
+
+```bash
+# JavaScript dosyalarını kontrol et
+npm run lint
+
+# Otomatik düzeltme
+npm run lint:fix
+```
+
+**Kurallar:**
+- ES6+ standartları
+- Tek tırnak kullanımı (strings)
+- 2 boşluk indentasyon
+- Noktalı virgül zorunlu
+- console.log kullanımı uyarı
+- debugger kullanımı yasak
+- Kullanılmayan değişkenler uyarı
+
+#### Güvenlik
+
+- ✅ **Şifre ve Kimlik Bilgileri**: Tüm hassas bilgiler environment variables ile yönetilir
+- ✅ **XSS Koruması**: HTML escape fonksiyonları (`escapeHtml`)
+- ✅ **CSRF Koruması**: API isteklerinde token doğrulama
+- ✅ **Rate Limiting**: E-posta gönderimi için sıkı limit (60 saniye ve 10 dakika pencereleri)
+- ✅ **Input Sanitization**: Tüm kullanıcı girişleri temizlenir
+- ✅ **Güvenli E-posta**: Sadece @adalet.gov.tr adresleri kabul edilir
+
+#### Performans Optimizasyonları
+
+- ✅ **Gzip Sıkıştırma**: Tüm metin tabanlı dosyalar sıkıştırılır
+- ✅ **Browser Caching**: Statik dosyalar için uzun süreli önbellekleme
+- ✅ **Async Loading**: JavaScript dosyaları asenkron yüklenir
+- ✅ **Lazy Loading**: Görseller ve ağır içerikler gerektiğinde yüklenir
+- ✅ **Minification**: Üretim için minified kütüphaneler kullanılır
+
+
 ### Tarayıcı Desteği
 
 - ✅ Chrome 90+
@@ -383,7 +526,28 @@ Bu uygulama, adliye teftiş süreçlerini kolaylaştırmak için tüm meslektaş
 
 ## 🔄 Sürüm Geçmişi
 
-### v1.1 (Güncel - 2025-11-08)
+### v1.2 (Güncel - 2025-11-09)
+- ✅ **ESLint Entegrasyonu**: JavaScript kod kalitesi kontrolü
+  - Flat config (ESLint v9+) kullanımı
+  - 0 hata, 243 uyarı (optimum seviye)
+  - Otomatik kod düzeltme desteği
+- ✅ **Güvenlik İyileştirmeleri**:
+  - Tüm proje tarandı, şifre/kimlik bilgisi yok
+  - Environment variables kullanımı doğrulandı
+  - XSS koruması güçlendirildi
+- ✅ **Kod Kalitesi**:
+  - Syntax hataları düzeltildi (wire-excel-input.js, yargilamagideri.js)
+  - 385+ stil sorunu otomatik düzeltildi
+  - Tutarlı kod stili (quotes, spacing, indentation)
+- ✅ **Performans**:
+  - Kod optimizasyonları
+  - Gereksiz console.log ifadeleri işaretlendi
+- ✅ **Dokümantasyon**:
+  - README tam güncellendi
+  - Tüm modüller listelendi (BYU, Duruşma Kaçağı, Tensip, vb.)
+  - Kod kalitesi standartları eklendi
+
+### v1.1 (2025-11-08)
 - ✅ Merkezi JavaScript yardımcı kütüphanesi (`utils.js`)
 - ✅ Merkezi PHP API yardımcı kütüphanesi (`api/utils.php`)
 - ✅ RSS/Atom feed desteği (`/api/feed.php`, `/feed`, `/rss`, `/atom`)
@@ -412,4 +576,4 @@ Bu uygulama, adliye teftiş süreçlerini kolaylaştırmak için tüm meslektaş
 
 ---
 
-**Son Güncelleme:** 2025-11-08
+**Son Güncelleme:** 2025-11-09
