@@ -470,7 +470,36 @@ Bu uygulama, adliye teftiş süreçlerini kolaylaştırmak için tüm meslektaş
 
 ## 🔄 Sürüm Geçmişi
 
-### v1.1 (Güncel - 2025-11-08)
+### v1.2 (Güncel - 2025-11-09)
+- ✅ **ESLint entegrasyonu ve kod kalitesi**
+  - ESLint yapılandırması eklendi
+  - Tüm console statements kaldırıldı (54 adet)
+  - 1000+ formatlama hatası düzeltildi
+  - Syntax hataları giderildi
+- ✅ **Docker desteği**
+  - Tek komutla deployment (`docker-compose up -d`)
+  - PHP 8.2 + Apache image
+  - Environment variables ile konfigürasyon
+  - Health check eklendi
+- ✅ **Güvenlik iyileştirmeleri**
+  - Credential taraması yapıldı (hardcoded yok)
+  - Veri sızıntısı kontrolü (sorun yok)
+  - Environment variables kullanımı doğrulandı
+- ✅ **Performans testi**
+  - test-performance.sh script eklendi
+  - Tüm sayfalar < 150ms
+  - Performans benchmarks dokümante edildi
+- ✅ **Türkçe dil kalitesi**
+  - Tüm mesajlar gözden geçirildi
+  - Resmi ve profesyonel dil kullanımı
+  - Tutarlı terminoloji
+- ✅ **Dokümantasyon güncellemeleri**
+  - Docker kurulum kılavuzu
+  - Performans test sonuçları
+  - Geliştirme araçları dokümantasyonu
+  - CHANGELOG-v1.2.md eklendi
+
+### v1.1 (2025-11-08)
 - ✅ Merkezi JavaScript yardımcı kütüphanesi (`utils.js`)
 - ✅ Merkezi PHP API yardımcı kütüphanesi (`api/utils.php`)
 - ✅ RSS/Atom feed desteği (`/api/feed.php`, `/feed`, `/rss`, `/atom`)
@@ -481,7 +510,7 @@ Bu uygulama, adliye teftiş süreçlerini kolaylaştırmak için tüm meslektaş
   - Güvenlik başlıkları
 - ✅ Kod tekrarlarının azaltılması ve okunabilirlik iyileştirmeleri
 
-### v1.0 (Önceki)
+### v1.0 (İlk Sürüm)
 - ✅ Tüm temel modüller
 - ✅ Excel dosya işleme
 - ✅ Tema desteği
@@ -491,12 +520,13 @@ Bu uygulama, adliye teftiş süreçlerini kolaylaştırmak için tüm meslektaş
 - ✅ E-posta entegrasyonu
 
 ### Gelecek Sürümler
+- 🔜 Unit testler (Jest/Mocha)
+- 🔜 CI/CD pipeline (GitHub Actions)
 - 🔜 Gelişmiş raporlama
 - 🔜 PDF export özelliği
 - 🔜 Kullanıcı yetkilendirme sistemi
 - 🔜 Veritabanı entegrasyonu
-- 🔜 REST API
 
 ---
 
-**Son Güncelleme:** 2025-11-08
+**Son Güncelleme:** 2025-11-09
