@@ -21,7 +21,7 @@
 })();
 function $(s){ return document.querySelector(s); }
 function text(el,v){ if(el) el.textContent=String(v); }
-function nonEmpty(v){ return v!==null && v!==undefined && String(v).trim()!==""; }
+function nonEmpty(v){ return v!==null && v!==undefined && String(v).trim()!==''; }
 function toNum(v){ if(v==null) return 0; var n=parseFloat(String(v).replace(',','.')); return isNaN(n)?0:n; }
 function siteAddress(){ try{return location.origin||(location.protocol+'//'+location.host);}catch(_){return 'https://657.com.tr';} }
 function yearFromCell(v){
@@ -252,13 +252,13 @@ function getJudgeKeysForRow(r, IDX){
  * =============================== */
 function _decideTypeByIDX(r, IDX){
   var o=toNum(r[IDX.o]), p=toNum(r[IDX.p]), t=toNum(r[IDX.t]), m=toNum(r[IDX.m]), q=toNum(r[IDX.q]), z=toNum(r[IDX.z]);
-  if(o>0) return "Mahkumiyet";
-  if(p>0) return "HAGB";
-  if(t>0) return "Gör/Yet/Birleş";
-  if(m>0) return "Beraat";
-  if(q>0) return "Red";
-  if(z>0) return "Tazminat";
-  return "Düşme/Cvyo/Diğer";
+  if(o>0) return 'Mahkumiyet';
+  if(p>0) return 'HAGB';
+  if(t>0) return 'Gör/Yet/Birleş';
+  if(m>0) return 'Beraat';
+  if(q>0) return 'Red';
+  if(z>0) return 'Tazminat';
+  return 'Düşme/Cvyo/Diğer';
 }
 function _hasJudgeForRow(rr, IDX){
   function _ne(x){ return x!=null && String(x).trim()!==''; }
@@ -392,16 +392,16 @@ function renderNoJudgeAlert_afterUpload(missingCount){
  * 7) Excel İşlemleri + Rapor Render
  * =============================== */
 (function(){
-  function getLetterFromInput(id,fb){ var el=document.getElementById(id); var v=el&&el.value?(""+el.value).trim():""; return v||fb||""; }
+  function getLetterFromInput(id,fb){ var el=document.getElementById(id); var v=el&&el.value?(''+el.value).trim():''; return v||fb||''; }
   function getIDXFromSettings(){
-    var map={ i:getLetterFromInput("col_i","I"), j:getLetterFromInput("col_j","J"), k:getLetterFromInput("col_k","K"),
-      l:getLetterFromInput("col_l","L"), m:getLetterFromInput("col_m","M"), o:getLetterFromInput("col_o","O"),
-      p:getLetterFromInput("col_p","P"), q:getLetterFromInput("col_q","Q"), t:getLetterFromInput("col_t","T"),
-      z:getLetterFromInput("col_z","Z"), h:getLetterFromInput("col_h","H") /* H okunur ama KULLANILMAZ */ };
+    var map={ i:getLetterFromInput('col_i','I'), j:getLetterFromInput('col_j','J'), k:getLetterFromInput('col_k','K'),
+      l:getLetterFromInput('col_l','L'), m:getLetterFromInput('col_m','M'), o:getLetterFromInput('col_o','O'),
+      p:getLetterFromInput('col_p','P'), q:getLetterFromInput('col_q','Q'), t:getLetterFromInput('col_t','T'),
+      z:getLetterFromInput('col_z','Z'), h:getLetterFromInput('col_h','H') /* H okunur ama KULLANILMAZ */ };
     var IDX={},k; for(k in map) IDX[k]=letterToIndex(map[k]); return IDX;
   }
   function allNumeric(arr){ var vals=[],i; for(i=0;i<arr.length;i++){ var v=arr[i]; if(nonEmpty(v)) vals.push(v); } if(vals.length===0) return false; for(i=0;i<vals.length;i++){ if(!(/^\s*\d+(,\d+|\.\d+)?\s*$/.test(String(vals[i])))) return false; } return true; }
-  function uniqueNonEmpty(list){ var seen={},c=0,i,s; for(i=0;i<list.length;i++){ s=String(list[i]||"").trim(); if(s && !seen[s]){ seen[s]=1; c++; } } return c; }
+  function uniqueNonEmpty(list){ var seen={},c=0,i,s; for(i=0;i<list.length;i++){ s=String(list[i]||'').trim(); if(s && !seen[s]){ seen[s]=1; c++; } } return c; }
   function updateKPIs(total,savciCount,hakimCount){ text($('#kpiTotal'),total); text($('#kpiSavci'),savciCount); text($('#kpiHakim'),hakimCount); }
 
   function buildResultCard(total,savciCount,hakimCount,info){
@@ -591,13 +591,13 @@ function renderNoJudgeAlert_afterUpload(missingCount){
 
     function decideType(r){
       var o=toNum(r[IDX.o]), p=toNum(r[IDX.p]), t=toNum(r[IDX.t]), m=toNum(r[IDX.m]), q=toNum(r[IDX.q]), z=toNum(r[IDX.z]);
-      if(o>0) return "Mahkumiyet";
-      if(p>0) return "HAGB";
-      if(t>0) return "Gör/Yet/Birleş";
-      if(m>0) return "Beraat";
-      if(q>0) return "Red";
-      if(z>0) return "Tazminat";
-      return "Düşme/Cvyo/Diğer";
+      if(o>0) return 'Mahkumiyet';
+      if(p>0) return 'HAGB';
+      if(t>0) return 'Gör/Yet/Birleş';
+      if(m>0) return 'Beraat';
+      if(q>0) return 'Red';
+      if(z>0) return 'Tazminat';
+      return 'Düşme/Cvyo/Diğer';
     }
 
     // Kolonları SADECE I,J,K içeriğine göre oluştur
@@ -605,7 +605,7 @@ function renderNoJudgeAlert_afterUpload(missingCount){
     for(var j=0;j<used.length;j++){
       var keys=getJudgeKeysForRow(used[j], IDX);
       for(var u=0;u<keys.length;u++){
-        var key=String(keys[u]||"").trim();
+        var key=String(keys[u]||'').trim();
         if(key && !seen[key]){ seen[key]=1; cols.push(key); }
       }
     }
@@ -615,9 +615,9 @@ function renderNoJudgeAlert_afterUpload(missingCount){
     for(var r=0;r<used.length;r++){ var d=dateFromCell(used[r][eIdx]); if(!d) continue; if(!minD||d<minD) minD=d; if(!maxD||d>maxD) maxD=d; }
 
     function buildGrid(rows){
-      var TYPES=["Mahkumiyet","Beraat","Düşme/Cvyo/Diğer","Zamanaşımı","HAGB","Gör/Yet/Birleş","Red","Tazminat"];
-      var grid={}; TYPES.forEach(function(t){grid[t]={};}); grid["Toplam"]={};
-      var EMPTY="__EMPTY__";
+      var TYPES=['Mahkumiyet','Beraat','Düşme/Cvyo/Diğer','Zamanaşımı','HAGB','Gör/Yet/Birleş','Red','Tazminat'];
+      var grid={}; TYPES.forEach(function(t){grid[t]={};}); grid['Toplam']={};
+      var EMPTY='__EMPTY__';
       for(var i=0;i<rows.length;i++){
         var r=rows[i], t=decideType(r), keys=getJudgeKeysForRow(r,IDX);
         if(keys.length===0) keys=[EMPTY];
@@ -629,20 +629,20 @@ function renderNoJudgeAlert_afterUpload(missingCount){
 
       // aktif filtre varsa sıfır sütunları gizle + toast
       (function(){
-        var sVal=(($('#startDate')||{}).value)||"", eVal=(($('#endDate')||{}).value)||"", sic=(($('#searchSicil')||{}).value)||"";
+        var sVal=(($('#startDate')||{}).value)||'', eVal=(($('#endDate')||{}).value)||'', sic=(($('#searchSicil')||{}).value)||'';
         var filtered=!!(sVal||eVal||sic.trim());
         if(filtered && window.toast){
           var parts=[];
-          if(sVal||eVal){ parts.push("tarih aralığı ("+ fmtDMYstr(sVal||"") + " - " + fmtDMYstr(eVal||"") + ")"); }
-          if(sic) parts.push("sicil ("+sic+")");
+          if(sVal||eVal){ parts.push('tarih aralığı ('+ fmtDMYstr(sVal||'') + ' - ' + fmtDMYstr(eVal||'') + ')'); }
+          if(sic) parts.push('sicil ('+sic+')');
           window.toast({type:'info',title:'Filtre uygulandı',body:parts.length?('Filtre: '+parts.join(', ')):'Kriterlere göre filtre uygulandı.'});
         }
         if(!filtered) return;
-        var keep=[]; for(var c=0;c<outCols.length;c++){ var key=outCols[c], sum=0; for(var t in grid){ if(t!=="Toplam") sum+=(grid[t][key]||0); } if(sum>0) keep.push(key); }
+        var keep=[]; for(var c=0;c<outCols.length;c++){ var key=outCols[c], sum=0; for(var t in grid){ if(t!=='Toplam') sum+=(grid[t][key]||0); } if(sum>0) keep.push(key); }
         if(keep.length) outCols=keep;
       })();
 
-      grid["Toplam"]={}; outCols.forEach(function(k){ var s=0; for(var t in grid){ if(t!=="Toplam") s+=(grid[t][k]||0); } grid["Toplam"][k]=s; });
+      grid['Toplam']={}; outCols.forEach(function(k){ var s=0; for(var t in grid){ if(t!=='Toplam') s+=(grid[t][k]||0); } grid['Toplam'][k]=s; });
       return {grid:grid, columns:outCols, EMPTY_KEY:EMPTY};
     }
 
@@ -681,8 +681,8 @@ function renderNoJudgeAlert_afterUpload(missingCount){
       var built=buildGrid(rows);
       var grid=built.grid, outCols=built.columns, EMPTY=built.EMPTY_KEY;
 
-      var card=document.getElementById("result-card"); if(!card) return;
-      var body=document.createElement("div"); body.className="panel-body";
+      var card=document.getElementById('result-card'); if(!card) return;
+      var body=document.createElement('div'); body.className='panel-body';
 
       // başlık ve araçlar
       var h='';
@@ -712,7 +712,7 @@ function renderNoJudgeAlert_afterUpload(missingCount){
         h+='<th'+cls+'>'+label+'</th>';
       }
       h+='</tr></thead><tbody>';
-      var ORDER=["Mahkumiyet","Beraat","Düşme/Cvyo/Diğer","Zamanaşımı","HAGB","Gör/Yet/Birleş","Red","Tazminat","Toplam"];
+      var ORDER=['Mahkumiyet','Beraat','Düşme/Cvyo/Diğer','Zamanaşımı','HAGB','Gör/Yet/Birleş','Red','Tazminat','Toplam'];
       for(var rix=0; rix<ORDER.length; rix++){
         var rowT=ORDER[rix];
         h+='<tr><td>'+rowT+'</td>';
@@ -761,13 +761,13 @@ function renderNoJudgeAlert_afterUpload(missingCount){
           return Array.from(new Set(headers));
         }
         var headers=getHeaders();
-        function refreshList(q){ dl.innerHTML=''; if(!q||q.length<1) return; var ql=q.toLocaleLowerCase('tr'); headers.filter(function(h){return h.toLocaleLowerCase('tr').includes(ql)}).slice(0,50).forEach(function(h){ var opt=document.createElement('option'); opt.value=h; dl.appendChild(opt); }); }
+        function refreshList(q){ dl.innerHTML=''; if(!q||q.length<1) return; var ql=q.toLocaleLowerCase('tr'); headers.filter(function(h){return h.toLocaleLowerCase('tr').includes(ql);}).slice(0,50).forEach(function(h){ var opt=document.createElement('option'); opt.value=h; dl.appendChild(opt); }); }
         input.addEventListener('input',function(e){ headers=getHeaders(); refreshList(e.target.value); });
         input.addEventListener('keydown',function(e){
           if(e.key==='Enter'){
             e.preventDefault();
             var val=normalizeHeaderLabel(input.value.trim());
-            var ok=headers.some(function(h){return h.toLocaleLowerCase('tr')===val.toLocaleLowerCase('tr')});
+            var ok=headers.some(function(h){return h.toLocaleLowerCase('tr')===val.toLocaleLowerCase('tr');});
             if(!ok){ if(window.toast) window.toast({type:'error',title:'Başlık bulunamadı',body:'Girdiğiniz "'+val+'" sütun başlıkları arasında yok.'}); else alert('Başlık yok'); return; }
             if(fBtn) fBtn.click();
           }
@@ -831,15 +831,15 @@ function renderNoJudgeAlert_afterUpload(missingCount){
 // Kısaltma
 function nFormatter(num, digits){
   var si = [
-    {v: 1E9, s: "B"},   // milyar
-    {v: 1E6, s: "M"},   // milyon
-    {v: 1E3, s: "B."},  // bin
-    {v: 1,   s: ""}
+    {v: 1E9, s: 'B'},   // milyar
+    {v: 1E6, s: 'M'},   // milyon
+    {v: 1E3, s: 'B.'},  // bin
+    {v: 1,   s: ''}
   ];
   var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
   num = Number(num)||0;
   for (var i = 0; i < si.length; i++) {
-    if (num >= si[i].v) return (num / si[i].v).toFixed(digits).replace(rx, "$1") + si[i].s;
+    if (num >= si[i].v) return (num / si[i].v).toFixed(digits).replace(rx, '$1') + si[i].s;
   }
   return String(num);
 }

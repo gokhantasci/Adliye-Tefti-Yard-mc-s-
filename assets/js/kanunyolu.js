@@ -1,16 +1,16 @@
 (() => {
-    "use strict";
+    'use strict';
 
     const $ = (s, r = document) => r.querySelector(s);
 
     // ---- DOM elemanları
-    const dropZone = $("#dropZone");
-    const fileInput = $("#fileInput");
-    const hintEl = $("#selectedFilesHint");
-    const statsBody = $("#cardUstSol .panel-body"); // KPI & karar türleri (üst sağ)
+    const dropZone = $('#dropZone');
+    const fileInput = $('#fileInput');
+    const hintEl = $('#selectedFilesHint');
+    const statsBody = $('#cardUstSol .panel-body'); // KPI & karar türleri (üst sağ)
 
     // ---- Sabitler
-    const REQUIRED_SHEET = "czmIstinafDefteriRaporu";
+    const REQUIRED_SHEET = 'czmIstinafDefteriRaporu';
     const pageSize = 20;
 
     // ---- Durum
@@ -19,13 +19,13 @@
 
     // ---- Yardımcılar
     const escapeHtml = s => String(s).replace(/[&<>"']/g, m => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
     } [m]));
-    const normalize = s => String(s ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+    const normalize = s => String(s ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
 
     const letterToIndex = L => {
         L = String(L).toUpperCase().trim();
@@ -35,7 +35,7 @@
     };
 
     function iconFor(type) {
-        return type === "success" ? "check_circle" : type === "warning" ? "warning" : type === "danger" ? "error" : "info";
+        return type === 'success' ? 'check_circle' : type === 'warning' ? 'warning' : type === 'danger' ? 'error' : 'info';
     }
 
     function toastWithIcon(type, title, msg, delay = 5000) {
@@ -53,16 +53,16 @@
     function isExcelFile(f) {
         if (!f || !f.name) return false;
         const n = f.name.toLowerCase();
-        return n.endsWith(".xls") || n.endsWith(".xlsx");
+        return n.endsWith('.xls') || n.endsWith('.xlsx');
     }
 	
 	function isRedOrRet(netice){
-	  return /^\s*re[dt]\s*-\s*/i.test(String(netice||""));
+	  return /^\s*re[dt]\s*-\s*/i.test(String(netice||''));
 	}
 	
 	function extractReasonFromNetice(netice){
-	  const m = String(netice||"").match(/^\s*re[dt]\s*-\s*(.+)$/i);
-	  return m ? m[1].trim() : "";
+	  const m = String(netice||'').match(/^\s*re[dt]\s*-\s*(.+)$/i);
+	  return m ? m[1].trim() : '';
 	}
 	
 	function renderKesinKararTablo(items){
@@ -70,19 +70,19 @@
 	  const rows = (items||[]).filter(it => isRedOrRet(it.netice));
 
 	  // Kart konumu: KPI grid’in hemen altı (Alt Sol kartının body’si)
-	  const hostCard = document.querySelector("#cardAltSol .card-body");
+	  const hostCard = document.querySelector('#cardAltSol .card-body');
 	  if (!hostCard) return;
 
 	  // Eski kartı sil, temiz kur
-	  let card = document.getElementById("kesinKararCard");
+	  let card = document.getElementById('kesinKararCard');
 	  if (card) card.remove();
 
-	  card = document.createElement("section");
-	  card.className = "panel";
-	  card.id = "kesinKararCard";
-	  card.style.marginTop = "0.5rem"; // 🔹 üstten boşluk
+	  card = document.createElement('section');
+	  card.className = 'panel';
+	  card.id = 'kesinKararCard';
+	  card.style.marginTop = '0.5rem'; // 🔹 üstten boşluk
 
-	  const labelText = "1-  Karar kesin olmasına veya öngörülen süre dolmasına rağmen kanun yolu merciine (Yargıtay veya Bölge Adliye Mahkemesi) gönderilen dosyalar";
+	  const labelText = '1-  Karar kesin olmasına veya öngörülen süre dolmasına rağmen kanun yolu merciine (Yargıtay veya Bölge Adliye Mahkemesi) gönderilen dosyalar';
 
 	  card.innerHTML = `
 	  <div class="panel-head" style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">
@@ -103,7 +103,7 @@
 		  </thead>
 		  <tbody></tbody>
 		</table>
-		${rows.length ? "" : `<div class="muted">Uygun kayıt bulunamadı.</div>`}
+		${rows.length ? '' : `<div class="muted">Uygun kayıt bulunamadı.</div>`}
 	  </div>
 	`;
 
@@ -111,22 +111,22 @@
 	  //const kpiGrid = hostCard.querySelector(".kpi-grid");
 	  //if (kpiGrid) kpiGrid.insertAdjacentElement("afterend", card);
 	  //else hostCard.appendChild(card);
-	  const gokhan = document.getElementById("gokhan");
-	  gokhan.insertAdjacentElement("afterend", card);
+	  const gokhan = document.getElementById('gokhan');
+	  gokhan.insertAdjacentElement('afterend', card);
 
 	  if (!rows.length) return;
 
-	  const tbody = card.querySelector("#kesinKararTable tbody");
+	  const tbody = card.querySelector('#kesinKararTable tbody');
 	  tbody.innerHTML = rows.map((it, idx) => {
-		const reason = extractReasonFromNetice(it.netice) || it.netice || "";
+		const reason = extractReasonFromNetice(it.netice) || it.netice || '';
 		return `
 		  <tr>
 			<td class="num">${idx+1}</td>
-			<td>${(it.esasNo||"")}</td>
-			<td>${(it.kararNo||"")}</td>
+			<td>${(it.esasNo||'')}</td>
+			<td>${(it.kararNo||'')}</td>
 			<td>${reason}</td>
 		  </tr>`;
-	  }).join("");
+	  }).join('');
 	  const btnCopyKesin = card.querySelector('#btnCopyKesin');
 		if (btnCopyKesin){
 		  btnCopyKesin.addEventListener('click', () => copyTableBodyToClipboard('kesinKararTable'));
@@ -136,9 +136,9 @@
 	
 	
 	
-    const isEsasOrKararNo = v => /^\s*\d{4}\/\d{1,6}\s*$/.test(String(v || ""));
+    const isEsasOrKararNo = v => /^\s*\d{4}\/\d{1,6}\s*$/.test(String(v || ''));
     const isDateLike = v => {
-        const s = String(v || "").trim();
+        const s = String(v || '').trim();
         return /^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/.test(s) || /^\d{4}-\d{2}-\d{2}$/.test(s);
     };
 
@@ -160,8 +160,8 @@
     }
 
     function extractDosyaNoFromD(text) {
-        const m = String(text || "").match(/(\d{4}\/\d{1,6})/);
-        return m ? m[1] : "";
+        const m = String(text || '').match(/(\d{4}\/\d{1,6})/);
+        return m ? m[1] : '';
     }
 	
 	async function copyTableBodyToClipboard(tableId){
@@ -211,24 +211,24 @@
 	  const notSentRows = (items||[]).filter(it => {
 		// net kontrol: mevcut classifyItem ile uyuşsun
 		const c = classifyItem({ oRaw: it.oRaw, netice: it.netice });
-		return c && c.bucket === "not_sent";
+		return c && c.bucket === 'not_sent';
 	  });
 
 	  // Hedef: kesinKararCard'ın hemen altı; yoksa Alt Sol kart body
-	  const hostBody = document.querySelector("#cardAltSol .card-body");
+	  const hostBody = document.querySelector('#cardAltSol .card-body');
 	  if (!hostBody) return;
 
 	  // Eski kart varsa temizle
-	  let card = document.getElementById("notSentCard");
+	  let card = document.getElementById('notSentCard');
 	  if (card) card.remove();
 
 	  // Yeni kart
-	  card = document.createElement("section");
-	  card.className = "panel";
-	  card.id = "notSentCard";
-	  card.style.marginTop = "1rem"; // KPI/üst karttan nefes payı
+	  card = document.createElement('section');
+	  card.className = 'panel';
+	  card.id = 'notSentCard';
+	  card.style.marginTop = '1rem'; // KPI/üst karttan nefes payı
 
-	  const label = "2- Kanun yolu merciine (Yargıtay veya Bölge Adliye Mahkemesi) henüz gönderilmeyen dosyalar;";
+	  const label = '2- Kanun yolu merciine (Yargıtay veya Bölge Adliye Mahkemesi) henüz gönderilmeyen dosyalar;';
 
 	  card.innerHTML = `
 	  <div class="panel-head" style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">
@@ -249,26 +249,26 @@
 		  </thead>
 		  <tbody></tbody>
 		</table>
-		${notSentRows.length ? "" : `<div class="muted">Uygun kayıt bulunamadı.</div>`}
+		${notSentRows.length ? '' : `<div class="muted">Uygun kayıt bulunamadı.</div>`}
 	  </div>
 	`;
 
 	  // kesinKararCard'ın hemen altına yerleştir
-	  const kesin = document.getElementById("gokhan");
-	  if (kesin) kesin.insertAdjacentElement("afterend", card);
+	  const kesin = document.getElementById('gokhan');
+	  if (kesin) kesin.insertAdjacentElement('afterend', card);
 	  else hostBody.appendChild(card);
 
 	  if (!notSentRows.length) return;
 
-	  const tbody = card.querySelector("#notSentTable tbody");
+	  const tbody = card.querySelector('#notSentTable tbody');
 	  tbody.innerHTML = notSentRows.map((it, idx) => `
 		<tr>
 		  <td class="num">${idx+1}</td>
-		  <td>${escapeHtml(it.esasNo || "")}</td>
-		  <td>${escapeHtml(it.kararNo || "")}</td>
-		  <td>${escapeHtml(it.istinafDilekceTarihi || "")}</td>
+		  <td>${escapeHtml(it.esasNo || '')}</td>
+		  <td>${escapeHtml(it.kararNo || '')}</td>
+		  <td>${escapeHtml(it.istinafDilekceTarihi || '')}</td>
 		</tr>
-	  `).join("");
+	  `).join('');
 	  
 	  const btnCopyNotSent = card.querySelector('#btnCopyNotSent');
 		if (btnCopyNotSent){
@@ -279,13 +279,13 @@
 
     // O sütununu okunabilir, standart netice cümlesine çevirir
     function deriveNeticeFromO(text) {
-        const raw = String(text || "").trim();
+        const raw = String(text || '').trim();
         if (!raw)
-            return "İstinaf Dilekçesi verilmiş, başvuru değerlendirilmemiş";
+            return 'İstinaf Dilekçesi verilmiş, başvuru değerlendirilmemiş';
 
         // 1) Tam "Kabul"
         if (/^\s*kabul\s*$/i.test(raw))
-            return "İstinaf Dilekçesi verilmiş, başvuru kabul edilmiş";
+            return 'İstinaf Dilekçesi verilmiş, başvuru kabul edilmiş';
 
         // 2) "Kabul - ... Ceza Dairesi'ne Gönderilmiştir." → incelemede
         if (/^\s*kabul\s*-\s*/i.test(raw) && /ceza\s*dairesi.*gönderilmiştir/i.test(raw)) {
@@ -295,7 +295,7 @@
                 const daire = m[2];
                 return `${il} Bölge Adliye Mahkemesi ${daire}. Ceza Dairesinde incelemede`;
             }
-            return "Bölge Adliye Mahkemesinde incelemede";
+            return 'Bölge Adliye Mahkemesinde incelemede';
         }
 
         // 3) Red - ... (sebep değişken olabilir) → olduğu gibi döndür
@@ -310,27 +310,27 @@
         if (m2) {
             const il = m2[1].trim();
             const daire = m2[2];
-            const kararMetni = m2[3].replace(/\s+/g, " ").trim();
+            const kararMetni = m2[3].replace(/\s+/g, ' ').trim();
             return `${il} Bölge Adliye Mahkemesi ${daire}. Ceza Dairesi ${kararMetni} kararı vermiştir.`;
         }
 
         // 4.5) “<il> BAM <n>. Ceza Dairesi İstinaf Başvurusunun Reddi kararı vermiştir.” → Red - ...
         if (/([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\s+bölge\s+adliye\s+mahkemesi\s*\d+\.\s*ceza\s*dairesi.*istinaf\s*başvurusunun\s*reddi\s*kararı\s*vermiştir/i.test(raw)) {
-            return "Red - İstinaf Başvurusunun Reddi";
+            return 'Red - İstinaf Başvurusunun Reddi';
         }
 
         // 5) Bilinen kısa kalıplar
         if (/hükmün\s*bozulması/i.test(raw))
-            return "Hükmün Bozulması kararı verilmiş";
+            return 'Hükmün Bozulması kararı verilmiş';
 
         if (/esastan\s*reddi/i.test(raw))
-            return "İstinaf Başvurusunun Esastan Reddine kararı verilmiş";
+            return 'İstinaf Başvurusunun Esastan Reddine kararı verilmiş';
 
         if (/düzelterek\s*onama/i.test(raw))
-            return "Düzelterek Onama kararı verilmiş";
+            return 'Düzelterek Onama kararı verilmiş';
 
         if (/\bonama\b/i.test(raw))
-            return "Onama kararı verilmiş";
+            return 'Onama kararı verilmiş';
 
         // 6) Varsayılan olarak metni olduğu gibi döndür
         return raw;
@@ -339,12 +339,12 @@
 
 
     function parseDosyaNoKey(s) {
-        const m = String(s || "").match(/(\d{4})\/(\d{1,6})/);
+        const m = String(s || '').match(/(\d{4})\/(\d{1,6})/);
         return m ? [parseInt(m[1]), parseInt(m[2])] : [0, 0];
     }
 
     function renderRaporOzet(stats, fileCount, totalRows, emptyRows, duplicateRows) {
-        const el = document.getElementById("raporOzetBody");
+        const el = document.getElementById('raporOzetBody');
         if (!el) return;
 
         // 1. temel rakamlar
@@ -355,7 +355,7 @@
         const dosyaAdedi = fileCount ?? 1;
 
         // 2. En çok gönderilen daire
-        let mostCourt = "-";
+        let mostCourt = '-';
         if (stats.courtCount && Object.keys(stats.courtCount).length) {
             const sorted = Object.entries(stats.courtCount)
                 .sort((a, b) => b[1] - a[1]);
@@ -363,7 +363,7 @@
         }
 
         // 3. En çok verilen karar türü
-        let mostDecision = "-";
+        let mostDecision = '-';
         if (stats.decisions && Object.keys(stats.decisions).length) {
             const sorted = Object.entries(stats.decisions)
                 .sort((a, b) => b[1] - a[1]);
@@ -381,15 +381,15 @@
         // 5. Rapor özeti metni
         const html = `
 		<ul class="report-summary">
-		  <li><b>${dosyaAdedi}</b> XLS dosyasından toplam <b>${satirOkunan.toLocaleString("tr-TR")}</b> satır okundu.</li>
-		  <li><b>${bosAtlanan.toLocaleString("tr-TR")}</b> satır boş olması nedeniyle, <b>${mukerrerAtlanan.toLocaleString("tr-TR")}</b> satır mükerrer olması nedeniyle atlandı.</li>
-		  <li>İncelenen <b>${incelenen.toLocaleString("tr-TR")}</b> satırdan:</li>
+		  <li><b>${dosyaAdedi}</b> XLS dosyasından toplam <b>${satirOkunan.toLocaleString('tr-TR')}</b> satır okundu.</li>
+		  <li><b>${bosAtlanan.toLocaleString('tr-TR')}</b> satır boş olması nedeniyle, <b>${mukerrerAtlanan.toLocaleString('tr-TR')}</b> satır mükerrer olması nedeniyle atlandı.</li>
+		  <li>İncelenen <b>${incelenen.toLocaleString('tr-TR')}</b> satırdan:</li>
 		  <ul>
 			<li>📂 En çok dosya <b>${mostCourt}</b>’ye gönderilmiş.</li>
 			<li>⚖️ En çok <b>${mostDecision}</b> türünden karar verilmiş.</li>
 			<li>📊 Karar verilen oran: <b>%${decidedRate}</b></li>
 			<li>⏳ İncelemede olan oran: <b>%${pendingRate}</b></li>
-			<li>📥 Henüz gönderilmemiş dosya sayısı: <b>${notSent.toLocaleString("tr-TR")}</b></li>
+			<li>📥 Henüz gönderilmemiş dosya sayısı: <b>${notSent.toLocaleString('tr-TR')}</b></li>
 		  </ul>
 		</ul>
 	  `;
@@ -399,7 +399,7 @@
 
     // Şehir + Daire ayıklama (gerekiyorsa üstte tanımlı olanı kullanın)
     function extractCourtFromO(oRaw) {
-        const s = String(oRaw || "");
+        const s = String(oRaw || '');
         const re = /([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\s+bölge\s+adliye\s+mahkemesi\s+(\d+)\.\s*ceza\s*dairesi/i;
         const m = s.match(re);
         if (!m) return null;
@@ -413,7 +413,7 @@
 
         const counts = {}; // { court: { incelemede, esastanRed, bozma, kismen } }
         function normTR(s) {
-            return String(s || "")
+            return String(s || '')
                 .toLocaleLowerCase('tr')
                 .replace(/\s+/g, ' ')
                 .trim();
@@ -454,8 +454,8 @@
             const court = extractCourtFromO(it.oRaw);
             if (!court) continue;
 
-            const neticeRaw = String(deriveNeticeFromO(it.oRaw) || "");
-            const oRaw = String(it.oRaw || "");
+            const neticeRaw = String(deriveNeticeFromO(it.oRaw) || '');
+            const oRaw = String(it.oRaw || '');
 
             if (!counts[court]) counts[court] = {
                 incelemede: 0,
@@ -499,7 +499,7 @@
         });
 
         // Tablonun konacağı yer
-        const panel = document.querySelector("#raporOzetBody") || document.getElementById("raporOzetBody");
+        const panel = document.querySelector('#raporOzetBody') || document.getElementById('raporOzetBody');
         if (!panel) return;
 
         // Tablo iskeleti
@@ -527,7 +527,7 @@
 		</table>
 	  `;
 
-        const tbody = panel.querySelector("#daireOzetTable tbody");
+        const tbody = panel.querySelector('#daireOzetTable tbody');
 
         function drawBody(data) {
             tbody.innerHTML = data.map(r => `
@@ -538,23 +538,23 @@
 			<td class="num">${r.bozma}</td>
 			<td class="num">${r.kismen}</td>
 		  </tr>
-		`).join("");
+		`).join('');
         }
 
         // İlk çizim
         drawBody(rows);
 
         // Sıralama
-        const thead = panel.querySelector("#daireOzetTable thead");
+        const thead = panel.querySelector('#daireOzetTable thead');
         let sortState = {
             key: null,
             dir: 1
         }; // 1: asc, -1: desc
 
-        thead.addEventListener("click", (e) => {
-            const th = e.target.closest(".orderable");
+        thead.addEventListener('click', (e) => {
+            const th = e.target.closest('.orderable');
             if (!th) return;
-            const key = th.getAttribute("data-key");
+            const key = th.getAttribute('data-key');
             if (!key) return;
 
             // yönü değiştir
@@ -567,11 +567,11 @@
             const dir = sortState.dir;
 
             // oku güncelle
-            thead.querySelectorAll(".orderable").forEach(thEl => thEl.classList.remove("asc", "desc"));
-            th.classList.add(dir === 1 ? "asc" : "desc");
+            thead.querySelectorAll('.orderable').forEach(thEl => thEl.classList.remove('asc', 'desc'));
+            th.classList.add(dir === 1 ? 'asc' : 'desc');
 
             const sorted = rows.slice().sort((a, b) => {
-                if (key === "court") {
+                if (key === 'court') {
                     return a.court.localeCompare(b.court, 'tr') * dir;
                 } else {
                     return ((a[key] || 0) - (b[key] || 0)) * dir;
@@ -588,7 +588,7 @@
     async function readSheetRowsArray(file, requiredSheetName) {
         const buf = await file.arrayBuffer();
         const wb = XLSX.read(buf, {
-            type: "array",
+            type: 'array',
             cellDates: true,
             raw: false
         });
@@ -597,7 +597,7 @@
         const ws = wb.Sheets[target];
         const rows = XLSX.utils.sheet_to_json(ws, {
             header: 1,
-            defval: "",
+            defval: '',
             raw: false
         });
         return {
@@ -608,70 +608,70 @@
 
     // ---- Sınıflandırma / İstatistik
     function classifyItem(item) {
-        const o = normalize(item.oRaw || ""); // O sütunun ham metni
-        const t = normalize(item.netice || ""); // türetilmiş açıklama
+        const o = normalize(item.oRaw || ''); // O sütunun ham metni
+        const t = normalize(item.netice || ''); // türetilmiş açıklama
 
         // 1) Henüz Gönderilmemiş: O boş ya da tam "kabul"
-        if (!o || o === "kabul") {
+        if (!o || o === 'kabul') {
             return {
-                bucket: "not_sent"
+                bucket: 'not_sent'
             };
         }
 
         // 2) İncelemede: "Kabul - ... Ceza Dairesi'ne Gönderilmiştir."
-        if (o.startsWith("kabul -") && o.includes("ceza dairesi")) {
+        if (o.startsWith('kabul -') && o.includes('ceza dairesi')) {
             return {
-                bucket: "pending_review"
+                bucket: 'pending_review'
             };
         }
 
         // 3) Red - ... (sebep değişken olabilir) → Karar Verilmiş (Red kararı)
         //    Örnek: "Red - Kesin Kararın İstinafının Reddi"
-        if (o.startsWith("red -")) {
+        if (o.startsWith('red -')) {
             return {
-                bucket: "decided",
-                decision: "Red"
+                bucket: 'decided',
+                decision: 'Red'
             };
         }
 
         // 4) Karar Verilmiş: netice metninden karar türlerini yakala
         if (
-            t.includes("kararı vermiş") ||
-            t.includes("kararına bağlanmıştır") ||
-            t.includes("karar verilmiş")
+            t.includes('kararı vermiş') ||
+            t.includes('kararına bağlanmıştır') ||
+            t.includes('karar verilmiş')
         ) {
-            if (t.includes("hükmün bozulması")) return {
-                bucket: "decided",
-                decision: "Bozma"
+            if (t.includes('hükmün bozulması')) return {
+                bucket: 'decided',
+                decision: 'Bozma'
             };
-            if (t.includes("esastan red")) return {
-                bucket: "decided",
-                decision: "Esastan Red"
+            if (t.includes('esastan red')) return {
+                bucket: 'decided',
+                decision: 'Esastan Red'
             };
-            if (t.includes("düzelterek onama")) return {
-                bucket: "decided",
-                decision: "Düzelterek Onama"
+            if (t.includes('düzelterek onama')) return {
+                bucket: 'decided',
+                decision: 'Düzelterek Onama'
             };
-            if (t.includes("onama")) return {
-                bucket: "decided",
-                decision: "Onama"
+            if (t.includes('onama')) return {
+                bucket: 'decided',
+                decision: 'Onama'
             };
             return {
-                bucket: "decided",
-                decision: "Diğer"
+                bucket: 'decided',
+                decision: 'Diğer'
             };
         }
 
         // 5) Ek güvenlik: netice cümlesinde “değerlendirilmemiş” varsa yine not_sent say
-        if (t.includes("değerlendirilmemiş")) {
+        if (t.includes('değerlendirilmemiş')) {
             return {
-                bucket: "not_sent"
+                bucket: 'not_sent'
             };
         }
 
         // 6) Diğer her şey
         return {
-            bucket: "other"
+            bucket: 'other'
         };
     }
 
@@ -686,9 +686,9 @@
         };
         for (const it of items) {
             const c = classifyItem(it);
-            if (c.bucket === "decided") {
+            if (c.bucket === 'decided') {
                 s.decided++;
-                const k = c.decision || "Diğer";
+                const k = c.decision || 'Diğer';
                 s.decisions[k] = (s.decisions[k] || 0) + 1;
             } else s[c.bucket]++;
         }
@@ -706,7 +706,7 @@
             <table class="table"><thead><tr><th>Tür</th><th>Adet</th></tr></thead><tbody>
               ${
                 Object.keys(stats.decisions).length
-                  ? Object.keys(stats.decisions).sort().map(k=>`<tr><td>${escapeHtml(k)}</td><td class="num">${stats.decisions[k]}</td></tr>`).join("")
+                  ? Object.keys(stats.decisions).sort().map(k=>`<tr><td>${escapeHtml(k)}</td><td class="num">${stats.decisions[k]}</td></tr>`).join('')
                   : `<tr><td colspan="2" class="muted">Henüz karar yok</td></tr>`
               }
             </tbody></table>
@@ -716,10 +716,10 @@
 
         // ÜST SOL: KPI kartları
         ensureKpiCards();
-        $("#kpiIstinafEdilen") && ($("#kpiIstinafEdilen").textContent = stats.total.toLocaleString("tr-TR"));
-        $("#kpiNotSent") && ($("#kpiNotSent").textContent = stats.not_sent.toLocaleString("tr-TR"));
-        $("#kpiPending") && ($("#kpiPending").textContent = stats.pending_review.toLocaleString("tr-TR"));
-        $("#kpiDecided") && ($("#kpiDecided").textContent = stats.decided.toLocaleString("tr-TR"));
+        $('#kpiIstinafEdilen') && ($('#kpiIstinafEdilen').textContent = stats.total.toLocaleString('tr-TR'));
+        $('#kpiNotSent') && ($('#kpiNotSent').textContent = stats.not_sent.toLocaleString('tr-TR'));
+        $('#kpiPending') && ($('#kpiPending').textContent = stats.pending_review.toLocaleString('tr-TR'));
+        $('#kpiDecided') && ($('#kpiDecided').textContent = stats.decided.toLocaleString('tr-TR'));
     }
 
     // ---- Dedupe: (Esas No + Karar No + Karar Tarihi), en eski İstinaf Dilekçesi
@@ -727,7 +727,7 @@
         const map = new Map();
         let removed = 0;
         for (const it of items) {
-            const key = [String(it.esasNo || ""), String(it.kararNo || ""), String(it.kararTarihi || "")].join("||");
+            const key = [String(it.esasNo || ''), String(it.kararNo || ''), String(it.kararTarihi || '')].join('||');
             const cur = map.get(key);
             if (!cur) map.set(key, it);
             else {
@@ -749,20 +749,20 @@
 
     // ---- Üst Sol KPI: card-head'i kaldır, KPI grid ekle
     function ensureKpiCards() {
-        const ustSol = $("#cardAltSol");
+        const ustSol = $('#cardAltSol');
         if (!ustSol) return;
 
-        const ch = ustSol.querySelector(".card-head");
+        const ch = ustSol.querySelector('.card-head');
         if (ch) ch.remove();
 
-        let body = ustSol.querySelector(".card-body");
+        let body = ustSol.querySelector('.card-body');
         if (!body) {
-            body = document.createElement("div");
-            body.className = "card-body";
+            body = document.createElement('div');
+            body.className = 'card-body';
             ustSol.appendChild(body);
         }
 
-        if (body.querySelector(".kpi-grid")) return;
+        if (body.querySelector('.kpi-grid')) return;
 
         body.innerHTML = `
 		<section class="kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;">
@@ -803,7 +803,7 @@
 
     // ---- Modal: gerçek overlay + backdrop (benzersiz id’ler)
     (function injectModalStyles() {
-        if (document.getElementById("kanunyolu-modal-style")) return;
+        if (document.getElementById('kanunyolu-modal-style')) return;
         const css = `
       body.modal-open { overflow: hidden; }
       .ozet-backdrop {
@@ -826,19 +826,19 @@
       .pager { display:flex; align-items:center; gap:.5rem; }
       #ozet-table td, #ozet-table th { white-space: nowrap; }
     `;
-        const style = document.createElement("style");
-        style.id = "kanunyolu-modal-style";
+        const style = document.createElement('style');
+        style.id = 'kanunyolu-modal-style';
         style.textContent = css;
         document.head.appendChild(style);
     })();
 
-    const backdrop = document.createElement("div");
-    backdrop.className = "ozet-backdrop";
+    const backdrop = document.createElement('div');
+    backdrop.className = 'ozet-backdrop';
     document.body.appendChild(backdrop);
 
-    const modal = document.createElement("div");
-    modal.id = "ozet-modal";
-    modal.className = "modal-card ozet-modal";
+    const modal = document.createElement('div');
+    modal.id = 'ozet-modal';
+    modal.className = 'modal-card ozet-modal';
     modal.innerHTML = `
     <div class="modal-head">
       <h2>İstinaf Özet Tablosu</h2>
@@ -869,32 +869,32 @@
     document.body.appendChild(modal);
 
     // Modal scoped elemanlar (ID çakışması önlendi)
-    const modalTbody = modal.querySelector("#ozet-table tbody");
-    const pagerInfo = modal.querySelector("#ozet-page-info");
-    const pagerMeta = modal.querySelector("#ozet-pager-meta");
-    const searchBox = modal.querySelector("#ozet-search");
-    const btnPrev = modal.querySelector("#ozet-page-prev");
-    const btnNext = modal.querySelector("#ozet-page-next");
-    const btnClose1 = modal.querySelector("#ozet-close-top");
-    const btnClose2 = modal.querySelector("#ozet-close-foot");
-    const btnExport = modal.querySelector("#ozet-export-xls");
-    const btnPrint = modal.querySelector("#ozet-print-all");
+    const modalTbody = modal.querySelector('#ozet-table tbody');
+    const pagerInfo = modal.querySelector('#ozet-page-info');
+    const pagerMeta = modal.querySelector('#ozet-pager-meta');
+    const searchBox = modal.querySelector('#ozet-search');
+    const btnPrev = modal.querySelector('#ozet-page-prev');
+    const btnNext = modal.querySelector('#ozet-page-next');
+    const btnClose1 = modal.querySelector('#ozet-close-top');
+    const btnClose2 = modal.querySelector('#ozet-close-foot');
+    const btnExport = modal.querySelector('#ozet-export-xls');
+    const btnPrint = modal.querySelector('#ozet-print-all');
 
     function openModal() {
-        document.body.classList.add("modal-open");
-        backdrop.style.display = "block";
-        modal.style.display = "block";
+        document.body.classList.add('modal-open');
+        backdrop.style.display = 'block';
+        modal.style.display = 'block';
         renderModalPage();
     }
 
     function closeModal() {
-        modal.style.display = "none";
-        backdrop.style.display = "none";
-        document.body.classList.remove("modal-open");
+        modal.style.display = 'none';
+        backdrop.style.display = 'none';
+        document.body.classList.remove('modal-open');
     }
-    backdrop.addEventListener("click", closeModal);
-    btnClose1.addEventListener("click", closeModal);
-    btnClose2.addEventListener("click", closeModal);
+    backdrop.addEventListener('click', closeModal);
+    btnClose1.addEventListener('click', closeModal);
+    btnClose2.addEventListener('click', closeModal);
 
     function renderModalPage() {
         const term = searchBox.value.trim().toLowerCase();
@@ -910,26 +910,26 @@
 
         modalTbody.innerHTML = pageItems.map(it => `
       <tr>
-        <td>${escapeHtml(it.esasNo||"")}</td>
-        <td>${escapeHtml(it.kararNo||"")}</td>
-        <td>${escapeHtml(it.kararTarihi||"")}</td>
-        <td>${escapeHtml(it.istinafDilekceTarihi||"")}</td>
-        <td>${escapeHtml(it.netice||"")}</td>
-        <td>${escapeHtml(it.hakim||"")}</td>
+        <td>${escapeHtml(it.esasNo||'')}</td>
+        <td>${escapeHtml(it.kararNo||'')}</td>
+        <td>${escapeHtml(it.kararTarihi||'')}</td>
+        <td>${escapeHtml(it.istinafDilekceTarihi||'')}</td>
+        <td>${escapeHtml(it.netice||'')}</td>
+        <td>${escapeHtml(it.hakim||'')}</td>
       </tr>
-    `).join("");
+    `).join('');
 
         pagerInfo.textContent = `Sayfa ${currentPage}/${totalPages}`;
         pagerMeta.textContent = `${filtered.length} kayıt gösteriliyor (toplam ${ozetData.length})`;
     }
 
-    btnPrev.addEventListener("click", () => {
+    btnPrev.addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
             renderModalPage();
         }
     });
-    btnNext.addEventListener("click", () => {
+    btnNext.addEventListener('click', () => {
         const term = searchBox.value.trim().toLowerCase();
         const filteredLen = term ?
             ozetData.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(term))).length :
@@ -940,38 +940,38 @@
             renderModalPage();
         }
     });
-    searchBox.addEventListener("input", () => {
+    searchBox.addEventListener('input', () => {
         currentPage = 1;
         renderModalPage();
     });
 
-    btnExport.addEventListener("click", () => {
+    btnExport.addEventListener('click', () => {
         // Export kolonları sabit sırada
         const exportRows = ozetData.map(it => ({
-            "Esas No": it.esasNo,
-            "Karar No": it.kararNo,
-            "Karar Tarihi": it.kararTarihi,
-            "İstinaf Dilekçesi Tarihi": it.istinafDilekceTarihi,
-            "Netice": it.netice,
-            "Hakim": it.hakim
+            'Esas No': it.esasNo,
+            'Karar No': it.kararNo,
+            'Karar Tarihi': it.kararTarihi,
+            'İstinaf Dilekçesi Tarihi': it.istinafDilekceTarihi,
+            'Netice': it.netice,
+            'Hakim': it.hakim
         }));
         const ws = XLSX.utils.json_to_sheet(exportRows);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Özet");
-        XLSX.writeFile(wb, "istinaf_ozet.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, 'Özet');
+        XLSX.writeFile(wb, 'istinaf_ozet.xlsx');
     });
 
-    btnPrint.addEventListener("click", () => {
-        const w = window.open("", "_blank");
+    btnPrint.addEventListener('click', () => {
+        const w = window.open('', '_blank');
         const exportRows = ozetData.map(it => `
       <tr>
-        <td>${escapeHtml(it.esasNo||"")}</td>
-        <td>${escapeHtml(it.kararNo||"")}</td>
-        <td>${escapeHtml(it.kararTarihi||"")}</td>
-        <td>${escapeHtml(it.istinafDilekceTarihi||"")}</td>
-        <td>${escapeHtml(it.netice||"")}</td>
-        <td>${escapeHtml(it.hakim||"")}</td>
-      </tr>`).join("");
+        <td>${escapeHtml(it.esasNo||'')}</td>
+        <td>${escapeHtml(it.kararNo||'')}</td>
+        <td>${escapeHtml(it.kararTarihi||'')}</td>
+        <td>${escapeHtml(it.istinafDilekceTarihi||'')}</td>
+        <td>${escapeHtml(it.netice||'')}</td>
+        <td>${escapeHtml(it.hakim||'')}</td>
+      </tr>`).join('');
         w.document.write(`
       <html><head><title>İstinaf Özet Tablosu</title>
       <style>
@@ -995,13 +995,13 @@
     });
 
     function showOzetButton() {
-        if (!$("#btnOpenOzet")) {
-            const btn = document.createElement("button");
-            btn.id = "btnOpenOzet";
-            btn.className = "btn btn--sm";
-            btn.textContent = "📊 Özet Tabloyu Aç";
-            btn.addEventListener("click", openModal);
-            if (hintEl) hintEl.insertAdjacentElement("afterend", btn);
+        if (!$('#btnOpenOzet')) {
+            const btn = document.createElement('button');
+            btn.id = 'btnOpenOzet';
+            btn.className = 'btn btn--sm';
+            btn.textContent = '📊 Özet Tabloyu Aç';
+            btn.addEventListener('click', openModal);
+            if (hintEl) hintEl.insertAdjacentElement('afterend', btn);
             else document.body.appendChild(btn);
         }
     }
@@ -1014,7 +1014,7 @@
 
         if (!Array.isArray(rows) || rows.length === 0) return null;
 
-        const eIdx = letterToIndex("E"); // Karar Tarihi
+        const eIdx = letterToIndex('E'); // Karar Tarihi
         const dates = [];
 
         for (let i = 0; i < rows.length; i++) {
@@ -1051,20 +1051,20 @@
 
 
     function renderDateFilterZone() {
-        const dz = document.getElementById("dropZone");
+        const dz = document.getElementById('dropZone');
         if (!dz) return;
 
         // Eski zone varsa kaldır
-        let wrap = document.getElementById("dateFilterZone");
+        let wrap = document.getElementById('dateFilterZone');
         if (wrap) wrap.remove();
 
-        wrap = document.createElement("div");
-        wrap.id = "dateFilterZone";
-        wrap.className = "date-filter-wrap";
+        wrap = document.createElement('div');
+        wrap.id = 'dateFilterZone';
+        wrap.className = 'date-filter-wrap';
 
         // Varsayılan min/max: ozetData içindeki Karar Tarihi'nden
-        let minVal = "",
-            maxVal = "";
+        let minVal = '',
+            maxVal = '';
         const rangeItems = getDateRangeFromItems(ozetData);
         if (rangeItems) {
             const fmt = (d) => d.toISOString().slice(0, 10);
@@ -1082,26 +1082,26 @@
           <button id="dateResetBtn" type="button" class="btn">Tümünü Göster</button>
 		</div>
 	  `;
-        dz.insertAdjacentElement("afterend", wrap);
+        dz.insertAdjacentElement('afterend', wrap);
 
-        const btnFilter = document.getElementById("dateFilterBtn");
-        const btnReset = document.getElementById("dateResetBtn");
+        const btnFilter = document.getElementById('dateFilterBtn');
+        const btnReset = document.getElementById('dateResetBtn');
 
-        btnFilter.addEventListener("click", () => {
-            const sVal = document.getElementById("startDate").value;
-            const eVal = document.getElementById("endDate").value;
+        btnFilter.addEventListener('click', () => {
+            const sVal = document.getElementById('startDate').value;
+            const eVal = document.getElementById('endDate').value;
 
             if (!Array.isArray(ozetData) || !ozetData.length) {
                 window.toast?.({
-                    type: "warning",
-                    title: "Veri yok",
-                    body: "Önce Excel yükleyin."
+                    type: 'warning',
+                    title: 'Veri yok',
+                    body: 'Önce Excel yükleyin.'
                 });
                 return;
             }
 
-            const start = sVal ? new Date(sVal + "T00:00:00") : null;
-            const end = eVal ? new Date(eVal + "T23:59:59") : null;
+            const start = sVal ? new Date(sVal + 'T00:00:00') : null;
+            const end = eVal ? new Date(eVal + 'T23:59:59') : null;
 
             const filteredItems = ozetData.filter(it => {
                 const d = dateFromCell(it.kararTarihi);
@@ -1113,9 +1113,9 @@
 
             if (filteredItems.length) {
                 window.toast?.({
-                    type: "info",
-                    title: "Filtre uygulandı",
-                    body: `${filteredItems.length} kayıt ${sVal || "?"} - ${eVal || "?"} aralığında`
+                    type: 'info',
+                    title: 'Filtre uygulandı',
+                    body: `${filteredItems.length} kayıt ${sVal || '?'} - ${eVal || '?'} aralığında`
                 });
                 // 🔁 Daire özet tablosunu FİLTRELENMİŞ item’larla yeniden oluştur
                 // ✅ KPI + Karar Türleri panelini filtreye göre güncelle
@@ -1128,19 +1128,19 @@
 				renderKesinKararTablo(filteredItems);				
             } else {
                 window.toast?.({
-                    type: "warning",
-                    title: "Kayıt bulunamadı",
-                    body: "Bu tarih aralığında uygun kayıt yok."
+                    type: 'warning',
+                    title: 'Kayıt bulunamadı',
+                    body: 'Bu tarih aralığında uygun kayıt yok.'
                 });
             }
         });
 
-        btnReset.addEventListener("click", () => {
+        btnReset.addEventListener('click', () => {
             // Varsayılan item aralığına dön
             const r = getDateRangeFromItems(ozetData);
-            const fmt = (d) => d && !isNaN(d) ? d.toISOString().slice(0, 10) : "";
-            document.getElementById("startDate").value = r ? fmt(r.min) : "";
-            document.getElementById("endDate").value = r ? fmt(r.max) : "";
+            const fmt = (d) => d && !isNaN(d) ? d.toISOString().slice(0, 10) : '';
+            document.getElementById('startDate').value = r ? fmt(r.min) : '';
+            document.getElementById('endDate').value = r ? fmt(r.max) : '';
 
             const all = ozetData; // tüm kayıtlar
             if (Array.isArray(all) && all.length) {
@@ -1154,9 +1154,9 @@
 				renderNotSentTablo(all);
 
                 window.toast?.({
-                    type: "primary",
-                    title: "Filtre sıfırlandı",
-                    body: "Tüm kayıtlar gösteriliyor."
+                    type: 'primary',
+                    title: 'Filtre sıfırlandı',
+                    body: 'Tüm kayıtlar gösteriliyor.'
                 });
             }
         });
@@ -1165,16 +1165,16 @@
 
     // Excel hücresinden JS Date üretir (dd/mm/yyyy, yyyy-mm-dd, Excel seri vs.)
     function dateFromCell(v) {
-        if (v == null || v === "") return null;
+        if (v == null || v === '') return null;
 
         // Zaten Date ise
-        if (Object.prototype.toString.call(v) === "[object Date]") {
+        if (Object.prototype.toString.call(v) === '[object Date]') {
             return isNaN(+v) ? null : v;
         }
 
         // Sayı veya sayısal string: Excel seri numarası desteği
-        if (typeof v === "number" || (/^\d+([.,]\d+)?$/.test(String(v).trim()))) {
-            const n = Number(String(v).replace(",", "."));
+        if (typeof v === 'number' || (/^\d+([.,]\d+)?$/.test(String(v).trim()))) {
+            const n = Number(String(v).replace(',', '.'));
             // Excel seri tarih aralığı (yaklaşık): 1899-12-30 tabanlı
             if (!isNaN(n) && n > 25569 && n < 60000) {
                 const epoch = new Date(Date.UTC(1899, 11, 30));
@@ -1205,7 +1205,7 @@
     async function processFiles(files) {
         const excelFiles = files.filter(isExcelFile);
         if (!excelFiles.length) {
-            toastWithIcon("warning", "Uyarı", "Yalnızca <b>.xls</b> / <b>.xlsx</b> dosyalarına izin verilir.");
+            toastWithIcon('warning', 'Uyarı', 'Yalnızca <b>.xls</b> / <b>.xlsx</b> dosyalarına izin verilir.');
             return;
         }
 
@@ -1215,12 +1215,12 @@
         const rowsUsedRaw = [];
 
         const COL = {
-            D: letterToIndex("D"),
-            E: letterToIndex("E"),
-            F: letterToIndex("F"),
-            J: letterToIndex("J"),
-            O: letterToIndex("O"),
-            Q: letterToIndex("Q") // HAKİM
+            D: letterToIndex('D'),
+            E: letterToIndex('E'),
+            F: letterToIndex('F'),
+            J: letterToIndex('J'),
+            O: letterToIndex('O'),
+            Q: letterToIndex('Q') // HAKİM
         };
 
         for (const f of excelFiles) {
@@ -1234,12 +1234,12 @@
                 for (let r = 1; r < rows.length; r++) {
                     const row = rows[r] || [];
                     const esasNo = extractDosyaNoFromD(row[COL.D]);
-                    const kararNo = row[COL.F] || "";
-                    const kararTrh = row[COL.E] || "";
-                    const dilekce = row[COL.J] || "";
+                    const kararNo = row[COL.F] || '';
+                    const kararTrh = row[COL.E] || '';
+                    const dilekce = row[COL.J] || '';
                     const netice = deriveNeticeFromO(row[COL.O]);
-                    const hakim = row[COL.Q] || "";
-                    const oHam = row[COL.O] || ""; // O sütunun HAM metni
+                    const hakim = row[COL.Q] || '';
+                    const oHam = row[COL.O] || ''; // O sütunun HAM metni
 
                     if (!(isEsasOrKararNo(esasNo) || isEsasOrKararNo(kararNo) || isDateLike(kararTrh))) {
                         skippedEmpty++;
@@ -1259,7 +1259,7 @@
                     });
                 }
             } catch (err) {
-                toastWithIcon("danger", "Hatalı Dosya", err.message || "Okuma/validasyon hatası.");
+                toastWithIcon('danger', 'Hatalı Dosya', err.message || 'Okuma/validasyon hatası.');
             }
         }
 
@@ -1294,21 +1294,21 @@
 
         // Toast
                 const bodyTxt = `<span class=\"material-symbols-rounded\" style=\"vertical-align:middle;font-size:20px;\">task_alt</span> ${totalRowsRead} satır okundu; ${skippedEmpty} boş; ${dupRemoved} mükerrer temizlendi. Kalan: ${deduped.length}. Özet tabloyu açabilirsiniz.`;
-                toastWithIcon("success", "Rapor Hazır", bodyTxt, 7500);
+                toastWithIcon('success', 'Rapor Hazır', bodyTxt, 7500);
 
     }
 
     // ---- Olaylar
     if (dropZone) {
-        ["dragenter", "dragover"].forEach(ev => dropZone.addEventListener(ev, e => {
+        ['dragenter', 'dragover'].forEach(ev => dropZone.addEventListener(ev, e => {
             e.preventDefault();
-            dropZone.style.opacity = "0.9";
+            dropZone.style.opacity = '0.9';
         }));
-        ["dragleave", "drop"].forEach(ev => dropZone.addEventListener(ev, e => {
+        ['dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, e => {
             e.preventDefault();
-            dropZone.style.opacity = "1";
+            dropZone.style.opacity = '1';
         }));
-        dropZone.addEventListener("drop", e => {
+        dropZone.addEventListener('drop', e => {
             e.preventDefault();
             const files = Array.from(e.dataTransfer?.files || []);
             processFiles(files);
@@ -1316,7 +1316,7 @@
     }
 
     if (fileInput) {
-        fileInput.addEventListener("change", () => {
+        fileInput.addEventListener('change', () => {
             const files = Array.from(fileInput.files || []);
             processFiles(files);
         });
@@ -1327,20 +1327,20 @@
         const abs = Math.abs(num);
         const units = [{
                 v: 1e9,
-                s: "B"
+                s: 'B'
             }, // milyar
             {
                 v: 1e6,
-                s: "M"
+                s: 'M'
             }, // milyon
             {
                 v: 1e3,
-                s: "K"
+                s: 'K'
             } // bin
         ];
         for (const u of units) {
             if (abs >= u.v) {
-                const val = (num / u.v).toFixed(digits).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, "$1");
+                const val = (num / u.v).toFixed(digits).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1');
                 return `${val}${u.s}`;
             }
         }
@@ -1355,7 +1355,7 @@
         const updateDom = (adetRaw) => {
             const kpiEl = document.getElementById('kpiIslem');
             if (kpiEl) kpiEl.textContent = nFormatter(adetRaw, 2);
-            if (typeof window.loadExampleExcelAndRender === "function") {
+            if (typeof window.loadExampleExcelAndRender === 'function') {
                 try {
                     window.loadExampleExcelAndRender(adetRaw);
                 } catch (_) {}
@@ -1365,7 +1365,7 @@
         const onError = () => updateDom(0);
 
         // jQuery varsa
-        if (window.jQuery && typeof window.jQuery.getJSON === "function") {
+        if (window.jQuery && typeof window.jQuery.getJSON === 'function') {
             window.jQuery.getJSON('https://sayac.657.com.tr/arttirkarar', function(response) {
                 try {
                     const adetRaw = (response && typeof response.adet !== 'undefined') ? (response.adet * 1) : 0;
@@ -1381,7 +1381,7 @@
         fetch('https://sayac.657.com.tr/arttirkarar', {
                 method: 'GET'
             })
-            .then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)))
+            .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
             .then(json => {
                 const adetRaw = (json && typeof json.adet !== 'undefined') ? (json.adet * 1) : 0;
                 updateDom(adetRaw);

@@ -7,7 +7,7 @@
       document.head.appendChild(s);
     });
   }
-  function ready(ok){ try{ document.dispatchEvent(new CustomEvent('xlsx-ready',{detail:{ok:!!ok}})); }catch(e){} }
+  function ready(ok){ try{ document.dispatchEvent(new CustomEvent('xlsx-ready',{detail:{ok:!!ok}})); }catch(e){ /* intentionally empty */ } }
   function hasX(){ return !!(window.XLSX && typeof XLSX.read==='function'); }
   if (hasX()) { ready(true); return; }
   load('/assets/js/xlsx.full.min.js').catch(function(){}).then(function(){

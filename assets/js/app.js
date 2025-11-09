@@ -3,57 +3,57 @@
 
 (function(){
   const root = document.documentElement;
-  const themeKey = "minimal-theme";
+  const themeKey = 'minimal-theme';
   let saved = localStorage.getItem(themeKey);
-  if (saved !== "light" && saved !== "dark") {
-    saved = "dark";
+  if (saved !== 'light' && saved !== 'dark') {
+    saved = 'dark';
     localStorage.setItem(themeKey, saved);
   }
-  document.documentElement.setAttribute("data-theme", saved);
-  const themeToggle = document.getElementById("themeToggle");
-  const themeIcon = document.getElementById("themeIcon");
-  const sidebar = document.getElementById("sidebar");
-  const sidebarToggle = document.getElementById("sidebarToggle");
+  document.documentElement.setAttribute('data-theme', saved);
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('sidebarToggle');
   function applyIcon(){
-    const mode = root.getAttribute("data-theme") || "dark";
-    if (themeIcon) themeIcon.textContent = (mode === "dark" ? "dark_mode" : "light_mode");
+    const mode = root.getAttribute('data-theme') || 'dark';
+    if (themeIcon) themeIcon.textContent = (mode === 'dark' ? 'dark_mode' : 'light_mode');
     if (themeToggle) {
-      const next = (mode === "dark" ? "light" : "dark");
-      themeToggle.setAttribute("aria-pressed", mode === "dark" ? "false" : "true");
-      themeToggle.setAttribute("aria-label", next === "light" ? "Açık temaya geç" : "Koyu temaya geç");
-      themeToggle.setAttribute("title", next === "light" ? "Açık tema" : "Koyu tema");
+      const next = (mode === 'dark' ? 'light' : 'dark');
+      themeToggle.setAttribute('aria-pressed', mode === 'dark' ? 'false' : 'true');
+      themeToggle.setAttribute('aria-label', next === 'light' ? 'Açık temaya geç' : 'Koyu temaya geç');
+      themeToggle.setAttribute('title', next === 'light' ? 'Açık tema' : 'Koyu tema');
     }
   }
   function toggleTheme(){
-    const cur = root.getAttribute("data-theme") || "dark";
-    const next = cur === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", next);
+    const cur = root.getAttribute('data-theme') || 'dark';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
     localStorage.setItem(themeKey, next);
     applyIcon();
   }
   function toggleSidebar(){
     if (!sidebar) return;
-    sidebar.classList.toggle("open");
+    sidebar.classList.toggle('open');
   }
-  if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
-  if (sidebarToggle) sidebarToggle.addEventListener("click", toggleSidebar);
+  if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+  if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
   applyIcon();
-  const notesEl = document.getElementById("notes");
-  const notesKey = "minimal-notes";
-  const readNotes = () => JSON.parse(localStorage.getItem(notesKey) || "[]");
+  const notesEl = document.getElementById('notes');
+  const notesKey = 'minimal-notes';
+  const readNotes = () => JSON.parse(localStorage.getItem(notesKey) || '[]');
   const writeNotes = (arr) => localStorage.setItem(notesKey, JSON.stringify(arr));
   // escapeHtml is now in utils.js - use window.escapeHtml
   function renderNotes(){
     if (!notesEl) return;
     const data = readNotes();
-    notesEl.innerHTML = "";
+    notesEl.innerHTML = '';
     if (data.length === 0) {
       notesEl.innerHTML = '<p class="muted">Hic not yok. "Yeni Not" ile baslayin.</p>';
       return;
     }
     data.forEach(function(text, idx){
-      const item = document.createElement("div");
-      item.className = "note";
+      const item = document.createElement('div');
+      item.className = 'note';
       item.innerHTML =
         '<div class="text">' + window.escapeHtml(text) + '</div>' +
         '<div class="actions">' +
@@ -62,22 +62,22 @@
         '</div>';
       notesEl.appendChild(item);
     });
-    notesEl.addEventListener("click", onNoteClick);
+    notesEl.addEventListener('click', onNoteClick);
   }
   function onNoteClick(e){
     const t = e.target;
-    if (t.matches("[data-del]")){
-      const idx = +t.getAttribute("data-del");
+    if (t.matches('[data-del]')){
+      const idx = +t.getAttribute('data-del');
       const arr = readNotes(); arr.splice(idx,1); writeNotes(arr); renderNotes();
-    } else if (t.matches("[data-edit]")){
-      const idx = +t.getAttribute("data-edit");
-      const arr = readNotes(); const val = prompt("Notu duzenle:", arr[idx] || "");
+    } else if (t.matches('[data-edit]')){
+      const idx = +t.getAttribute('data-edit');
+      const arr = readNotes(); const val = prompt('Notu duzenle:', arr[idx] || '');
       if (val !== null){ arr[idx] = val.trim(); writeNotes(arr); renderNotes(); }
     }
   }
   window.addNote = function(val){
     if (!val) {
-      val = prompt("Yeni not:");
+      val = prompt('Yeni not:');
       if (!val) return;
     }
     const arr = readNotes(); arr.unshift(String(val).trim()); writeNotes(arr); renderNotes();
@@ -86,17 +86,17 @@
 })();
 (function(){
   const API = '/api/notes.php';
-  const notesKey = "minimal-notes";
+  const notesKey = 'minimal-notes';
   async function syncDown(){
     try{
       const r = await fetch(API, {headers:{'Accept':'application/json'}});
       if (!r.ok) return;
       const j = await r.json();
       const remote = (j && j.data && j.data.items) ? j.data.items : [];
-      const local = JSON.parse(localStorage.getItem(notesKey) || "[]");
+      const local = JSON.parse(localStorage.getItem(notesKey) || '[]');
       if (local.length === 0 && remote.length > 0) {
         localStorage.setItem(notesKey, JSON.stringify(remote.map(function(x){ return x.text; })));
-        if (typeof window.renderNotes === "function") window.renderNotes();
+        if (typeof window.renderNotes === 'function') window.renderNotes();
         else {
           const ev = document.createEvent('Event');
           ev.initEvent('notes-sync', true, true);
@@ -112,13 +112,13 @@
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({action:'add', text:text})
       });
-    } catch(e){  }
+    } catch(e){ /* intentionally empty */ }
   }
   const origAdd = window.addNote;
   if (typeof origAdd === 'function'){
     window.addNote = function(val){
       if (!val) {
-        val = prompt("Yeni not:");
+        val = prompt('Yeni not:');
         if (!val) return;
       }
       origAdd(val);
@@ -136,8 +136,8 @@
   }
 })();
 (function(){
-  const key = "dashboard-settings";
-  const ids = ["col_i","col_j","col_k","col_o","col_p","col_t","col_m","col_q","col_z"];
+  const key = 'dashboard-settings';
+  const ids = ['col_i','col_j','col_k','col_o','col_p','col_t','col_m','col_q','col_z'];
   const $ = (id) => document.getElementById(id);
   function load(){
     try {
@@ -149,18 +149,18 @@
   }
   function save(){
     const data = {};
-    ids.forEach(k => { if ($(k)) data[k] = String(($(k).value || "")).trim(); });
+    ids.forEach(k => { if ($(k)) data[k] = String(($(k).value || '')).trim(); });
     try {
       localStorage.setItem(key, JSON.stringify(data));
       return true;
     } catch(e){ return false; }
   }
-  const btn = document.getElementById("saveBtn");
+  const btn = document.getElementById('saveBtn');
   if (btn) {
-    btn.addEventListener("click", function(){
+    btn.addEventListener('click', function(){
       const ok = save();
       const old = btn.textContent;
-      btn.textContent = ok ? "Kaydedildi ✔" : "Kaydedilemedi ✖";
+      btn.textContent = ok ? 'Kaydedildi ✔' : 'Kaydedilemedi ✖';
       setTimeout(()=>{ btn.textContent = old; }, 1400);
     });
   }
@@ -285,32 +285,32 @@ if (typeof dismissTestAlert !== 'function') {
   };
 })();
 (function () {
-  var NEWS_URL = "/data/teftis.json";      
-  var LS_KEY = "teftisNews_v1";
-  var LS_FETCHED_AT = "teftisNewsFetchedAt_v1";
+  var NEWS_URL = '/data/teftis.json';      
+  var LS_KEY = 'teftisNews_v1';
+  var LS_FETCHED_AT = 'teftisNewsFetchedAt_v1';
   var REFRESH_MS = 60 * 60 * 1000;         
   var PAGE_SIZE = 2;                       
-  var listEl = document.getElementById("newsList");
-  var metaEl = document.getElementById("newsMeta");
+  var listEl = document.getElementById('newsList');
+  var metaEl = document.getElementById('newsMeta');
   if (!listEl || !metaEl) return;
-  var pagerEl = document.getElementById("newsPager");
+  var pagerEl = document.getElementById('newsPager');
   if (!pagerEl) {
-    pagerEl = document.createElement("nav");
-    pagerEl.id = "newsPager";
-    pagerEl.className = "pager";
-    pagerEl.setAttribute("role", "navigation");
-    pagerEl.setAttribute("aria-label", "Haber sayfalama");
+    pagerEl = document.createElement('nav');
+    pagerEl.id = 'newsPager';
+    pagerEl.className = 'pager';
+    pagerEl.setAttribute('role', 'navigation');
+    pagerEl.setAttribute('aria-label', 'Haber sayfalama');
   }
 
   // -- pager konumu: newsCard'ın card-footer'ında --
   (function placePager() {
-    const newsCard = document.getElementById("newsCard");
+    const newsCard = document.getElementById('newsCard');
     if (!newsCard) return;
     
-    let cardFoot = newsCard.querySelector(".card-footer") || newsCard.querySelector(".card-foot");
+    let cardFoot = newsCard.querySelector('.card-footer') || newsCard.querySelector('.card-foot');
     if (!cardFoot) {
-      cardFoot = document.createElement("div");
-      cardFoot.className = "card-footer";
+      cardFoot = document.createElement('div');
+      cardFoot.className = 'card-footer';
       newsCard.appendChild(cardFoot);
     }
     
@@ -325,8 +325,8 @@ if (typeof dismissTestAlert !== 'function') {
     var out = [];
     for (var i = 0; i < raw.length; i++) {
       var x = raw[i] || {};
-      var t = x.tarih || x.Tarih || x.date || "";
-      var c = x.icerik || x.İcerik || x.İÇERİK || x.content || "";
+      var t = x.tarih || x.Tarih || x.date || '';
+      var c = x.icerik || x.İcerik || x.İÇERİK || x.content || '';
       if (t && c) out.push({ tarih: t, icerik: c });
     }
     function toTime(s) { var d = new Date(s); return isNaN(d) ? 0 : d.getTime(); }
@@ -337,7 +337,7 @@ if (typeof dismissTestAlert !== 'function') {
     try {
       localStorage.setItem(LS_KEY, JSON.stringify(items));
       localStorage.setItem(LS_FETCHED_AT, String(Date.now()));
-    } catch (e) {}
+    } catch (e) { /* intentionally empty */ }
   }
   function load() {
     try {
@@ -347,16 +347,16 @@ if (typeof dismissTestAlert !== 'function') {
   }
   function lastFetchedMs() { return Number(localStorage.getItem(LS_FETCHED_AT) || 0); }
   function shouldRefresh() { return (Date.now() - lastFetchedMs()) >= REFRESH_MS; }
-  function setMetaLoading() { try { metaEl.textContent = "Yükleniyor…"; } catch (e) {} }
+  function setMetaLoading() { try { metaEl.textContent = 'Yükleniyor…'; } catch (e) { /* intentionally empty */ } }
   function setErrorInCard() {
-    var body = document.querySelector("#newsCard .news-drop__content") || document.querySelector("#newsCard .card-body");
+    var body = document.querySelector('#newsCard .news-drop__content') || document.querySelector('#newsCard .card-body');
     if (body) body.innerHTML = '<p class="news-error">Haberler alınamadı.</p>';
   }
   function fetchFromRemote() {
     setMetaLoading();
-    return fetch(NEWS_URL, { cache: "no-store" })
+    return fetch(NEWS_URL, { cache: 'no-store' })
       .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
       })
       .then(function (data) {
@@ -371,7 +371,7 @@ if (typeof dismissTestAlert !== 'function') {
   }
   function renderMeta(total) {
     var fetchedAt = lastFetchedMs();
-    var fetchedText = "—";
+    var fetchedText = '—';
     if (fetchedAt) {
       try {
         fetchedText = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'short' })
@@ -380,12 +380,12 @@ if (typeof dismissTestAlert !== 'function') {
         fetchedText = new Date(fetchedAt).toLocaleString('tr-TR');
       }
     }
-    metaEl.textContent = total + " haber · Son güncelleme: " + fetchedText;
+    metaEl.textContent = total + ' haber · Son güncelleme: ' + fetchedText;
   }
   function renderListPage(items, page) {
     if (!items || !items.length) {
       listEl.innerHTML = "<p class='news-empty'>Haber bulunamadı.</p>";
-      if (pagerEl) { pagerEl.innerHTML = ""; pagerEl.style.display = "none"; }
+      if (pagerEl) { pagerEl.innerHTML = ''; pagerEl.style.display = 'none'; }
       return;
     }
     var total = items.length;
@@ -396,8 +396,8 @@ if (typeof dismissTestAlert !== 'function') {
     var start = (page - 1) * PAGE_SIZE;
     var end = start + PAGE_SIZE;
     var slice = items.slice(start, end);
-    pagerEl.innerHTML = "";
-    pagerEl.style.display = (totalPages <= 1 ? "none" : "");
+    pagerEl.innerHTML = '';
+    pagerEl.style.display = (totalPages <= 1 ? 'none' : '');
     if (totalPages > 1) {
       // unified pager layout: left(prev), center(info), right(next)
   var left = document.createElement('div');
@@ -432,7 +432,7 @@ if (typeof dismissTestAlert !== 'function') {
         const storedKey = 'footerNews_v1';
         const existingRaw = localStorage.getItem(storedKey);
         let existing = [];
-        if (existingRaw){ try{ existing = JSON.parse(existingRaw)||[]; }catch(e){} }
+        if (existingRaw){ try{ existing = JSON.parse(existingRaw)||[]; }catch(e){ /* intentionally empty */ } }
         const seen = new Set(existing.map(x=> (x.date+'__'+x.text)));
         const addList = [];
         itemsCache.forEach(function(it){
@@ -503,7 +503,7 @@ if (typeof dismissTestAlert !== 'function') {
           const msg = (opts.title||'') + (opts.body? ': '+opts.body:'');
           if (window.logEvent) window.logEvent(toastType, msg);
         }
-      } catch(_) { }
+      } catch(_) { /* intentionally empty */ }
       queue.push(opts);
       showNext();
       return { queued:true };
@@ -542,8 +542,8 @@ if (typeof dismissTestAlert !== 'function') {
       fetchFromRemote().then(function (it) { render(it); });
     }
   }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function () { ensureData(); scheduleHourly(); });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { ensureData(); scheduleHourly(); });
   } else {
     ensureData(); scheduleHourly();
   }
@@ -730,7 +730,7 @@ if (typeof dismissTestAlert !== 'function') {
 // [fusion] searchSicil: Enter => filterBtn, then check column; toast if not found
 (function(){
   if (window.__bindSearchEnterToast) return; window.__bindSearchEnterToast=true;
-  const searchEl = document.getElementById("searchSicil");
+  const searchEl = document.getElementById('searchSicil');
   if (searchEl){
     searchEl.addEventListener('keydown', (ev)=>{
       if (ev.key === 'Enter'){
@@ -741,18 +741,18 @@ if (typeof dismissTestAlert !== 'function') {
     });
   }
   // Hook filter button to show "sicil yok" toast if column not found
-  const filterBtn = document.getElementById("filterBtn");
+  const filterBtn = document.getElementById('filterBtn');
   if (filterBtn){
-    filterBtn.addEventListener("click", ()=>{
+    filterBtn.addEventListener('click', ()=>{
       try{
-        const qEl = document.getElementById("searchSicil");
-        const q = qEl ? (qEl.value||"").trim() : "";
+        const qEl = document.getElementById('searchSicil');
+        const q = qEl ? (qEl.value||'').trim() : '';
         if (!q) return;
-        const wrap = document.querySelector(".table-wrap");
+        const wrap = document.querySelector('.table-wrap');
         let found = false;
         if (wrap){
-          const ths = wrap.querySelectorAll("th");
-          const needle = "(" + q + ")";
+          const ths = wrap.querySelectorAll('th');
+          const needle = '(' + q + ')';
           for (let i=0;i<ths.length;i++){
             if (ths[i].textContent.trim() === needle){ found=true; break; }
           }
@@ -760,7 +760,7 @@ if (typeof dismissTestAlert !== 'function') {
         if (!found && window.toast){
           window.toast({ type:'warning', title:'Kayıt bulunamadı', body:'Bu sicile ait bir kayıt bulunamamıştır.' });
         }
-      }catch(_){}
+      }catch(_){ /* intentionally empty */ }
     });
   }
 })();
@@ -1029,23 +1029,23 @@ function __applyPager(tableSelector, pageSize){
 // [fusion] saveBtn toast
 (function(){
   if (window.__saveBtnToastBound) return; window.__saveBtnToastBound = true;
-  const btn = document.getElementById("saveBtn");
+  const btn = document.getElementById('saveBtn');
   if (!btn) return;
-  btn.addEventListener("click", function(){
+  btn.addEventListener('click', function(){
     try{
       var ok = true;
-      if (typeof save === "function") ok = !!save();
+      if (typeof save === 'function') ok = !!save();
       var old = btn.textContent;
-      btn.textContent = ok ? "Kaydedildi ✔" : "Kaydedilemedi ✖";
+      btn.textContent = ok ? 'Kaydedildi ✔' : 'Kaydedilemedi ✖';
       setTimeout(()=>{ btn.textContent = old; }, 1400);
       if (window.toast) {
         window.toast({
-          type: ok ? "success" : "error",
-          title: ok ? "Başarılı" : "Hata",
-          body: ok ? "Ayarlar başarıyla kaydedildi." : "Kayıt sırasında bir hata oluştu."
+          type: ok ? 'success' : 'error',
+          title: ok ? 'Başarılı' : 'Hata',
+          body: ok ? 'Ayarlar başarıyla kaydedildi.' : 'Kayıt sırasında bir hata oluştu.'
         });
       }
-    }catch(_e){ if (window.toast) window.toast({type:"success", title:"Başarılı", body:"Ayarlar başarıyla kaydedildi."}); }
+    }catch(_e){ if (window.toast) window.toast({type:'success', title:'Başarılı', body:'Ayarlar başarıyla kaydedildi.'}); }
   });
 })();
 
@@ -1118,7 +1118,7 @@ function __applyPager(tableSelector, pageSize){
       if(window.__LOG_BUFFER__) window.__LOG_BUFFER__.length = 0;
       const stats = document.getElementById('logStats'); if(stats) stats.textContent='0 kayıt';
       // localStorage'dan da temizle
-      try{ localStorage.removeItem('app_logs'); }catch(_){}
+      try{ localStorage.removeItem('app_logs'); }catch(_){ /* intentionally empty */ }
       logEvent('ui','Loglar temizlendi');
     });
   })();

@@ -14,12 +14,15 @@
     "JSZip": "readonly",
     "toast": "readonly",
     "showModal": "readonly",
-    "hideModal": "readonly"
+    "hideModal": "readonly",
+    "jQuery": "readonly",
+    "$": "readonly"
   },
   "rules": {
-    "no-console": "warn",
+    "no-console": "error",
     "no-unused-vars": "warn",
     "semi": ["error", "always"],
-    "quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": true }]
+    "no-empty": "warn",
+    "no-prototype-builtins": "warn"
   }
 }

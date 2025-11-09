@@ -1,10 +1,10 @@
 (() => {
-  "use strict";
+  'use strict';
 
   // ======================
   //  Layout Hotfix (rev3)
   // ======================
-  if (!document.getElementById("kesinlesme-layout-hotfix")) {
+  if (!document.getElementById('kesinlesme-layout-hotfix')) {
     const css = `
       .container, .card, .card-head, .card-body, .ustsag, .altsol, .altsag { min-width: 0; }
       .card-body { box-sizing: border-box; max-width: 100%; overflow-wrap: anywhere; }
@@ -75,16 +75,16 @@
         --st-bd-h: #777;
       }
     `;
-    const s = document.createElement("style");
-    s.id = "kesinlesme-layout-hotfix"; s.textContent = css;
+    const s = document.createElement('style');
+    s.id = 'kesinlesme-layout-hotfix'; s.textContent = css;
     document.head.appendChild(s);
   }
   // ====== Bugün tatil / en yakın tatil toast'ları (10 sn) ======
 	let __holidayToastShown = false;
 
 	function normalizeStr(s){
-	  return String(s||"").toLowerCase()
-		.replace(/\s+/g," ")
+	  return String(s||'').toLowerCase()
+		.replace(/\s+/g,' ')
 		.replace(/[’']/g,"'") // tek tırnak varyantları
 		.trim();
 	}
@@ -93,81 +93,81 @@
 	  const t = normalizeStr(aciklama);
 
 	  // Sıraya dikkat: daha spesifikler önce
-	  if (t.includes("yılbaşı")) {
+	  if (t.includes('yılbaşı')) {
 		return {
-		  type: "primary",
-		  title: "Mutlu Yıllar",
+		  type: 'primary',
+		  title: 'Mutlu Yıllar',
 		  body: `Mutlu Yıllar, ${year} tüm Adalet Bakanlığı Çalışanlarına huzur ve sağlık getirmesi dileğiyle,`
 		};
 	  }
-	  if (t.includes("cumhuriyet bayram")) { // 28/29 ekim ve yarım gün varyantları
+	  if (t.includes('cumhuriyet bayram')) { // 28/29 ekim ve yarım gün varyantları
 		return {
-		  type: "primary",
-		  title: "Cumhuriyet Bayramı",
+		  type: 'primary',
+		  title: 'Cumhuriyet Bayramı',
 		  body: `Cumhuriyet; eşitliğin, özgürlüğün ve bağımsızlığın en güzel ifadesidir. Ne mutlu Türküm diyene!”
 		  `
 		};
 	  }
-	  if (t.includes("ramazan bayram")) {
+	  if (t.includes('ramazan bayram')) {
 		return {
-		  type: "primary",
-		  title: "Ramazan Bayramı",
-		  body: "Ramazan Bayramınızı tebrik ederiz!"
+		  type: 'primary',
+		  title: 'Ramazan Bayramı',
+		  body: 'Ramazan Bayramınızı tebrik ederiz!'
 		};
 	  }
-	  if (t.includes("kurban bayram")) {
+	  if (t.includes('kurban bayram')) {
 		return {
-		  type: "primary",
-		  title: "Kurban Bayramı",
-		  body: "Kurban Bayramınızı tebrik ederiz!"
+		  type: 'primary',
+		  title: 'Kurban Bayramı',
+		  body: 'Kurban Bayramınızı tebrik ederiz!'
 		};
 	  }
-	  if (t.includes("ulusal egemenlik ve çocuk bayramı")) {
+	  if (t.includes('ulusal egemenlik ve çocuk bayramı')) {
 		return {
-		  type: "primary",
-		  title: "23 Nisan",
-		  body: "Ulusal Egemenlik ve Çocuk Bayramı Kutlu Olsun,"
+		  type: 'primary',
+		  title: '23 Nisan',
+		  body: 'Ulusal Egemenlik ve Çocuk Bayramı Kutlu Olsun,'
 		};
 	  }
-	  if (t.includes("emek ve dayanışma günü") || t.includes("işçi bayram")) {
+	  if (t.includes('emek ve dayanışma günü') || t.includes('işçi bayram')) {
 		return {
-		  type: "primary",
-		  title: "1 Mayıs",
+		  type: 'primary',
+		  title: '1 Mayıs',
 		  body: "Birlik ve dayanışma içinde, eşit haklarla çalışacağımız güzel bir dünya dileğiyle 1 Mayıs İşçi Bayramı'mız kutlu olsun!,"
 		};
 	  }
-	  if (t.includes("atatürk'ü anma, gençlik ve spor bayramı") || t.includes("gençlik ve spor bayramı")) {
+	  if (t.includes("atatürk'ü anma, gençlik ve spor bayramı") || t.includes('gençlik ve spor bayramı')) {
 		return {
-		  type: "primary",
-		  title: "19 Mayıs",
+		  type: 'primary',
+		  title: '19 Mayıs',
 		  body: "Ey yükselen yeni nesil, gelecek sizindir. Cumhuriyeti biz kurduk; onu yükseltecek ve sürdürecek sizsiniz (K. Atatürk). 19 Mayıs Atatürk'ü Anma Gençlik ve Spor Bayramınız kutlu olsun."
 		};
 	  }
-	  if (t.includes("demokrasi ve milli birlik günü") || t.includes("15 temmuz")) {
+	  if (t.includes('demokrasi ve milli birlik günü') || t.includes('15 temmuz')) {
 		return {
-		  type: "primary",
-		  title: "15 Temmuz",
-		  body: "Bir bayrak uğruna can veren yiğitleri minnetle anıyoruz. 15 Temmuz Demokrasi ve Milli Birlik Günü kutlu olsun"
+		  type: 'primary',
+		  title: '15 Temmuz',
+		  body: 'Bir bayrak uğruna can veren yiğitleri minnetle anıyoruz. 15 Temmuz Demokrasi ve Milli Birlik Günü kutlu olsun'
 		};
 	  }
-	  if (t.includes("zafer bayramı") || t.includes("30 ağustos")) {
+	  if (t.includes('zafer bayramı') || t.includes('30 ağustos')) {
 		return {
-		  type: "primary",
-		  title: "30 Ağustos",
-		  body: "30 Ağustos Zafer Bayramı kutlu olsun! Başta Gazi Mustafa Kemal Atatürk olmak üzere tüm şehitlerimizi rahmet ve minnetle anıyoruz."
+		  type: 'primary',
+		  title: '30 Ağustos',
+		  body: '30 Ağustos Zafer Bayramı kutlu olsun! Başta Gazi Mustafa Kemal Atatürk olmak üzere tüm şehitlerimizi rahmet ve minnetle anıyoruz.'
 		};
 	  }
 	  // Varsayılan (her ihtimale karşı)
 	  return {
-		type: "primary",
-		title: "Tatil",
-		body: aciklama || "Güzel bir gün dileriz."
+		type: 'primary',
+		title: 'Tatil',
+		body: aciklama || 'Güzel bir gün dileriz.'
 	  };
 	}
 
 	function findTodayHoliday(){
 	  const today = new Date(); today.setHours(0,0,0,0);
-	  const todayISO = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+	  const todayISO = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 	  return tatiller.find(t => t.iso === todayISO) || null;
 	}
 
@@ -181,12 +181,12 @@
 	}
 
 	function maybeHolidayToast(){
-	  if (__holidayToastShown || typeof window.toast !== "function") return;
+	  if (__holidayToastShown || typeof window.toast !== 'function') return;
 	  const today = new Date(); today.setHours(0,0,0,0);
 
 	  const th = findTodayHoliday();
 	  if (th) {
-		const msg = getHolidayMessage(th.aciklama || "", today.getFullYear());
+		const msg = getHolidayMessage(th.aciklama || '', today.getFullYear());
 		window.toast({ type: msg.type, title: msg.title, body: msg.body, delay: 10000 });
 		__holidayToastShown = true;
 		return;
@@ -195,10 +195,10 @@
 	  const nh = findNextHoliday();
 	  if (nh) {
 		const diffDays = Math.round((new Date(`${nh.iso}T00:00:00`).getTime() - today.getTime()) / (1000*60*60*24));
-		const label = nh.aciklama ? ` : ${nh.aciklama}` : "";
+		const label = nh.aciklama ? ` : ${nh.aciklama}` : '';
 		window.toast({
-		  type: "info",
-		  title: "Yaklaşan Tatil",
+		  type: 'info',
+		  title: 'Yaklaşan Tatil',
 		  body: `En Yakın Tatil${label} — ${fmt_dots(new Date(`${nh.iso}T00:00:00`))} (${diffDays} gün sonra)`,
 		  delay: 10000
 		});
@@ -211,13 +211,13 @@
   //  Kısa yardımcılar
   // ======================
   const $ = (s, r = document) => r.querySelector(s);
-  const pad = n => String(n).padStart(2, "0");
+  const pad = n => String(n).padStart(2, '0');
   const toISO = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   const fromISO = iso => (iso ? new Date(`${iso}T00:00:00`) : null);
   const fmt_ddmm = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
   const fmt_dots = d => `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}`;
   const addDays = (d, n) => { const x = new Date(d.getTime()); x.setDate(x.getDate()+n); return x; };
-  const trDays = ["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
+  const trDays = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
 
   // ======================
   //  Tatiller (API → JSON fallback) ve normalize
@@ -226,14 +226,14 @@
 
   function buildPathCandidates(subpath) {
     const path = window.location.pathname;
-    const segs = path.split("/").filter(Boolean);
+    const segs = path.split('/').filter(Boolean);
     const out = [];
     for (let i = segs.length - 1; i >= 0; i--) {
-      const prefix = "/" + segs.slice(0, i).join("/");
-      const base = prefix.endsWith("/") ? prefix : (prefix ? prefix + "/" : "/");
-      out.push(base + subpath.replace(/^\/+/, ""));
+      const prefix = '/' + segs.slice(0, i).join('/');
+      const base = prefix.endsWith('/') ? prefix : (prefix ? prefix + '/' : '/');
+      out.push(base + subpath.replace(/^\/+/, ''));
     }
-    const root = "/" + subpath.replace(/^\/+/, "");
+    const root = '/' + subpath.replace(/^\/+/, '');
     if (!out.includes(root)) out.push(root);
     return [...new Set(out)];
   }
@@ -242,11 +242,11 @@
     for (const p of paths) {
       const url = new URL(p, window.location.origin).href;
       try {
-        const res = await fetch(url, { cache: "no-store" });
+        const res = await fetch(url, { cache: 'no-store' });
         if (res.ok) return await res.json();
       } catch { /* pass */ }
     }
-    throw new Error("tatiller kaynakları bulunamadı");
+    throw new Error('tatiller kaynakları bulunamadı');
   }
 
   function normalizeTatiller(raw) {
@@ -255,24 +255,24 @@
       if (!v) return null;
       let m;
       if ((m = v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/))) {
-        const [, d, M, y] = m; return `${y}-${String(M).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        const [, d, M, y] = m; return `${y}-${String(M).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       }
       if ((m = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/))) {
-        const [, d, M, y] = m; return `${y}-${String(M).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        const [, d, M, y] = m; return `${y}-${String(M).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       }
       if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(v)) {
-        const [y, M, d] = v.split("-"); return `${y}-${String(M).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        const [y, M, d] = v.split('-'); return `${y}-${String(M).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       }
       return null;
     };
     if (Array.isArray(raw)) {
       for (const it of raw) {
-        if (it && typeof it === "object") {
+        if (it && typeof it === 'object') {
           const iso = toISOguess(it.tarih || it.iso);
           if (!iso) continue;
-          out.push({ iso, tur: Number(it.tur) === 2 ? 2 : 1, aciklama: it.aciklama || "" });
-        } else if (typeof it === "string") {
-          const iso = toISOguess(it); if (iso) out.push({ iso, tur: 1, aciklama: "" });
+          out.push({ iso, tur: Number(it.tur) === 2 ? 2 : 1, aciklama: it.aciklama || '' });
+        } else if (typeof it === 'string') {
+          const iso = toISOguess(it); if (iso) out.push({ iso, tur: 1, aciklama: '' });
         }
       }
     }
@@ -281,7 +281,7 @@
 
   async function loadHolidays() {
     try {
-      const apiPaths  = buildPathCandidates("api/tatiller.php");
+      const apiPaths  = buildPathCandidates('api/tatiller.php');
       const rawApi    = await fetchJsonWithFallback(apiPaths);
       const arr       = Array.isArray(rawApi?.data) ? rawApi.data : rawApi;
       tatiller        = normalizeTatiller(arr);
@@ -289,14 +289,14 @@
 	  maybeHolidayToast();
     } catch (eApi) {
       try {
-        const jsonPaths = buildPathCandidates("data/tatiller.json");
+        const jsonPaths = buildPathCandidates('data/tatiller.json');
         const rawJson   = await fetchJsonWithFallback(jsonPaths);
         const arr2      = Array.isArray(rawJson?.data) ? rawJson.data : rawJson;
         tatiller        = normalizeTatiller(arr2);
         paintHolidays();
 		maybeHolidayToast();
       } catch (eJson) {
-        $("#holidayInfo").textContent = "tatiller yüklenemedi.";
+        $('#holidayInfo').textContent = 'tatiller yüklenemedi.';
       }
     }
   }
@@ -306,7 +306,7 @@
   // ======================
   function mountForm() {
     const todayISO = toISO(new Date());
-    $("#formMount").innerHTML = `
+    $('#formMount').innerHTML = `
 	  <div class="form-row">
 		<label class="row-label" for="tebligTarihi">Tebliğ Tarihi</label>
 		<div class="row-field">
@@ -335,39 +335,39 @@
         </div>
       </div>
     `;
-    $("#tebligTarihi").value = todayISO;
+    $('#tebligTarihi').value = todayISO;
 
-    $("#formMount").querySelectorAll(".date-actions .btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-		  const inp = $("#tebligTarihi");
+    $('#formMount').querySelectorAll('.date-actions .btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+		  const inp = $('#tebligTarihi');
 		  let d = fromISO(inp.value) || new Date();
-		  if (btn.dataset.today === "1") {
+		  if (btn.dataset.today === '1') {
 			d = new Date();
 			if (window.toast)
-			  window.toast({ type: "info", title: "Tarih sıfırlandı", body: "Bugüne alındı" });
+			  window.toast({ type: 'info', title: 'Tarih sıfırlandı', body: 'Bugüne alındı' });
 		  } else {
 			const delta = parseInt(btn.dataset.delta, 10) || 0;
 			d = addDays(d, delta);
 			const infoTxt = `${fmt_dots(d)} (${trDays[d.getDay()]})`;
 			if (window.toast)
-			  window.toast({ type: "info", title: "Tarih değişti", body: `Yeni tarih: ${infoTxt}` });
+			  window.toast({ type: 'info', title: 'Tarih değişti', body: `Yeni tarih: ${infoTxt}` });
 		  }
 		  inp.value = toISO(d);
 		});
     });
 
-    $("#btnCalc")?.addEventListener("click", onCalc);
-    $("#btnClear")?.addEventListener("click", onClear);
+    $('#btnCalc')?.addEventListener('click', onCalc);
+    $('#btnClear')?.addEventListener('click', onClear);
   }
 
   // ======================
   //  Tatiller paneli (dd/mm/yyyy; geçmiş=filled, gelecek=outline)
   // ======================
   function paintHolidays() {
-    const info  = $("#holidayInfo");
-    const mount = $("#holidayMount");
+    const info  = $('#holidayInfo');
+    const mount = $('#holidayMount');
     const items = tatiller.slice().sort((a,b)=>a.iso.localeCompare(b.iso));
-    info.textContent = items.length ? `${items.length} kayıt` : "kayıt yok";
+    info.textContent = items.length ? `${items.length} kayıt` : 'kayıt yok';
 
     const today = new Date(); today.setHours(0,0,0,0);
     // Gruplar: geçmiş ve gelecek ayrı; her grup hover/focus ile açılır.
@@ -382,15 +382,15 @@
       const label = fmt_ddmm(d);
       const isFuture = d.getTime() >= today.getTime();
       const cls = isFuture
-        ? (t.tur===2 ? "tag tag--o-half" : "tag tag--o-full")
-        : (t.tur===2 ? "tag tag--half"  : "tag tag--full");
-      const title = (t.aciklama || "").replace(/"/g,"&quot;");
+        ? (t.tur===2 ? 'tag tag--o-half' : 'tag tag--o-full')
+        : (t.tur===2 ? 'tag tag--half'  : 'tag tag--full');
+      const title = (t.aciklama || '').replace(/"/g,'&quot;');
       return `<span class="${cls}" title="${title}">${label}</span>`;
     }
     function groupHtml(list, groupLabel){
       if (!list.length) return '';
       const head = `<div class="holiday-group-head muted"><span class="chevron">▸</span><span>${groupLabel} (${list.length})</span></div>`;
-      const inner = list.map(renderTag).join("");
+      const inner = list.map(renderTag).join('');
       return `<div class="holiday-group" tabindex="0">${head}<div class="holiday-group-inner">${inner}</div></div>`;
     }
     const toolbar = `<div class="holiday-groups-toolbar"><button class="toggle-all-btn" type="button" id="btnToggleAll"><span class="material-symbols-rounded" style="font-size:16px;"> unfold_more </span><span>Tümünü aç</span></button><div id="holidayInfoInline" class="muted small"></div></div>`;
@@ -398,7 +398,7 @@
     mount.innerHTML = html || '<em>Tanımlı yok</em>';
 
     // Bilgiyi toolbar'a da yaz
-    const infoInline = $("#holidayInfoInline"); if (infoInline) infoInline.textContent = items.length ? `${items.length} kayıt` : "kayıt yok";
+    const infoInline = $('#holidayInfoInline'); if (infoInline) infoInline.textContent = items.length ? `${items.length} kayıt` : 'kayıt yok';
 
     // Etkileşimler: tek tek aç/kapa ve tümünü aç/kapa
     mount.querySelectorAll('.holiday-group').forEach(el=>{
@@ -413,7 +413,7 @@
         if (e.key==='ArrowLeft')  el.classList.remove('open');
       });
     });
-    const btnAll = $("#btnToggleAll");
+    const btnAll = $('#btnToggleAll');
     if (btnAll){
       let allOpen = false;
       const updateLabel = ()=>{
@@ -462,8 +462,8 @@
     }
 
     let son = new Date(teblig);
-    if (unit === "hafta") son = addDays(son, 7*count);
-    else if (unit === "ay") { const d = new Date(son); d.setMonth(d.getMonth()+count); son = d; }
+    if (unit === 'hafta') son = addDays(son, 7*count);
+    else if (unit === 'ay') { const d = new Date(son); d.setMonth(d.getMonth()+count); son = d; }
     else son = addDays(son, count);
 
     for (let i=0;i<3;i++){
@@ -485,7 +485,7 @@
           notes.push(`${fmt_dots(son)} tarihi ${hol.aciklama}  günü yarım gün Resmi Tatil ise de, Yargıtay Ceza Genel Kurulu’nun 22.06.2022 tarih ve 2020/255 E. , 2022/365 K. sayılı ilamıyla özetle *öngörülen bir haftalık temyiz süresinin 6,5 güne indirilmesi anlamına geleceği, dolayısıyla da kanun yoluna başvuru hakkını kısıtlayıcı sonuç doğuracağı ve temyiz süresinin son günü normal mesai saati bitiminden önce saat 13.00’ten itibaren resmî tatilin başlaması nedeniyle sanığın temyiz süresinin resmî tatilin bitimine kadar uzayacağı kabul edilmelidir.* kararına istinaden süre tatilin bitimine UZAR,  <a href="https://657.com.tr/tebligin-son-gunu-yarim-gun-tatile-denk-gelirse-surenin-uzayacagi-karari/" target="_blank">Yargıtay Kararı için tıklayınız.</a>`);
 		  son = addDays(son, 1);
         } else {
-          notes.push(`${fmt_dots(son)} günü ${hol.aciklama || "Resmî Tatil"}  günü olduğundan, CMK Madde 39/4 uyarınca 'Son gün bir tatile rastlarsa süre, tatilin ertesi günü biter'.`);
+          notes.push(`${fmt_dots(son)} günü ${hol.aciklama || 'Resmî Tatil'}  günü olduğundan, CMK Madde 39/4 uyarınca 'Son gün bir tatile rastlarsa süre, tatilin ertesi günü biter'.`);
           son = addDays(son, 1);
         }
       }
@@ -503,18 +503,18 @@
 //  Hesapla / Temizle
 // ======================
 	function onCalc() {
-	  const tebligISO = $("#tebligTarihi").value;
-	  const count = Math.max(1, parseInt($("#sureSayi").value, 10) || 0);
-	  const unit  = $("#sureTur").value;
+	  const tebligISO = $('#tebligTarihi').value;
+	  const count = Math.max(1, parseInt($('#sureSayi').value, 10) || 0);
+	  const unit  = $('#sureTur').value;
 
 	  if (!tebligISO) {
-		if (typeof window.toast === "function") window.toast({type:'warning', title:'Uyarı', body:'Tebliğ tarihi seçiniz.'});
+		if (typeof window.toast === 'function') window.toast({type:'warning', title:'Uyarı', body:'Tebliğ tarihi seçiniz.'});
 		return;
 	  }
 
 	  const out = computeKesinlesme({ tebligISO, count, unit });
 	  if (!out) {
-		if (typeof window.toast === "function") window.toast({type:'warning', title:'Uyarı', body:'Hesaplama yapılamadı.'});
+		if (typeof window.toast === 'function') window.toast({type:'warning', title:'Uyarı', body:'Hesaplama yapılamadı.'});
 		return;
 	  }
 
@@ -524,24 +524,24 @@
 		const today = new Date(); today.setHours(0,0,0,0);
 		const diffDays = Math.round((kesin.getTime() - today.getTime()) / (1000*60*60*24));
 
-		let colorClass = "text-muted";
-		let phrase = "", icon = "";
+		let colorClass = 'text-muted';
+		let phrase = '', icon = '';
 
 		if (diffDays === 0) {
-		  colorClass = "text-warning";
-		  phrase = "BUGÜN";
-		  icon = "🟡";
+		  colorClass = 'text-warning';
+		  phrase = 'BUGÜN';
+		  icon = '🟡';
 		} else if (diffDays > 0) {
-		  colorClass = "text-success";
+		  colorClass = 'text-success';
 		  phrase = `${diffDays} gün sonra`;
-		  icon = "✅";
+		  icon = '✅';
 		} else {
-		  colorClass = "text-danger";
+		  colorClass = 'text-danger';
 		  phrase = `${Math.abs(diffDays)} gün GECİKTİ`;
-		  icon = "🔴";
+		  icon = '🔴';
 		}
 
-		$("#resultBox").innerHTML = `
+		$('#resultBox').innerHTML = `
 		  <div class="kpi-value">${fmt_ddmm(kesin)}</div>
 		  <div class="kpi-label">${dayName} <span class="status-chip ${colorClass}">– ${phrase} ${icon}</span></div>
 		`;
@@ -549,27 +549,27 @@
 
 	  // --- Açıklamalar: whitespace temizle; tek öğe kalırsa gizle; linkleri HTML render et ---
 	  const cleanNotes = out.notes
-		.map(n => String(n || "").replace(/\s+/g, " ").trim())
+		.map(n => String(n || '').replace(/\s+/g, ' ').trim())
 		.filter(n => n.length > 0);
 
-	  const ul = $("#explainList");
+	  const ul = $('#explainList');
 	  if (cleanNotes.length <= 1) {
-		ul.innerHTML = "";
+		ul.innerHTML = '';
 	  } else {
 		ul.innerHTML = cleanNotes.map(n => {
 		  // Eğer metinde <a href= geçiyorsa HTML render et
-		  if (n.includes("<a ")) return `<li>${n}</li>`;
-		  const safe = n.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+		  if (n.includes('<a ')) return `<li>${n}</li>`;
+		  const safe = n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 		  return `<li>${safe}</li>`;
-		}).join("");
+		}).join('');
 	  }
 
 	  refreshOpsCounter();
 
 	  if (window.toast) {
 		window.toast({
-		  type: "success",
-		  title: "Hesaplandı",
+		  type: 'success',
+		  title: 'Hesaplandı',
 		  body: `Kesinleşme tarihi: ${fmt_dots(kesin)} (${trDays[kesin.getDay()]})`
 		});
 	  }
@@ -578,16 +578,16 @@
 
   function onClear() {
     const todayISO = toISO(new Date());
-    $("#tebligTarihi").value = todayISO;
-    $("#sureSayi").value = 2;
-    $("#sureTur").value  = "hafta";
-    $("#resultBox").innerHTML = `
+    $('#tebligTarihi').value = todayISO;
+    $('#sureSayi').value = 2;
+    $('#sureTur').value  = 'hafta';
+    $('#resultBox').innerHTML = `
       <div class="kpi-value muted">—</div>
       <div class="kpi-label">—</div>`;
-    $("#explainList").innerHTML = "";
+    $('#explainList').innerHTML = '';
     refreshOpsCounter();
 	if (window.toast)
-	  window.toast({ type: "warning", title: "Form sıfırlandı", body: "Alanlar temizlendi" });
+	  window.toast({ type: 'warning', title: 'Form sıfırlandı', body: 'Alanlar temizlendi' });
 
   }
 
@@ -616,13 +616,13 @@
   function refreshOpsCounter() {
     const wrap = ensureOpsCounterCard();
     if (!wrap) return;
-    const outEl = $("#opsCount");
+    const outEl = $('#opsCount');
     if (!outEl) return;
 
     function updateDom(val){ outEl.textContent = String(val); }
     function onError(){ /* sessiz geç */ }
 
-    if (window.jQuery && typeof window.jQuery.getJSON === "function") {
+    if (window.jQuery && typeof window.jQuery.getJSON === 'function') {
       window.jQuery.getJSON('https://sayac.657.com.tr/arttirkarar', function(response) {
         try {
           const adetRaw = (response && typeof response.adet !== 'undefined') ? (response.adet * 1) : 0;
@@ -637,7 +637,7 @@
   // ======================
   //  Başlat
   // ======================
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener('DOMContentLoaded', () => {
     mountForm();
     loadHolidays();
     ensureOpsCounterCard();

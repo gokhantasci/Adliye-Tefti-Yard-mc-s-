@@ -19,7 +19,7 @@
    * @returns {number} Zero-based column index
    */
   function letterToIndex(col) {
-    col = String(col || "").trim().toUpperCase();
+    col = String(col || '').trim().toUpperCase();
     let n = 0;
     for (let i = 0; i < col.length; i++) {
       n = n * 26 + (col.charCodeAt(i) - 64);
@@ -33,7 +33,7 @@
    * @returns {string} Escaped string
    */
   function escapeHtml(s) {
-    return String(s ?? "").replace(/[&<>"']/g, function(m) {
+    return String(s ?? '').replace(/[&<>"']/g, function(m) {
       return {
         '&': '&amp;',
         '<': '&lt;',
@@ -51,24 +51,24 @@
    * @returns {string} Normalized string
    */
   function normalizeTurkish(s) {
-    return String(s ?? "")
-      .replace(/\u00A0/g, " ")
-      .replace(/\r?\n+/g, " ")
+    return String(s ?? '')
+      .replace(/\u00A0/g, ' ')
+      .replace(/\r?\n+/g, ' ')
       .trim()
       .toLowerCase()
-      .replace(/\s+/g, " ")
-      .replaceAll("ı", "i")
-      .replaceAll("İ", "i")
-      .replaceAll("ş", "s")
-      .replaceAll("Ş", "s")
-      .replaceAll("ğ", "g")
-      .replaceAll("Ğ", "g")
-      .replaceAll("ö", "o")
-      .replaceAll("Ö", "o")
-      .replaceAll("ü", "u")
-      .replaceAll("Ü", "u")
-      .replaceAll("ç", "c")
-      .replaceAll("Ç", "c");
+      .replace(/\s+/g, ' ')
+      .replaceAll('ı', 'i')
+      .replaceAll('İ', 'i')
+      .replaceAll('ş', 's')
+      .replaceAll('Ş', 's')
+      .replaceAll('ğ', 'g')
+      .replaceAll('Ğ', 'g')
+      .replaceAll('ö', 'o')
+      .replaceAll('Ö', 'o')
+      .replaceAll('ü', 'u')
+      .replaceAll('Ü', 'u')
+      .replaceAll('ç', 'c')
+      .replaceAll('Ç', 'c');
   }
 
   /**
@@ -80,7 +80,7 @@
    * @param {number} opts.delay - Auto-hide delay in milliseconds
    */
   function showToast(opts) {
-    if (typeof window.toast === "function") {
+    if (typeof window.toast === 'function') {
       window.toast(opts);
     }
     // No fallback - silently ignore if toast function not available
@@ -95,12 +95,12 @@
    */
   function toastWithIcon(type, title, msg, delay = 5000) {
     const icons = {
-      success: "check_circle",
-      warning: "warning",
-      danger: "error",
-      info: "info"
+      success: 'check_circle',
+      warning: 'warning',
+      danger: 'error',
+      info: 'info'
     };
-    const icon = icons[type] || "info";
+    const icon = icons[type] || 'info';
     
     const bodyHtml = `<div style="display:flex;align-items:flex-start;gap:.5rem;">
       <span class="material-symbols-rounded" style="font-size:22px;">${icon}</span>
@@ -116,7 +116,7 @@
    * @returns {string} Formatted number
    */
   function formatNumber(n) {
-    return new Intl.NumberFormat("tr-TR").format(n || 0);
+    return new Intl.NumberFormat('tr-TR').format(n || 0);
   }
 
   /**
@@ -169,7 +169,7 @@
    * @returns {boolean} True if valid
    */
   function isValidAdaletEmail(email) {
-    return /^[A-Z0-9._%+-]+@adalet\.gov\.tr$/i.test(String(email || "").trim());
+    return /^[A-Z0-9._%+-]+@adalet\.gov\.tr$/i.test(String(email || '').trim());
   }
 
   /**
@@ -178,7 +178,7 @@
    * @returns {string} Extracted email or empty string
    */
   function extractEmail(text) {
-    const match = String(text || "").match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+    const match = String(text || '').match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
     return match ? match[0].trim() : '';
   }
 
@@ -399,13 +399,15 @@
     setTimeout(renderAllLogs, 100);
   }
   // Intercept console methods
+  /* eslint-disable no-console */
     ['log','warn','error','info'].forEach(kind => {
       const original = console[kind];
       console[kind] = function(...args){
-        try{ logEvent(kind, args.map(a=> typeof a==='string'? a: JSON.stringify(a)).join(' ')); }catch(_){}
+        try{ logEvent(kind, args.map(a=> typeof a==='string'? a: JSON.stringify(a)).join(' ')); }catch(_){ /* intentionally empty */ }
         original.apply(console, args);
       };
     });
+  /* eslint-enable no-console */
     // Ensure toast logging at display-time and auto-rewrap if reassigned later
     (function ensureToastLogging(){
       function normalize(args){

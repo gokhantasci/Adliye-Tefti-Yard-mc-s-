@@ -1,31 +1,31 @@
 (function(){
-  "use strict";
+  'use strict';
   // letterToIndex is now in utils.js - use window.letterToIndex
   function pick(row, keys){
-    if (!row) return "";
-    var map = { B: window.letterToIndex("B"), C: window.letterToIndex("C"), E: window.letterToIndex("E") };
+    if (!row) return '';
+    var map = { B: window.letterToIndex('B'), C: window.letterToIndex('C'), E: window.letterToIndex('E') };
     for (var i=0;i<keys.length;i++){
       var k = keys[i];
       if (Array.isArray(row) && (k in map)){
         var v = row[map[k]];
-        if (v != null && String(v).trim() !== "") return String(v).trim();
-      } else if (row && typeof row === "object"){
+        if (v != null && String(v).trim() !== '') return String(v).trim();
+      } else if (row && typeof row === 'object'){
         for (var kk in row){
           if (Object.prototype.hasOwnProperty.call(row, kk) && kk.toLowerCase() === k.toLowerCase()){
             var v2 = row[kk];
-            if (v2 != null && String(v2).trim() !== "") return String(v2).trim();
+            if (v2 != null && String(v2).trim() !== '') return String(v2).trim();
           }
         }
       }
     }
-    return "";
+    return '';
   }
-  function getSicil(r){ return pick(r, ["sicil","hakimId","hakimSicil","hukumHakimBaskanPId"]); }
-  function getType(r){  return pick(r, ["type","tur","kararTuru","KararTuru"]); }
+  function getSicil(r){ return pick(r, ['sicil','hakimId','hakimSicil','hukumHakimBaskanPId']); }
+  function getType(r){  return pick(r, ['type','tur','kararTuru','KararTuru']); }
   function pushIndex(map, sicil, type, idx){
     if(!sicil) return;
     var s = String(sicil).trim();
-    var t = type ? String(type).trim() : "";
+    var t = type ? String(type).trim() : '';
     if (!map[s]) map[s] = {};
     if (!map[s][t]) map[s][t] = [];
     map[s][t].push(idx);
@@ -35,7 +35,7 @@
     for (var i=0;i<G.rows.length;i++){
       var r = G.rows[i];
       var sicil = getSicil(r);
-      var type  = getType(r) || "";
+      var type  = getType(r) || '';
       pushIndex(G.perSicil, sicil, type, i);
     }
     if (!window.TYPES_ORDER || !Array.isArray(window.TYPES_ORDER) || window.TYPES_ORDER.length===0){
@@ -51,9 +51,9 @@
       return {
         sicil: getSicil(r),
         type:  getType(r),
-        B:     pick(r,["B","No","numara"]),
-        C:     pick(r,["C","esasNo","esas_no"]),
-        E:     pick(r,["E","yil","kararYili"])
+        B:     pick(r,['B','No','numara']),
+        C:     pick(r,['C','esasNo','esas_no']),
+        E:     pick(r,['E','yil','kararYili'])
       };
     });
   }

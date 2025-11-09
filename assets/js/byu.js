@@ -1,21 +1,21 @@
 (() => {
-  "use strict";
+  'use strict';
   if (window.__byuBooted) return; window.__byuBooted = true;
 
   const $ = (s, r=document) => r.querySelector(s);
   const PAGE_SIZE = 20;
-  const norm = s => String(s ?? "").replace(/\u00A0/g," ").replace(/\r?\n+/g," ").trim().toLowerCase().replace(/\s+/g," ")
-    .replaceAll("ı","i").replaceAll("İ","i").replaceAll("ş","s").replaceAll("Ş","s")
-    .replaceAll("ğ","g").replaceAll("Ğ","g").replaceAll("ö","o").replaceAll("Ö","o")
-    .replaceAll("ü","u").replaceAll("Ü","u").replaceAll("ç","c").replaceAll("Ç","c");
-  const txt = v => String(v ?? "").trim();
-  const esc = s => String(s ?? "").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const norm = s => String(s ?? '').replace(/\u00A0/g,' ').replace(/\r?\n+/g,' ').trim().toLowerCase().replace(/\s+/g,' ')
+    .replaceAll('ı','i').replaceAll('İ','i').replaceAll('ş','s').replaceAll('Ş','s')
+    .replaceAll('ğ','g').replaceAll('Ğ','g').replaceAll('ö','o').replaceAll('Ö','o')
+    .replaceAll('ü','u').replaceAll('Ü','u').replaceAll('ç','c').replaceAll('Ç','c');
+  const txt = v => String(v ?? '').trim();
+  const esc = s => String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
   const COL = { C:2, F:5, G:6, I:8, J:9, K:10, L:11, D:3 }; // D başlık kontrolü için
   const ROW = { TITLE:2, BIRIM:4, ARALIK:5, HEADER:10, DATA_START:11 };
-  const TITLE_NEEDLE = norm("BASİT YARGILAMA USULÜ ZAMAN KONTROLÜ");
+  const TITLE_NEEDLE = norm('BASİT YARGILAMA USULÜ ZAMAN KONTROLÜ');
 
-  const state = { rows: [], sheetName: "", birimAdi: "", denetimAraligi: "", currentPage: 1, searchTerm: "", delayCheckDone: false, dateErrors: 0, emptyFieldErrors: 0 };
+  const state = { rows: [], sheetName: '', birimAdi: '', denetimAraligi: '', currentPage: 1, searchTerm: '', delayCheckDone: false, dateErrors: 0, emptyFieldErrors: 0 };
 
   function toast(type,title,body){ if (typeof window.toast === 'function') window.toast({type,title,body}); }
 
@@ -29,12 +29,12 @@
     const K = norm(row[COL.K]||'');
     const L = norm(row[COL.L]||'');
     let score=0;
-    if(C.includes("esas") && C.includes("no")) score++;
-    if(F.includes("usul") && (F.includes("karar") || F.includes("uygulanmasina"))) score++;
-    if(G.includes("son") && G.includes("islem") && G.includes("tarih")) score++;
-    if(I.includes("gerekceli") && I.includes("karar") && I.includes("tarih")) score++;
-    if(J.includes("sure") || J.includes("süre")) score++;
-    if(L.includes("hakim") || L.includes("hâkim")) score++;
+    if(C.includes('esas') && C.includes('no')) score++;
+    if(F.includes('usul') && (F.includes('karar') || F.includes('uygulanmasina'))) score++;
+    if(G.includes('son') && G.includes('islem') && G.includes('tarih')) score++;
+    if(I.includes('gerekceli') && I.includes('karar') && I.includes('tarih')) score++;
+    if(J.includes('sure') || J.includes('süre')) score++;
+    if(L.includes('hakim') || L.includes('hâkim')) score++;
     return score >= 5;
   }
 
@@ -422,14 +422,14 @@
     setChosenText(`Seçilen: ${f.name}`); 
     window.setInlineXlsLoading('#xlsInlineSpinnerByu', true); 
     Promise.resolve().then(()=>processExcel(f)).finally(()=>window.setInlineXlsLoading('#xlsInlineSpinnerByu', false)); 
-    if (window.jQuery && typeof window.jQuery.getJSON === "function") {
-      window.jQuery.getJSON("https://sayac.657.com.tr/arttirkarar", function(response) {
+    if (window.jQuery && typeof window.jQuery.getJSON === 'function') {
+      window.jQuery.getJSON('https://sayac.657.com.tr/arttirkarar', function(response) {
         try {
-          const adetRaw = (response && typeof response.adet !== "undefined") ? Number(response.adet) : 0;
+          const adetRaw = (response && typeof response.adet !== 'undefined') ? Number(response.adet) : 0;
           if (adetRaw > 0) {
-            const fmtInt = n => new Intl.NumberFormat("tr-TR").format(n || 0);
+            const fmtInt = n => new Intl.NumberFormat('tr-TR').format(n || 0);
             const msg = `28/10/2025 tarihinden bugüne kadar ${fmtInt(adetRaw)} adet işlem yaptık.`;
-            window.toast?.({ type: "info", title: "Başarılı", body: msg, delay : 9000 });
+            window.toast?.({ type: 'info', title: 'Başarılı', body: msg, delay : 9000 });
           }
         } catch (e) {
         }
@@ -438,13 +438,13 @@
     }
   }
 
-  if(elDrop){ elDrop.addEventListener('click',()=> elInput?.click()); ["dragenter","dragover"].forEach(ev=> elDrop.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); elDrop.classList.add('dragover'); })); ["dragleave","drop"].forEach(ev=> elDrop.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); elDrop.classList.remove('dragover'); })); elDrop.addEventListener('drop',e=>{ const files=e.dataTransfer?.files; if(!files||files.length===0){ toast('warning','Dosya','Bırakılan dosya algılanamadı.'); return;} handleFiles(files); }); }
+  if(elDrop){ elDrop.addEventListener('click',()=> elInput?.click()); ['dragenter','dragover'].forEach(ev=> elDrop.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); elDrop.classList.add('dragover'); })); ['dragleave','drop'].forEach(ev=> elDrop.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); elDrop.classList.remove('dragover'); })); elDrop.addEventListener('drop',e=>{ const files=e.dataTransfer?.files; if(!files||files.length===0){ toast('warning','Dosya','Bırakılan dosya algılanamadı.'); return;} handleFiles(files); }); }
   if(elInput){ elInput.addEventListener('change',()=>{ const files=elInput.files; if(!files||!files.length){ toast('warning','Dosya','Herhangi bir dosya seçilmedi.'); return;} handleFiles(files); }); }
   
   // Arama input event listener
-  const searchInput = $("#searchInput");
+  const searchInput = $('#searchInput');
   if (searchInput){
-    searchInput.addEventListener("input", (e) => {
+    searchInput.addEventListener('input', (e) => {
       state.searchTerm = e.target.value.trim();
       state.currentPage = 1;
       renderCombinedPreview();

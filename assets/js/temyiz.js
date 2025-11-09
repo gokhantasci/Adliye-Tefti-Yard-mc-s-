@@ -1,16 +1,16 @@
 (() => {
-    "use strict";
+    'use strict';
 
     const $ = (s, r = document) => r.querySelector(s);
 
     // ---- DOM elemanları
-    const dropZone = $("#dropZone");
-    const fileInput = $("#fileInput");
-    const hintEl = $("#selectedFilesHint");
-    const statsBody = $("#cardUstSol .panel-body"); // KPI & karar türleri (üst sağ)
+    const dropZone = $('#dropZone');
+    const fileInput = $('#fileInput');
+    const hintEl = $('#selectedFilesHint');
+    const statsBody = $('#cardUstSol .panel-body'); // KPI & karar türleri (üst sağ)
 
     // ---- Sabitler
-    const REQUIRED_SHEET = "czmIstinafDefteriRaporu";
+    const REQUIRED_SHEET = 'czmIstinafDefteriRaporu';
     const pageSize = 20;
 
     // ---- Durum
@@ -19,13 +19,13 @@
 
     // ---- Yardımcılar
     const escapeHtml = s => String(s).replace(/[&<>"']/g, m => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
     } [m]));
-    const normalize = s => String(s ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+    const normalize = s => String(s ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
 
     const letterToIndex = L => {
         L = String(L).toUpperCase().trim();
@@ -35,7 +35,7 @@
     };
 
     function iconFor(type) {
-        return type === "success" ? "check_circle" : type === "warning" ? "warning" : type === "danger" ? "error" : "info";
+        return type === 'success' ? 'check_circle' : type === 'warning' ? 'warning' : type === 'danger' ? 'error' : 'info';
     }
 
     function toastWithIcon(type, title, msg, delay = 5000) {
@@ -53,7 +53,7 @@
     function isExcelFile(f) {
         if (!f || !f.name) return false;
         const n = f.name.toLowerCase();
-        return n.endsWith(".xls") || n.endsWith(".xlsx");
+        return n.endsWith('.xls') || n.endsWith('.xlsx');
     }
 	
 
@@ -69,7 +69,7 @@
             <table class="table"><thead><tr><th>Tür</th><th>Adet</th></tr></thead><tbody>
               ${
                 Object.keys(stats.decisions).length
-                  ? Object.keys(stats.decisions).sort().map(k=>`<tr><td>${escapeHtml(k)}</td><td class="num">${stats.decisions[k]}</td></tr>`).join("")
+                  ? Object.keys(stats.decisions).sort().map(k=>`<tr><td>${escapeHtml(k)}</td><td class="num">${stats.decisions[k]}</td></tr>`).join('')
                   : `<tr><td colspan="2" class="muted">Henüz karar yok</td></tr>`
               }
             </tbody></table>
@@ -79,30 +79,30 @@
 
         // ÜST SOL: KPI kartları
         ensureKpiCards();
-        $("#kpiIstinafEdilen") && ($("#kpiIstinafEdilen").textContent = stats.total.toLocaleString("tr-TR"));
-		$("#kpiVazgecilen") && ($("#kpiVazgecilen").textContent = stats.withdrawn.toLocaleString("tr-TR"));
-        $("#kpiNotSent") && ($("#kpiNotSent").textContent = stats.not_sent.toLocaleString("tr-TR"));
-        $("#kpiPending") && ($("#kpiPending").textContent = stats.pending_review.toLocaleString("tr-TR"));
-        $("#kpiDecided") && ($("#kpiDecided").textContent = stats.decided.toLocaleString("tr-TR"));
+        $('#kpiIstinafEdilen') && ($('#kpiIstinafEdilen').textContent = stats.total.toLocaleString('tr-TR'));
+		$('#kpiVazgecilen') && ($('#kpiVazgecilen').textContent = stats.withdrawn.toLocaleString('tr-TR'));
+        $('#kpiNotSent') && ($('#kpiNotSent').textContent = stats.not_sent.toLocaleString('tr-TR'));
+        $('#kpiPending') && ($('#kpiPending').textContent = stats.pending_review.toLocaleString('tr-TR'));
+        $('#kpiDecided') && ($('#kpiDecided').textContent = stats.decided.toLocaleString('tr-TR'));
     }
 
  
     // ---- Üst Sol KPI: card-head'i kaldır, KPI grid ekle
     function ensureKpiCards() {
-        const ustSol = $("#cardAltSol");
+        const ustSol = $('#cardAltSol');
         if (!ustSol) return;
 
-        const ch = ustSol.querySelector(".card-head");
+        const ch = ustSol.querySelector('.card-head');
         if (ch) ch.remove();
 
-        let body = ustSol.querySelector(".card-body");
+        let body = ustSol.querySelector('.card-body');
         if (!body) {
-            body = document.createElement("div");
-            body.className = "card-body";
+            body = document.createElement('div');
+            body.className = 'card-body';
             ustSol.appendChild(body);
         }
 
-        if (body.querySelector(".kpi-grid")) return;
+        if (body.querySelector('.kpi-grid')) return;
 
         body.innerHTML = `
 		<section class="kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;">

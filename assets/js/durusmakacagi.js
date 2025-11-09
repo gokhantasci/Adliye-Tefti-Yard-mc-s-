@@ -7,7 +7,7 @@
 
   function toast(type,title,body){
     if (typeof window.toast === 'function') window.toast({type,title,body});
-    else console[type==='danger'?'error':type==='warning'?'warn':'log'](`${title}: ${body}`);
+    // No fallback - silently ignore if toast not available
   }
 
   async function downloadTemplate(){

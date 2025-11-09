@@ -15,12 +15,12 @@ function computeKararNo(r){
 }
 
 (function(){
-  if (typeof window.openModal === "function") return;
+  if (typeof window.openModal === 'function') return;
 
   function ensureModal(){
-    let modal = document.getElementById("caseModal");
+    let modal = document.getElementById('caseModal');
     if (!modal){
-      const tpl = document.createElement("template");
+      const tpl = document.createElement('template');
       tpl.innerHTML = `
 <div id="caseModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="cm-backdrop" data-close></div>
@@ -40,7 +40,7 @@ function computeKararNo(r){
   </div>
 </div>`;
       document.body.appendChild(tpl.content);
-      modal = document.getElementById("caseModal");
+      modal = document.getElementById('caseModal');
 
       function close(){ modal.classList.remove('is-open','active'); modal.setAttribute('aria-hidden','true'); }
       modal.__close = close;

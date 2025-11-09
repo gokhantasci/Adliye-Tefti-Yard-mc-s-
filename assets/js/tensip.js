@@ -1,33 +1,33 @@
 (() => {
-  "use strict";
+  'use strict';
   if (window.__tensipBooted) return; window.__tensipBooted = true;
 
   const $ = (s, r=document) => r.querySelector(s);
   const PAGE_SIZE = 20;
-  const fmtInt = n => new Intl.NumberFormat("tr-TR").format(n || 0);
+  const fmtInt = n => new Intl.NumberFormat('tr-TR').format(n || 0);
 
   function toast(type, title, body){
-    if (typeof window.toast === "function") window.toast({type, title, body});
-    else console[type === 'danger' ? 'error' : type === 'warning' ? 'warn' : 'log'](`${title}: ${body}`);
+    if (typeof window.toast === 'function') window.toast({type, title, body});
+    // No fallback - silently ignore if toast not available
   }
-  const norm = (s) => String(s ?? "")
-    .replace(/\u00A0/g," ").replace(/\r?\n+/g," ")
-    .trim().toLowerCase().replace(/\s+/g," ")
-    .replaceAll("ı","i").replaceAll("İ","i")
-    .replaceAll("ş","s").replaceAll("Ş","s")
-    .replaceAll("ğ","g").replaceAll("Ğ","g")
-    .replaceAll("ö","o").replaceAll("Ö","o")
-    .replaceAll("ü","u").replaceAll("Ü","u")
-    .replaceAll("ç","c").replaceAll("Ç","c");
-  const cell = (aoa, r, c) => (aoa?.[r]?.[c] ?? "");
-  const txt  = (v) => String(v ?? "").trim();
-  const esc  = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const norm = (s) => String(s ?? '')
+    .replace(/\u00A0/g,' ').replace(/\r?\n+/g,' ')
+    .trim().toLowerCase().replace(/\s+/g,' ')
+    .replaceAll('ı','i').replaceAll('İ','i')
+    .replaceAll('ş','s').replaceAll('Ş','s')
+    .replaceAll('ğ','g').replaceAll('Ğ','g')
+    .replaceAll('ö','o').replaceAll('Ö','o')
+    .replaceAll('ü','u').replaceAll('Ü','u')
+    .replaceAll('ç','c').replaceAll('Ç','c');
+  const cell = (aoa, r, c) => (aoa?.[r]?.[c] ?? '');
+  const txt  = (v) => String(v ?? '').trim();
+  const esc  = (s) => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
   const COL = { C:2, F:5, H:7, K:10, L:11 };
   const ROW = { TITLE:2, BIRIM:4, ARALIK:5, HEADER:10, DATA_START:11 }; // D3, G5, G6, C11
-  const TITLE_NEEDLE = norm("TENSİP ZAMAN KONTROLÜ");
+  const TITLE_NEEDLE = norm('TENSİP ZAMAN KONTROLÜ');
 
-  const state = { rows: [], sheetName: "", birimAdi: "", denetimAraligi: "", currentPage: 1, searchTerm: "", delayCheckDone: false };
+  const state = { rows: [], sheetName: '', birimAdi: '', denetimAraligi: '', currentPage: 1, searchTerm: '', delayCheckDone: false };
 
   function isDataHeaderRow(row){
     const C = norm(row[COL.C]||'');
@@ -36,18 +36,18 @@
     const K = norm(row[COL.K]||'');
     const L = norm(row[COL.L]||'');
     let score = 0;
-    if (C.startsWith("esas no")) score++;
-    if (F.includes("kabul") && F.includes("tarih")) score++;
-    if (H.includes("tensip") && H.includes("tarih")) score++;
-    if (K.includes("sure") || K.includes("süre")) score++;
-    if (L === "hakim" || L === "hakim adi" || L === "hakim adı") score++;
+    if (C.startsWith('esas no')) score++;
+    if (F.includes('kabul') && F.includes('tarih')) score++;
+    if (H.includes('tensip') && H.includes('tarih')) score++;
+    if (K.includes('sure') || K.includes('süre')) score++;
+    if (L === 'hakim' || L === 'hakim adi' || L === 'hakim adı') score++;
     return score >= 4;
   }
 
   const RX_ID = /^\s*\d{4}\s*\/\s*\d{1,6}\s*$/;
   const RX_DT = /^\s*\d{2}\/\d{2}\/\d{4}\s*$/;
-  function isValidId(v){ return RX_ID.test(String(v||"")); }
-  function isValidDate(v){ return RX_DT.test(String(v||"")); }
+  function isValidId(v){ return RX_ID.test(String(v||'')); }
+  function isValidDate(v){ return RX_DT.test(String(v||'')); }
 
   // Tarih helpers
   function parseDate(s){
@@ -114,18 +114,18 @@
   }
 
   function clearPreview(){
-    const wrap = $("#combinedTableWrap");
-    const card = $("#combinedSummaryCard");
-    const stats = $("#combinedStats");
+    const wrap = $('#combinedTableWrap');
+    const card = $('#combinedSummaryCard');
+    const stats = $('#combinedStats');
     if (wrap) wrap.innerHTML = `<div class="placeholder">Henüz veri yok.</div>`;
-    if (stats) stats.innerHTML = "";
-    if (card) card.style.display = "none";
+    if (stats) stats.innerHTML = '';
+    if (card) card.style.display = 'none';
   }
 
   function renderCombinedPreview(){
-    const wrap = $("#combinedTableWrap");
-    const card = $("#combinedSummaryCard");
-    const stats = $("#combinedStats");
+    const wrap = $('#combinedTableWrap');
+    const card = $('#combinedSummaryCard');
+    const stats = $('#combinedStats');
     if (!wrap || !card) return;
     
     // Arama filtresi uygula
@@ -144,15 +144,15 @@
     const total = filteredRows.length;
     if (!total){ 
       wrap.innerHTML = '<div class="placeholder">Arama sonucu bulunamadı.</div>';
-      card.style.display = "block";
+      card.style.display = 'block';
       return;
     }
     if (stats){
       stats.innerHTML = `
         <span class="badge">${total} kayıt</span>
-        ${state.sheetName ? `<span class=\"badge\">${esc(state.sheetName)}</span>` : ""}
-        ${state.birimAdi ? `<span class=\"badge\">${esc(state.birimAdi)}</span>` : ""}
-        ${state.denetimAraligi ? `<span class=\"badge\">${esc(state.denetimAraligi)}</span>` : ""}
+        ${state.sheetName ? `<span class=\"badge\">${esc(state.sheetName)}</span>` : ''}
+        ${state.birimAdi ? `<span class=\"badge\">${esc(state.birimAdi)}</span>` : ''}
+        ${state.denetimAraligi ? `<span class=\"badge\">${esc(state.denetimAraligi)}</span>` : ''}
       `;
     }
     const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -202,8 +202,8 @@
   }
   function bindPager(pc){
     const toPage = (p)=>{ state.currentPage = Math.min(pc, Math.max(1,p)); renderCombinedPreview(); };
-    $("#pgPrev")?.addEventListener('click', ()=>toPage(state.currentPage-1));
-    $("#pgNext")?.addEventListener('click', ()=>toPage(state.currentPage+1));
+    $('#pgPrev')?.addEventListener('click', ()=>toPage(state.currentPage-1));
+    $('#pgNext')?.addEventListener('click', ()=>toPage(state.currentPage+1));
   }
 
   async function exportToDocx(){
@@ -302,22 +302,22 @@
   }
 
   // Upload UI bindings (same pattern as others)
-  const elDrop = $("#udfDrop"); const elInput = $("#udfInput"); const elChosen = $("#xlsChosen");
+  const elDrop = $('#udfDrop'); const elInput = $('#udfInput'); const elChosen = $('#xlsChosen');
   const setChosenText = (t)=>{ if (elChosen) elChosen.textContent = t || ''; };
-  function isExcelFile(f){ if (!f) return false; const nameOk = /\.xlsx?$/i.test(f.name); const typeOk = /sheet|excel|spreadsheet/i.test(f.type||"") || nameOk; return nameOk || typeOk; }
+  function isExcelFile(f){ if (!f) return false; const nameOk = /\.xlsx?$/i.test(f.name); const typeOk = /sheet|excel|spreadsheet/i.test(f.type||'') || nameOk; return nameOk || typeOk; }
   function pickFirstExcelFile(list){ if (!list||list.length===0) return null; if (list.length>1) toast('warning','Tek Dosya','Yalnızca 1 adet XLS/XLSX seçebilirsiniz. İlk dosya işlendi.'); const f=list[0]; if (!isExcelFile(f)){ toast('warning','Dosya Türü','Lütfen XLS/XLSX dosyası seçiniz.'); return null;} return f; }
   function handleFiles(fl){ 
     const f = pickFirstExcelFile(fl); 
     if (!f){ setChosenText(''); return;} 
     setChosenText(`Seçilen: ${f.name}`); 
     processExcel(f).catch(err=>{ toast('danger','Okuma Hatası','Excel okunurken sorun oluştu.'); }); 
-    if (window.jQuery && typeof window.jQuery.getJSON === "function") {
-      window.jQuery.getJSON("https://sayac.657.com.tr/arttirkarar", function(response) {
+    if (window.jQuery && typeof window.jQuery.getJSON === 'function') {
+      window.jQuery.getJSON('https://sayac.657.com.tr/arttirkarar', function(response) {
         try {
-          const adetRaw = (response && typeof response.adet !== "undefined") ? Number(response.adet) : 0;
+          const adetRaw = (response && typeof response.adet !== 'undefined') ? Number(response.adet) : 0;
           if (adetRaw > 0) {
             const msg = `28/10/2025 tarihinden bugüne kadar ${fmtInt(adetRaw)} adet işlem yaptık.`;
-            window.toast?.({ type: "info", title: "Başarılı", body: msg, delay : 9000 });
+            window.toast?.({ type: 'info', title: 'Başarılı', body: msg, delay : 9000 });
           }
         } catch (e) {
         }
@@ -331,16 +331,16 @@
   }
   if (elDrop){
     elDrop.addEventListener('click', ()=> elInput?.click());
-    ["dragenter","dragover"].forEach(ev=> elDrop.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); elDrop.classList.add('dragover'); }));
-    ["dragleave","drop"].forEach(ev=> elDrop.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); elDrop.classList.remove('dragover'); }));
+    ['dragenter','dragover'].forEach(ev=> elDrop.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); elDrop.classList.add('dragover'); }));
+    ['dragleave','drop'].forEach(ev=> elDrop.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); elDrop.classList.remove('dragover'); }));
     elDrop.addEventListener('drop', e=>{ const files = e.dataTransfer?.files; if (!files||files.length===0){ toast('warning','Dosya','Bırakılan dosya algılanamadı.'); return;} handleFilesWithInline(files); });
   }
   if (elInput){ elInput.addEventListener('change', ()=>{ const files = elInput.files; if (!files||!files.length){ toast('warning','Dosya','Herhangi bir dosya seçilmedi.'); return;} handleFilesWithInline(files); }); }
   
   // Arama input event listener
-  const searchInput = $("#searchInput");
+  const searchInput = $('#searchInput');
   if (searchInput){
-    searchInput.addEventListener("input", (e) => {
+    searchInput.addEventListener('input', (e) => {
       state.searchTerm = e.target.value.trim();
       state.currentPage = 1;
       renderCombinedPreview();

@@ -401,7 +401,7 @@
           const text = await res.clone().text();
           try { const j = JSON.parse(text); if (j && j.reason) msg = j.reason; }
           catch { if (text) msg = text.slice(0, 500); }
-        } catch {}
+        } catch { /* intentionally empty */ }
         window.toast?.({type:'danger', title:'Hata', body: msg});
         return;
       }
