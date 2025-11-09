@@ -83,10 +83,8 @@
     if (typeof window.toast === 'function') {
       window.toast(opts);
     } else {
-      // Fallback to console
-      const level = opts.type === 'danger' ? 'error' :
-        opts.type === 'warning' ? 'warn' : 'log';
-      console[level](`${opts.title}: ${opts.body}`);
+      // Fallback silently - no console output
+      // Toast sistem yoksa sessizce atla
     }
   }
 
@@ -402,7 +400,9 @@
     bindLogPagerControls();
     setTimeout(renderAllLogs, 100);
   }
-  // Intercept console methods
+  // Production mode: Suppress console output completely
+  // Console intercept disabled for clean production logs
+  /*
   ['log','warn','error','info'].forEach(kind => {
     const original = console[kind];
     console[kind] = function(...args){
@@ -410,6 +410,7 @@
       original.apply(console, args);
     };
   });
+  */
   // Ensure toast logging at display-time and auto-rewrap if reassigned later
   (function ensureToastLogging(){
     function normalize(args){

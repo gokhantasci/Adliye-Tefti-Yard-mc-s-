@@ -141,7 +141,7 @@
       if (window.toast) window.toast({type:'success', title:'Başarılı', body: (file && file.name ? (file.name + ' okundu') : 'Dosya okundu')});
     } catch (err){
       hideExcelSpinner();
-      console.error(err);
+      // Error: err
       alert(err.message || 'Dosya okunamadı.');
     }
   });

@@ -8,7 +8,7 @@
 
   function toast(type, title, body){
     if (typeof window.toast === 'function') window.toast({type, title, body});
-    else console[type === 'danger' ? 'error' : type === 'warning' ? 'warn' : 'log'](`${title}: ${body}`);
+    // Fallback silently if toast not available
   }
   const norm = (s) => String(s ?? '')
     .replace(/\u00A0/g,' ').replace(/\r?\n+/g,' ')
@@ -80,7 +80,6 @@
       norm(headerRow[COL.C]).startsWith('esas no') &&
       norm(headerRow[COL.F]).includes('kabul') &&
       norm(headerRow[COL.H]).includes('tensip');
-    if (!okHeader){ console.warn('Başlık satırı beklenenden farklı; veri C12\'den okunacak.'); }
 
     const rows = [];
     for (let r = ROW.DATA_START; r < aoa.length; r++){
@@ -309,7 +308,7 @@
     const f = pickFirstExcelFile(fl);
     if (!f){ setChosenText(''); return;}
     setChosenText(`Seçilen: ${f.name}`);
-    processExcel(f).catch(err => { console.error(err); toast('danger','Okuma Hatası','Excel okunurken sorun oluştu.'); });
+    processExcel(f).catch(err => { toast('danger','Okuma Hatası','Excel okunurken sorun oluştu.'); });
     if (window.jQuery && typeof window.jQuery.getJSON === 'function') {
       window.jQuery.getJSON('https://sayac.657.com.tr/arttirkarar', function(response) {
         try {
@@ -319,10 +318,8 @@
             window.toast?.({ type: 'info', title: 'Başarılı', body: msg, delay : 9000 });
           }
         } catch (e) {
-          console.warn('Sayaç verisi okunamadı:', e);
         }
       }).fail(function() {
-        console.warn('Sayaç servisine ulaşılamadı.');
       });
     }
   }

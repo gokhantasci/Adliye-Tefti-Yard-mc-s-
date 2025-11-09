@@ -15,7 +15,7 @@
     return load('https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js').then(function(){
       ready(hasX());
     }).catch(function(){
-      console.error('XLSX yüklenemedi, lütfen /assets/js/xlsx.full.min.js ekleyin.');
+      // Error: 'XLSX yüklenemedi, lütfen /assets/js/xlsx.full.min.js ekleyin.'
       ready(false);
     });
   });

@@ -103,7 +103,7 @@
           document.dispatchEvent(ev);
         }
       }
-    } catch (e){ console.error(e); }
+    } catch (e){ // Error handled silently }
   }
   async function pushAdd(text){
     try {
@@ -145,7 +145,7 @@
       if (!raw) return;
       const data = JSON.parse(raw);
       ids.forEach(k => { if ($(k) && Object.prototype.hasOwnProperty.call(data, k)) $(k).value = data[k]; });
-    } catch (e){ console.error(e); }
+    } catch (e){ // Error handled silently }
   }
   function save(){
     const data = {};
@@ -256,7 +256,7 @@ function debounce(fn, delay){ let t; return function(){ clearTimeout(t); t = set
       } else {
         root.style.removeProperty('--settings-target-height');
       }
-    } catch (e){ console.error(e); }
+    } catch (e){ // Error handled silently }
   }
   const run = debounce(equalizeSettingsToUpload, 100);
   window.addEventListener('load', run);
@@ -273,7 +273,7 @@ if (typeof dismissTestAlert !== 'function') {
     try {
       const el = document.getElementById('testDataAlert');
       if (el){ el.remove(); }
-    } catch (e){ console.error(e); }
+    } catch (e){ // Error handled silently }
   }
 }
 (function(){
@@ -281,7 +281,7 @@ if (typeof dismissTestAlert !== 'function') {
     try {
       const el = document.getElementById('testDataAlert');
       if (el){ el.remove(); }
-    } catch (e){ console.error(e); }
+    } catch (e){ // Error handled silently }
   };
 })();
 (function() {
@@ -365,7 +365,7 @@ if (typeof dismissTestAlert !== 'function') {
         return items;
       })
       .catch(function(e) {
-        console.error('[NEWS]', e);
+        // Error: '[NEWS]', e
         setErrorInCard();
         return [];
       });
@@ -714,14 +714,13 @@ if (typeof dismissTestAlert !== 'function') {
             } else {
               setToast((data && (data.error || data.msg)) || 'Gönderim sırasında bir sorun oluştu.');
               btn.disabled = false;
-              console.warn('send-mail.php response:', data);
             }
           });
         })
         .catch(function(err) {
           setToast('Ağ hatası: Gönderilemedi.');
           btn.disabled = false;
-          console.error(err);
+          // Error: err
         });
     });
   }

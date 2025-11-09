@@ -20,7 +20,7 @@
         aboutContent.innerHTML = html;
       })
       .catch(function(error) {
-        console.error('README yükleme hatası:', error);
+        // README yükleme hatası - sessizce ele al
         aboutContent.innerHTML = '<p class="muted">Hakkında bilgisi yüklenemedi.</p>';
       });
   }

@@ -97,11 +97,69 @@
 
 ### Gereksinimler
 
-- PHP 7.4 veya üzeri
-- Web sunucusu (Apache/Nginx)
-- Modern web tarayıcısı (Chrome, Edge, Firefox önerilir)
+- **Geleneksel Kurulum İçin:**
+  - PHP 7.4 veya üzeri
+  - Web sunucusu (Apache/Nginx)
+  - Modern web tarayıcısı (Chrome, Edge, Firefox önerilir)
 
-### Kurulum Adımları
+- **Docker Kurulumu İçin:**
+  - Docker 20.10 veya üzeri
+  - Docker Compose 2.0 veya üzeri
+
+### 🐳 Docker ile Kurulum (Önerilen)
+
+Docker ile uygulamayı tek komutta çalıştırabilirsiniz:
+
+1. **Projeyi İndirin**
+   ```bash
+   git clone https://github.com/gokhantasci/Adliye-Teftis-Yardimcisi.git
+   cd Adliye-Teftis-Yardimcisi
+   ```
+
+2. **Environment Dosyasını Hazırlayın**
+   ```bash
+   cp .env.example .env
+   # .env dosyasını düzenleyip Gmail bilgilerinizi girin
+   ```
+
+3. **Uygulamayı Başlatın**
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Tarayıcınızda Açın**
+   - `http://localhost:8080` adresine gidin
+   - Uygulama hazır!
+
+#### Docker Komutları
+
+```bash
+# Uygulamayı başlat
+docker-compose up -d
+
+# Logları görüntüle
+docker-compose logs -f
+
+# Uygulamayı durdur
+docker-compose down
+
+# Uygulamayı yeniden başlat
+docker-compose restart
+
+# Container'a bağlan
+docker exec -it adliye-teftis bash
+```
+
+#### Docker Avantajları
+
+✅ Tek komut ile kurulum  
+✅ Tüm bağımlılıklar otomatik yüklenir  
+✅ PHP, Apache, tüm extensions hazır  
+✅ İzolasyonlu çalışma ortamı  
+✅ Port çakışması yok (8080 portu kullanılır)  
+✅ Kolay yedekleme ve taşıma  
+
+### 💻 Geleneksel Kurulum
 
 1. **Projeyi İndirin**
    ```bash
@@ -119,7 +177,14 @@
    chmod 777 data/
    ```
 
-4. **Uygulamayı Başlatın**
+4. **Environment Variables Ayarlayın**
+   - Gmail SMTP için environment variables tanımlayın:
+   ```bash
+   export GMAIL_USER="your-email@gmail.com"
+   export GMAIL_APP_PASSWORD="your-app-password"
+   ```
+
+5. **Uygulamayı Başlatın**
    - Tarayıcınızda `http://localhost/Adliye-Teftis-Yardimcisi` adresine gidin
    - veya doğrudan `teftis.657.com.tr` adresini kullanın
 
