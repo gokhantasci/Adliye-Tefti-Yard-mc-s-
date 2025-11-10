@@ -79,7 +79,7 @@
   const fileInput  = $('#udfInput');
   const chosenHint = $('#udfChosen');
   const col2       = $('#col2');
-  const col10      = $('#col10');
+  const col10      = $('#jsonUploadCol');
 
   // ==== JSON yükleme ====
   fileInput?.addEventListener('change', async (e) => {
@@ -145,7 +145,11 @@
       if (chosenHint) chosenHint.textContent = files.map(f => f.name).join(', ');
       toastOK(`${RAW.length.toLocaleString('tr-TR')} kayıt yüklendi.`);
 
-      // JSON başarıyla yüklendi: Çoklu Excel kartını görünür yap
+      // JSON başarıyla yüklendi: jsonUploadCol göster
+      const uploadCol = document.getElementById('jsonUploadCol');
+      if (uploadCol) uploadCol.style.display = '';
+
+      // Çoklu Excel kartını görünür yap
       const mcard = document.getElementById('multiExcelCard');
       if (mcard) mcard.style.display = '';
 
@@ -180,27 +184,26 @@
     if (!col2) return;
     if ($('#jrSideDateCard')) return;
 
-    const card = document.createElement('section');
-    card.className = 'card';
+    const card = document.createElement('div');
+    card.className = 'card mb-3';
     card.id = 'jrSideDateCard';
-    card.style.alignSelf = 'start';
     card.innerHTML = `
       <div class="card-header d-flex flex-wrap align-items-center gap-2">
-        <strong style="font-size:var(--fs-md);margin:0;" class="me-auto">Tarih Filtresi</strong>
-        <button type="button" class="chip" id="btnClr_acilis" data-key="acilis" data-active="0" hidden>Açılış ✕</button>
-        <button type="button" class="chip" id="btnClr_karar" data-key="karar" data-active="0" hidden>Karar ✕</button>
-        <button type="button" class="chip" id="btnClr_kapanis" data-key="kapanis" data-active="0" hidden>Kapanış ✕</button>
-        <button type="button" class="chip" id="btnClr_all" hidden>Tümü ✕</button>
+        <strong class="me-auto">Tarih Filtresi</strong>
+        <button type="button" class="badge bg-primary" id="btnClr_acilis" data-key="acilis" data-active="0" hidden>Açılış ✕</button>
+        <button type="button" class="badge bg-primary" id="btnClr_karar" data-key="karar" data-active="0" hidden>Karar ✕</button>
+        <button type="button" class="badge bg-primary" id="btnClr_kapanis" data-key="kapanis" data-active="0" hidden>Kapanış ✕</button>
+        <button type="button" class="badge bg-secondary" id="btnClr_all" hidden>Tümü ✕</button>
       </div>
-      <div class="card-body" style="padding:14px;">
+      <div class="card-body">
         ${pairBlock('Açılış', 'acilis')}
         ${pairBlock('Karar',  'karar')}
         ${pairBlock('Kapanış','kapanis')}
       </div>
       <div class="card-footer">
         <div class="d-flex gap-2">
-          <button class="btn" id="btnClearAll" style="font-size:var(--fs-sm);">Tümünü Temizle</button>
-          <button class="btn" id="btnApplyDateFilters" style="font-size:var(--fs-sm);">Uygula</button>
+          <button class="btn btn-outline-secondary btn-sm" id="btnClearAll">Tümünü Temizle</button>
+          <button class="btn btn-primary btn-sm" id="btnApplyDateFilters">Uygula</button>
         </div>
       </div>
     `;
@@ -238,8 +241,9 @@
       validateAll(); updateHeaderChips(); applyFilters();
     });
     // Keyboard accessibility for chips
-    card.querySelectorAll('.chip').forEach(chip => {
+    card.querySelectorAll('.badge').forEach(chip => {
       chip.tabIndex = 0;
+      chip.style.cursor = 'pointer';
       chip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); chip.click(); } });
     });
 
@@ -328,10 +332,9 @@
       const has = !!(st.from || st.to);
       chip.hidden = !has;
       chip.dataset.active = has ? '1' : '0';
+      const label = k === 'acilis' ? 'Açılış' : (k === 'karar' ? 'Karar' : 'Kapanış');
       if (has){
-        chip.textContent = (k === 'acilis' ? 'Açılış' : (k === 'karar' ? 'Karar' : 'Kapanış')) + ': ' + (st.from || '…') + ' – ' + (st.to || '…') + ' ✕';
-      } else {
-        chip.textContent = (k === 'acilis' ? 'Açılış' : (k === 'karar' ? 'Karar' : 'Kapanış')) + ' ✕';
+        chip.textContent = label + ' ✕';
       }
     });
     const any = [DF.acilis,DF.karar,DF.kapanis].some(st => st.from || st.to);
@@ -431,7 +434,7 @@
           <input id="${key}Search" type="text" class="form-control form-control-sm"
             placeholder="${key === 'statu' ? 'Statü ara' : '139329'}" list="${key}Suggestions">
           <datalist id="${key}Suggestions"></datalist>
-          <button class="btn" id="${key}SaveBtn" style="display:inline-flex;align-items:center;gap:6px;">
+          <button class="btn ghost" id="${key}SaveBtn" style="display:inline-flex;align-items:center;gap:6px;">
             <span class="material-symbols-rounded" style="font-size:18px;">save</span>
             <span>XLS</span>
           </button>
@@ -520,9 +523,9 @@
     }
     footer.innerHTML = `
       <div class="pager" style="display:flex;align-items:center;justify-content:center;gap:8px;">
-        <div><button class="btn" id="${key}Prev">Önceki</button></div>
+        <div><button class="btn ghost" id="${key}Prev">Önceki</button></div>
         <div class="muted" style="min-width:80px;text-align:center;">${total ? (start + 1) : 0}–${end} / ${total}</div>
-        <div><button class="btn" id="${key}Next">Sonraki</button></div>
+        <div><button class="btn ghost" id="${key}Next">Sonraki</button></div>
       </div>
     `;
     footer.querySelector(`#${key}Prev`)?.addEventListener('click', () => { if (JR_STATE[key].page > 1){ JR_STATE[key].page--; renderCard(key);} });
@@ -641,10 +644,11 @@
     const pager = document.createElement('div');
     pager.className = 'pager';
     pager.id = 'hatirlatmaPager';
+    pager.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:8px;';
     pager.innerHTML = `
-      <div><button class="btn" id="hatirPrev">Önceki</button></div>
-      <div class="muted" id="hatirPageInfo">Sayfa 1/1</div>
-      <div><button class="btn" id="hatirNext">Sonraki</button></div>
+      <div><button class="btn ghost" id="hatirPrev">Önceki</button></div>
+      <div class="muted" id="hatirPageInfo" style="min-width:80px;text-align:center;">Sayfa 1/1</div>
+      <div><button class="btn ghost" id="hatirNext">Sonraki</button></div>
     `;
 
     body.appendChild(tableWrap);
@@ -967,50 +971,53 @@
 
     const row = document.createElement('div');
     row.id = 'jrRow2';
-    row.className = 'mt-1';
+    row.className = 'row g-3';
 
     // 1) Statü
-    row.appendChild(wrapCard(`
+    const statuCol = document.createElement('div');
+    statuCol.className = 'col-12 col-md-6';
+    statuCol.innerHTML = `
       <div class="card h-100" id="statuCard">
-        <div class="card-header py-2 d-flex align-items-center gap-2">
+        <div class="card-header d-flex align-items-center gap-2">
           <span class="material-symbols-rounded">flag</span>
-          <strong class="small mb-0">Dosya Durumu</strong>
+          <strong>Dosya Durumu</strong>
         </div>
         <div class="card-body p-0" id="statuBody"></div>
       </div>
-    `));
+    `;
+    row.appendChild(statuCol);
 
     // 2) Kayıt Türü
-    row.appendChild(wrapCard(`
+    const kayitCol = document.createElement('div');
+    kayitCol.className = 'col-12 col-md-6';
+    kayitCol.innerHTML = `
       <div class="card h-100" id="kayitCard">
-        <div class="card-header py-2 d-flex align-items-center gap-2">
+        <div class="card-header d-flex align-items-center gap-2">
           <span class="material-symbols-rounded">category</span>
-          <strong class="small mb-0">Dosya Açılış Durumu</strong>
+          <strong>Dosya Açılış Durumu</strong>
         </div>
         <div class="card-body p-0" id="kayitBody"></div>
       </div>
-    `));
+    `;
+    row.appendChild(kayitCol);
 
     // 3) Hatırlatmalar
-    row.appendChild(wrapCard(`
+    const hatirCol = document.createElement('div');
+    hatirCol.className = 'col-12';
+    hatirCol.innerHTML = `
       <div class="card h-100" id="hatirlatmaCard">
-        <div class="card-header py-2 d-flex align-items-center gap-2">
+        <div class="card-header d-flex align-items-center gap-2">
           <span class="material-symbols-rounded">notifications_active</span>
-          <strong class="small mb-0">Hatırlatmalar</strong>
+          <strong>Hatırlatmalar</strong>
         </div>
         <div class="card-body" id="hatirlatmaBody">
-          <div class="text-body-secondary small">Bu kartı bir sonraki adımda tasarlayacağız.</div>
+          <div class="text-muted small">Veriler yüklendikten sonra hatırlatmalar burada görünecektir.</div>
         </div>
       </div>
-    `));
+    `;
+    row.appendChild(hatirCol);
 
     col10.appendChild(row);
-
-    function wrapCard(html){
-      const d = document.createElement('div');
-      d.innerHTML = html.trim();
-      return d.firstElementChild;
-    }
   }
 
   function renderSecondCard(key){
@@ -1057,9 +1064,9 @@
 	  }
     footer.innerHTML = `
         <div class="pager" style="display:flex;align-items:center;justify-content:center;gap:8px;">
-          <div><button class="btn" id="${key}Prev">Önceki</button></div>
+          <div><button class="btn ghost" id="${key}Prev">Önceki</button></div>
           <div class="muted small" style="min-width:80px;text-align:center;">${total ? (start + 1) : 0}–${end} / ${total}</div>
-          <div><button class="btn" id="${key}Next">Sonraki</button></div>
+          <div><button class="btn ghost" id="${key}Next">Sonraki</button></div>
         </div>
       `;
 	  footer.querySelector(`#${key}Prev`)?.addEventListener('click', () => { if (JR_STATE[key].page > 1){ JR_STATE[key].page--; renderSecondCard(key);} });
@@ -1081,12 +1088,14 @@
   function ensureModalStyles(){
     if (document.getElementById('jrModalFix')) return;
     const css = `
-#jrListModal.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.35);z-index:2147483647}
-#jrListModal.modal-backdrop.open{display:flex}
-#jrListModal .modal-card{width:min(92vw,860px);max-height:88vh;background:var(--card-bg,#fff);color:var(--text,#111);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.25);display:flex;flex-direction:column}
-#jrListModal .modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.08);position:sticky;top:0;background:inherit;z-index:1}
-#jrListModal .modal-body{padding:12px 16px;overflow:auto}
-#jrListModal .modal-foot{padding:8px 16px;border-top:1px solid rgba(0,0,0,.08)}
+#jrListModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);z-index:2147483647;}
+#jrListModal.open{display:flex;}
+#jrListModal .modal-dialog{width:min(92vw,900px);max-width:900px;margin:0;}
+#jrListModal .modal-content{background:var(--adalet-card-bg,var(--card-bg,#fff));color:var(--adalet-text,var(--text,#111));border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);display:flex;flex-direction:column;max-height:90vh;}
+#jrListModal .modal-header{padding:1rem 1.25rem;border-bottom:1px solid var(--adalet-border,rgba(0,0,0,.08));}
+#jrListModal .modal-body{padding:1.25rem;overflow-y:auto;flex:1;}
+#jrListModal .modal-footer{padding:0.75rem 1.25rem;border-top:1px solid var(--adalet-border,rgba(0,0,0,.08));}
+#jrListModal .table-container{max-height:400px;overflow-y:auto;border:1px solid var(--adalet-border,rgba(0,0,0,.1));border-radius:6px;}
     `.trim();
     const style = document.createElement('style');
     style.id = 'jrModalFix';
@@ -1099,31 +1108,39 @@
 
     const wrap = document.createElement('div');
     wrap.innerHTML = `
-      <div id="jrListModal" class="modal-backdrop">
-        <div class="modal-card" style="max-width:860px">
-          <div class="modal-head">
-            <strong id="jrListHdrTitle">Kayıtlar</strong>
-            <button class="btn btn--icon" id="btnJrListClose" aria-label="Kapat">✕</button>
-          </div>
-          <div class="modal-body">
-            <div class="title-actions" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-              <input id="jrListSearch" class="input form-control form-control-sm" placeholder="Ara (dosyaNo / kararNo)" style="flex:1;min-width:220px">
-              <button class="btn" id="btnJrListExport" title="Tümünü Kaydet (XLS)">
-                <span class="material-symbols-rounded" style="font-size:18px;vertical-align:middle;">file_download</span>
-                <span style="vertical-align:middle;">Kaydet (XLS)</span>
-              </button>
+      <div id="jrListModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header d-flex align-items-center justify-content-between">
+              <h5 class="modal-title mb-0" id="jrListHdrTitle">Kayıtlar</h5>
+              <button type="button" class="btn-close" id="btnJrListClose" aria-label="Kapat"></button>
             </div>
-            <div style="overflow:auto;max-height:60vh">
-              <table class="table table-sm" style="width:100%">
-                <thead class="table-light"><tr><th>#</th><th>dosyaNo</th><th>kararNo</th></tr></thead>
-                <tbody id="jrListTbody"></tbody>
-              </table>
+            <div class="modal-body">
+              <div class="d-flex gap-2 align-items-center mb-3">
+                <input id="jrListSearch" type="search" class="form-control form-control-sm" placeholder="Ara (dosyaNo / kararNo)" style="flex:1;min-width:220px;">
+                <button class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2" id="btnJrListExport" title="Tümünü Kaydet (XLS)">
+                  <span class="material-symbols-rounded" style="font-size:1rem;">download</span>
+                  <span>XLS</span>
+                </button>
+              </div>
+              <div class="table-container">
+                <table class="table table-sm table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th style="width:60px;">#</th>
+                      <th>Dosya No</th>
+                      <th>Karar No</th>
+                    </tr>
+                  </thead>
+                  <tbody id="jrListTbody"></tbody>
+                </table>
+              </div>
             </div>
-          </div>
-          <div class="modal-foot d-flex justify-content-end align-items-center gap-2">
-            <button class="btn" id="jrListPrev">Önceki</button>
-            <span class="text-body-secondary small" id="jrListInfo"></span>
-            <button class="btn" id="jrListNext">Sonraki</button>
+            <div class="modal-footer d-flex justify-content-between align-items-center">
+              <button class="btn btn-outline-secondary btn-sm" id="jrListPrev">‹ Önceki</button>
+              <span class="text-muted small" id="jrListInfo"></span>
+              <button class="btn btn-outline-secondary btn-sm" id="jrListNext">Sonraki ›</button>
+            </div>
           </div>
         </div>
       </div>`;
@@ -1138,9 +1155,9 @@
 
     document.addEventListener('click', (e) => {
       const modalEl = document.getElementById('jrListModal');
-      const inModal = !!e.target.closest('#jrListModal .modal-card');
+      const inModal = !!e.target.closest('#jrListModal .modal-content');
 
-      if (modalEl && modalEl.classList.contains('open') && !inModal && e.target === modalEl) {
+      if (modalEl && modalEl.classList.contains('open') && !inModal) {
         modalEl.classList.remove('open');
         return;
       }
@@ -1241,12 +1258,21 @@
     const tbody = document.getElementById('jrListTbody');
     if (tbody){
       tbody.innerHTML = all.slice(start,end).map((r,i) => `
-        <tr><td class="text-body-secondary">${start + i + 1}</td><td>${esc(r.dosyaNo)}</td><td>${esc(r.kararNo)}</td></tr>
-      `).join('') || `<tr><td colspan="3" class="text-body-secondary">Kayıt yok.</td></tr>`;
+        <tr>
+          <td class="text-muted">${start + i + 1}</td>
+          <td>${esc(r.dosyaNo)}</td>
+          <td>${esc(r.kararNo)}</td>
+        </tr>
+      `).join('') || `<tr><td colspan="3" class="text-center text-muted py-4">Kayıt yok.</td></tr>`;
     }
 
     const info = document.getElementById('jrListInfo');
     if (info) info.textContent = `${total ? (start + 1) : 0}–${end} / ${total}`;
+    
+    const prevBtn = document.getElementById('jrListPrev');
+    const nextBtn = document.getElementById('jrListNext');
+    if (prevBtn) prevBtn.disabled = JR_LIST.page === 1;
+    if (nextBtn) nextBtn.disabled = JR_LIST.page >= mp;
   }
 
   // ==== Export yardımcıları ====
@@ -1311,40 +1337,37 @@
 	  }
 
 	  function buildCard(){
-      const sec = document.createElement('section');
+      const sec = document.createElement('div');
       sec.id = 'multiExcelCard';
-      sec.className = 'panel';
-      sec.style.marginTop = '0';
+      sec.className = 'card';
       sec.setAttribute('aria-label','Çoklu Excel yükleme');
       sec.innerHTML = `
-		  <div class="panel-head">
-			<div style="display:flex;align-items:center;gap:8px;">
-			  <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
-			  <strong>Çoklu Excel Yükle</strong>
-			</div>
+		  <div class="card-header d-flex align-items-center gap-2">
+			<span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+			<strong>Çoklu Excel Yükle</strong>
 		  </div>
-        <div class="panel-body" style="display:block;margin-top:0;">
-			<div id="multiExcelDrop" style="min-height:120px; display:block; padding:18px; text-align:center; border:1px dashed var(--border); border-radius:10px; cursor:pointer;">
+        <div class="card-body">
+			<div id="multiExcelDrop" class="border border-2 border-dashed rounded p-4 text-center mb-3" style="cursor:pointer; transition: all 0.2s; min-height:120px;">
 			  <input id="multiExcelInput" type="file"
 				accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 				multiple hidden>
-			  <div id="multiExcelHint" class="muted" style="text-align:center;">
-				<div style="font-weight:600; margin-bottom:6px">Dosyaları buraya sürükleyip bırakın</div>
+			  <div id="multiExcelHint" class="text-muted text-center">
+				<div class="fw-bold mb-2">Dosyaları buraya sürükleyip bırakın</div>
 				<div>Yalnızca <strong>XLS</strong> ve <strong>XLSX</strong> kabul edilir.</div>
 			  </div>
 			</div>
-      <div style="margin-top:10px; display:flex; justify-content:flex-end; gap:8px; flex-wrap:nowrap;">
-        <label for="multiExcelInput" class="btn" title="XLS/XLSX seç" style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap;">
-        <span class="material-symbols-rounded" style="font-size:20px; line-height:1; display:inline-block;">add_to_drive</span>
-        <span style="line-height:1; display:inline-block;">Dosya Seç</span>
+      <div class="d-flex justify-content-end gap-2 flex-wrap">
+        <label for="multiExcelInput" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2" title="XLS/XLSX seç">
+        <span class="material-symbols-rounded" style="font-size:1rem;">add_to_drive</span>
+        <span>Dosya Seç</span>
         </label>
-        <button type="button" class="btn" id="btnMultiExcelClear" title="Seçimi temizle" style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap;">
-        <span class="material-symbols-rounded" style="font-size:20px; line-height:1; display:inline-block;">delete</span>
-        <span style="line-height:1; display:inline-block;">Temizle</span>
+        <button type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2" id="btnMultiExcelClear" title="Seçimi temizle">
+        <span class="material-symbols-rounded" style="font-size:1rem;">delete</span>
+        <span>Temizle</span>
         </button>
-        <button type="button" class="btn" id="btnMultiExcelImport" title="Seçili dosyaları işle" style="display:inline-flex; align-items:center; gap:8px; white-space:nowrap;">
-        <span class="material-symbols-rounded" style="font-size:20px; line-height:1; display:inline-block;">play_arrow</span>
-        <span style="line-height:1; display:inline-block;">İçe Aktar (çoklu)</span>
+        <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2" id="btnMultiExcelImport" title="Seçili dosyaları işle">
+        <span class="material-symbols-rounded" style="font-size:1rem;">play_arrow</span>
+        <span>İçe Aktar (çoklu)</span>
         </button>
       </div>
       <div id="multiExcelSummary" class="muted" style="font-size:12px; margin-top:6px;"></div>

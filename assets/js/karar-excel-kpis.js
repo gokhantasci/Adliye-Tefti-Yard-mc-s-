@@ -70,27 +70,57 @@ function getJudgeKeysForRow(r, IDX){
 (function(){
   function ensureNoJudgeModal(){
     let modal = document.getElementById('noJudgeModal'); if (modal) return modal;
-    modal = document.createElement('div'); modal.id = 'noJudgeModal'; modal.className = 'modal-backdrop';
-    const inner = document.createElement('div'); inner.className = 'modal-card';
+    modal = document.createElement('div'); 
+    modal.id = 'noJudgeModal'; 
+    modal.className = 'modal fade';
+    modal.setAttribute('tabindex', '-1');
+    modal.setAttribute('aria-labelledby', 'noJudgeModalLabel');
+    modal.setAttribute('aria-hidden', 'true');
+    
+    modal.innerHTML = `
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title d-flex align-items-center gap-2" id="noJudgeModalLabel">
+              <span class="material-symbols-rounded text-warning">warning</span>
+              Hakim Bilgisi Bulunmayan Dosyalar
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <input id="noJudgeSearch_missing" type="search" class="form-control" placeholder="Dosya / Esas / Karar No ara...">
+            </div>
+            <div class="table-responsive" id="noJudgeTableWrap">
+              <table id="noJudgeTable" class="table table-sm table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Esas No (C)</th>
+                    <th>Karar No</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-sm btn-success" id="btnNoJudgeExport_missing">
+              <span class="material-symbols-rounded me-1" style="font-size:0.875rem;">download</span>
+              Excel
+            </button>
+            <button class="btn btn-sm btn-secondary" id="btnNoJudgePrint_missing">
+              <span class="material-symbols-rounded me-1" style="font-size:0.875rem;">print</span>
+              Yazdır
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Kapat</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
 
-    const head = document.createElement('div'); head.className = 'modal-head';
-    head.innerHTML = '<span class="material-symbols-rounded">warning</span><h2 style="margin:0;font-size:18px;">Hakim Bilgisi Bulunmayan Dosyalar</h2>';
-    const acts = document.createElement('div'); acts.className = 'modal-actions';
-    acts.innerHTML = '<input id="noJudgeSearch_missing" type="search" placeholder="Dosya / Esas / Karar No ara..." class="input">' +
-                   '<button class="btn" id="btnNoJudgeExport_missing">Excel</button>' +
-                   '<button class="btn" id="btnNoJudgePrint_missing">Yazdır</button>' +
-                   '<button class="btn ghost" id="btnNoJudgeClose_missing">Kapat</button>';
-    head.appendChild(acts);
-
-    const body = document.createElement('div'); body.id = 'noJudgeTableWrap'; body.className = 'modal-body';
-    body.innerHTML = '<table id="noJudgeTable" class="table" style="width:100%;border-collapse:collapse;">' +
-                   '<thead><tr><th>#</th><th>Esas No (C)</th><th>Karar No</th></tr></thead><tbody></tbody></table>';
-    const foot = document.createElement('div'); foot.className = 'modal-foot'; foot.textContent = 'Kaynak: ' + siteAddress();
-
-    inner.appendChild(head); inner.appendChild(body); inner.appendChild(foot); modal.appendChild(inner); document.body.appendChild(modal);
-
-    modal.addEventListener('click',e => { if (e.target === modal) hideNoJudgeModal(); });
-    document.getElementById('btnNoJudgeClose_missing').addEventListener('click', hideNoJudgeModal);
     document.getElementById('noJudgeSearch_missing').addEventListener('input',function(){ filterNoJudgeTable(this.value); });
     document.getElementById('btnNoJudgeExport_missing').addEventListener('click',exportNoJudgeToExcel);
     document.getElementById('btnNoJudgePrint_missing').addEventListener('click',printNoJudgeTable);
@@ -153,8 +183,19 @@ function getJudgeKeysForRow(r, IDX){
     if (!tableEl){ alert('Dışa aktarılacak tablo bulunamadı.'); return; }
     var wb = XLSX.utils.book_new(); var ws = XLSX.utils.table_to_sheet(tableEl); XLSX.utils.book_append_sheet(wb, ws, 'Tablo'); XLSX.writeFile(wb,'rapor.xlsx');
   }
-  function showNoJudgeModal(){ ensureNoJudgeModal().classList.add('is-open'); fillNoJudgeTable(); }
-  function hideNoJudgeModal(){ const m = $('#noJudgeModal'); if (m) m.classList.remove('is-open'); }
+  function showNoJudgeModal(){ 
+    const modalEl = ensureNoJudgeModal();
+    const bsModal = new bootstrap.Modal(modalEl);
+    bsModal.show();
+    fillNoJudgeTable(); 
+  }
+  function hideNoJudgeModal(){ 
+    const modalEl = document.getElementById('noJudgeModal'); 
+    if (modalEl) {
+      const bsModal = bootstrap.Modal.getInstance(modalEl);
+      if (bsModal) bsModal.hide();
+    }
+  }
   window.showNoJudgeModal = showNoJudgeModal;
   window.hideNoJudgeModal = hideNoJudgeModal;
 })();
@@ -165,43 +206,97 @@ function getJudgeKeysForRow(r, IDX){
 (function(){
   function ensureCaseModal(){
     let m = $('#caseModal'); if (m) return m;
-    m = document.createElement('div'); m.id = 'caseModal'; m.className = 'modal-backdrop';
-    const inner = document.createElement('div'); inner.className = 'modal-card';
+    m = document.createElement('div'); 
+    m.id = 'caseModal'; 
+    m.className = 'modal fade';
+    m.setAttribute('tabindex', '-1');
+    m.setAttribute('aria-labelledby', 'caseModalLabel');
+    m.setAttribute('aria-hidden', 'true');
 
-    const head = document.createElement('div'); head.className = 'modal-head';
-    head.innerHTML = '<span class="material-symbols-rounded">list_alt</span><h2 id="caseModalTitle" style="margin:0;font-size:18px;">Kayıtlar</h2>';
+    m.innerHTML = `
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title d-flex align-items-center gap-2" id="caseModalLabel">
+              <span class="material-symbols-rounded">list_alt</span>
+              <span id="caseModalTitle">Kayıtlar</span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <input id="caseSearch" type="search" class="form-control form-control-sm" placeholder="Ara... (Esas No, Karar No)">
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm table-hover" id="caseTable">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Esas No (C)</th>
+                    <th>Karar No</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-success" id="btnCaseExportAll">
+                <span class="material-symbols-rounded me-1" style="font-size:0.875rem;">download</span>
+                İndir (XLS)
+              </button>
+              <button class="btn btn-sm btn-secondary" id="btnCasePrintAll">
+                <span class="material-symbols-rounded me-1" style="font-size:0.875rem;">print</span>
+                Yazdır
+              </button>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <button class="btn btn-sm btn-outline-secondary" id="btnCasePrev">
+                <span class="material-symbols-rounded" style="font-size:0.875rem;">chevron_left</span>
+              </button>
+              <span id="casePager" class="text-muted small" style="min-width:80px;text-align:center"></span>
+              <button class="btn btn-sm btn-outline-secondary" id="btnCaseNext">
+                <span class="material-symbols-rounded" style="font-size:0.875rem;">chevron_right</span>
+              </button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Kapat</button>
+          </div>
+        </div>
+      </div>
+    `;
 
-    const acts = document.createElement('div'); acts.className = 'modal-actions';
-    acts.innerHTML = ''
-      + '<button class="btn" id="btnCasePrintAll">Tümünü Yazdır</button>'
-      + '<button class="btn" id="btnCaseExportAll">Tümünü İndir (XLS)</button>'
-      + '<button class="btn" id="btnCasePrev">Önceki</button>'
-      + '<span id="casePager" class="muted" style="min-width:120px;text-align:center"></span>'
-      + '<button class="btn" id="btnCaseNext">Sonraki</button>'
-      + '<button class="btn ghost" id="btnCaseClose">Kapat</button>';
-    head.appendChild(acts);
+    document.body.appendChild(m);
 
-    const body = document.createElement('div'); body.className = 'modal-body';
-    body.innerHTML = '<table class="table" id="caseTable" style="width:100%;border-collapse:collapse">' +
-                   '<thead><tr><th>#</th><th>Esas No (C)</th><th>Karar No</th></tr></thead><tbody></tbody></table>';
-    const foot = document.createElement('div'); foot.className = 'modal-foot'; foot.textContent = 'Kaynak: ' + siteAddress();
-
-    inner.appendChild(head); inner.appendChild(body); inner.appendChild(foot); m.appendChild(inner); document.body.appendChild(m);
-
-    m.addEventListener('click',e => { if (e.target === m) hideCaseModal(); });
-    $('#btnCaseClose').addEventListener('click', hideCaseModal);
     $('#btnCasePrev').addEventListener('click', () => pageCase(-1));
     $('#btnCaseNext').addEventListener('click', () => pageCase(1));
     $('#btnCasePrintAll').addEventListener('click', printAllCases);
     $('#btnCaseExportAll').addEventListener('click', exportAllCases);
+    $('#caseSearch').addEventListener('input', (e) => filterCaseTable(e.target.value));
     return m;
   }
-  const CASE_STATE = {rows:[], page:1, size:20, title:''};
+  const CASE_STATE = {rows:[], filteredRows:[], page:1, size:10, title:'', searchQuery:''};
+  
+  function filterCaseTable(query){
+    CASE_STATE.searchQuery = query.toLowerCase();
+    if (!query.trim()) {
+      CASE_STATE.filteredRows = CASE_STATE.rows;
+    } else {
+      CASE_STATE.filteredRows = CASE_STATE.rows.filter(r => {
+        const searchText = (r.sira + ' ' + r.esas + ' ' + r.karar).toLowerCase();
+        return searchText.indexOf(CASE_STATE.searchQuery) > -1;
+      });
+    }
+    CASE_STATE.page = 1; // Reset to first page
+    renderCaseTable();
+  }
+  
   function renderCaseTable(){
     const tb = $('#caseTable tbody'); if (!tb) return; tb.innerHTML = '';
-    const start = (CASE_STATE.page - 1) * CASE_STATE.size, end = Math.min(start + CASE_STATE.size, CASE_STATE.rows.length);
+    const dataToShow = CASE_STATE.filteredRows.length > 0 || CASE_STATE.searchQuery ? CASE_STATE.filteredRows : CASE_STATE.rows;
+    const start = (CASE_STATE.page - 1) * CASE_STATE.size, end = Math.min(start + CASE_STATE.size, dataToShow.length);
     for (let i = start;i < end;i++){
-      const r = CASE_STATE.rows[i];
+      const r = dataToShow[i];
       const tr = document.createElement('tr');
       tr.innerHTML = '<td style="padding:8px;border-bottom:1px solid #0001">' + r.sira + '</td>' +
                    '<td style="padding:8px;border-bottom:1px solid #0001">' + (r.esas || '') + '</td>' +
@@ -209,17 +304,19 @@ function getJudgeKeysForRow(r, IDX){
       tb.appendChild(tr);
     }
     const pager = $('#casePager');
-    if (pager){ const total = Math.max(1,Math.ceil(CASE_STATE.rows.length / CASE_STATE.size)); pager.textContent = CASE_STATE.page + ' / ' + total; }
+    if (pager){ const total = Math.max(1,Math.ceil(dataToShow.length / CASE_STATE.size)); pager.textContent = CASE_STATE.page + ' / ' + total; }
     const ttl = $('#caseModalTitle'); if (ttl) ttl.textContent = CASE_STATE.title || 'Kayıtlar';
   }
   function pageCase(delta){
-    const total = Math.max(1,Math.ceil(CASE_STATE.rows.length / CASE_STATE.size));
+    const dataToShow = CASE_STATE.filteredRows.length > 0 || CASE_STATE.searchQuery ? CASE_STATE.filteredRows : CASE_STATE.rows;
+    const total = Math.max(1,Math.ceil(dataToShow.length / CASE_STATE.size));
     CASE_STATE.page = Math.min(total, Math.max(1, CASE_STATE.page + delta));
     renderCaseTable();
   }
   function printAllCases(){
     const w = window.open('','_blank'); if (!w) return;
-    const rows = CASE_STATE.rows || [];
+    const dataToShow = CASE_STATE.filteredRows.length > 0 || CASE_STATE.searchQuery ? CASE_STATE.filteredRows : CASE_STATE.rows;
+    const rows = dataToShow || [];
     let html = '<table style="width:100%;border-collapse:collapse" border="0" cellspacing="0" cellpadding="0"><thead>' +
              '<tr><th style="text-align:left;border-bottom:1px solid #ddd;padding:8px">#</th>' +
              '<th style="text-align:left;border-bottom:1px solid #ddd;padding:8px">Esas No (C)</th>' +
@@ -237,13 +334,32 @@ function getJudgeKeysForRow(r, IDX){
   }
   function exportAllCases(){
     if (!window.XLSX){ alert('Excel dışa aktarım için XLSX kütüphanesi gerekli.'); return; }
+    const dataToShow = CASE_STATE.filteredRows.length > 0 || CASE_STATE.searchQuery ? CASE_STATE.filteredRows : CASE_STATE.rows;
     const aoa = [['Kayıtlar','',''],['#','Esas No (C)','Karar No']];
-    (CASE_STATE.rows || []).forEach(r => aoa.push([r.sira,r.esas,r.karar]));
+    (dataToShow || []).forEach(r => aoa.push([r.sira,r.esas,r.karar]));
     const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(aoa); XLSX.utils.book_append_sheet(wb, ws, 'Kayıtlar');
     XLSX.writeFile(wb, 'sicil-detay.xlsx');
   }
-  function showCaseModal(rows, title){ ensureCaseModal().classList.add('is-open'); CASE_STATE.rows = rows || []; CASE_STATE.page = 1; CASE_STATE.title = title || 'Kayıtlar'; renderCaseTable(); }
-  function hideCaseModal(){ const m = $('#caseModal'); if (m) m.classList.remove('is-open'); }
+  function showCaseModal(rows, title){ 
+    const modalEl = ensureCaseModal();
+    const bsModal = new bootstrap.Modal(modalEl);
+    CASE_STATE.rows = rows || []; 
+    CASE_STATE.filteredRows = CASE_STATE.rows;
+    CASE_STATE.searchQuery = '';
+    CASE_STATE.page = 1; 
+    CASE_STATE.title = title || 'Kayıtlar';
+    const searchInput = $('#caseSearch');
+    if (searchInput) searchInput.value = '';
+    renderCaseTable();
+    bsModal.show();
+  }
+  function hideCaseModal(){ 
+    const modalEl = $('#caseModal'); 
+    if (modalEl) {
+      const bsModal = bootstrap.Modal.getInstance(modalEl);
+      if (bsModal) bsModal.hide();
+    }
+  }
   window.showCaseModal = showCaseModal; window.hideCaseModal = hideCaseModal;
 })();
 
@@ -269,11 +385,11 @@ function _rowToCaseObj(r, idx){
   const esas = nonEmpty(r[cIdx]) ? String(r[cIdx]) : ''; const yil = yearFromCell(r[eIdx]) || ''; const b = nonEmpty(r[bIdx]) ? String(r[bIdx]) : '';
   return {sira:(idx + 1), esas:esas, karar:(yil ? yil : '') + (b ? ('/' + b) : '')};
 }
-function cellClickHandler(td){
+window.cellClickHandler = function(td){
   const rowType = td.getAttribute('data-type'); const colKey = td.getAttribute('data-col');
   if (colKey === '__EMPTY__'){ openEmptyModalFor(rowType); return; }
   openJudgeSicilModal(colKey,rowType);
-}
+};
 function openEmptyModalFor(decisionType){
   const ms = window.__matrixSource || {}; const used = (window.__lastExcelRows && window.__lastExcelRows.rowsUsed) || []; const IDX = ms.IDX || {};
   const rows = [];
@@ -292,7 +408,16 @@ function openEmptyModalFor(decisionType){
     tb.appendChild(tr);
   });
   window.__noJudgeData = rows.slice();
-  const head = $('#noJudgeModal .modal-head h2'); if (head) head.textContent = 'Hakim Bilgisi Bulunmayan Dosyalar' + (decisionType && decisionType !== 'Toplam' ? ' — ' + decisionType : '');
+  const titleEl = document.querySelector('#noJudgeModalLabel span:last-child');
+  if (!titleEl) {
+    const labelEl = document.getElementById('noJudgeModalLabel');
+    if (labelEl) {
+      const textPart = labelEl.childNodes[labelEl.childNodes.length - 1];
+      if (textPart && textPart.nodeType === Node.TEXT_NODE) {
+        textPart.textContent = 'Hakim Bilgisi Bulunmayan Dosyalar' + (decisionType && decisionType !== 'Toplam' ? ' — ' + decisionType : '');
+      }
+    }
+  }
 }
 // Savcı siciline özel modal (L sütunu)
 function openSavciModal(sicil, decisionType){
@@ -405,10 +530,32 @@ function renderNoJudgeAlert_afterUpload(missingCount){
   function updateKPIs(total,savciCount,hakimCount){ text($('#kpiTotal'),total); text($('#kpiSavci'),savciCount); text($('#kpiHakim'),hakimCount); }
 
   function buildResultCard(total,savciCount,hakimCount,info){
-    // Karar sayfası yeni düzen: two-col-8-4 -> sol kolon .col-left
-    const host = document.querySelector('.col-left') || document.querySelector('.altsol') || document.querySelector('#altsol') || document.querySelector('[class*="altsol"]'); if (!host) return;
-    let card = document.getElementById('result-card'); if (!card){ card = document.createElement('section'); card.className = 'panel'; card.id = 'result-card'; host.appendChild(card); }
-    card.innerHTML = '<div class="panel-head" style="display:flex;align-items:center;gap:8px;"><span class="material-symbols-rounded">analytics</span><strong>Rapor Özeti</strong></div>';
+    console.log('[KARAR] buildResultCard çağrıldı - total:', total, 'savci:', savciCount, 'hakim:', hakimCount);
+    
+    // Bootstrap layout için reportContainer
+    const host = document.getElementById('reportContainer');
+    if (!host) {
+      console.error('[KARAR] #reportContainer bulunamadı!');
+      return;
+    }
+    
+    console.log('[KARAR] #reportContainer bulundu, rapor oluşturuluyor');
+    
+    let card = document.getElementById('result-card'); 
+    if (!card) { 
+      card = document.createElement('div'); 
+      card.className = 'card'; 
+      card.id = 'result-card'; 
+      host.appendChild(card); 
+    }
+    
+    card.innerHTML = '<div class="card-header d-flex align-items-center gap-2">' +
+                     '<span class="material-symbols-rounded">analytics</span>' +
+                     '<strong>Rapor Özeti</strong>' +
+                     '</div>' +
+                     '<div class="card-body" id="reportBody"></div>';
+                     
+    console.log('[KARAR] Rapor kartı oluşturuldu');
   }
 
   function readAsArrayBuffer(file){
@@ -544,17 +691,67 @@ function renderNoJudgeAlert_afterUpload(missingCount){
   }
 
   function ensureInputSetup(){
-    const input = $('#excelInput'); if (!input) return null;
-    input.setAttribute('accept','.xls,.xlsx'); input.setAttribute('multiple','true'); return input;
+    console.log('[KARAR] ensureInputSetup başlatıldı');
+    const input = $('#excelInput'); 
+    if (!input) {
+      console.error('[KARAR] #excelInput bulunamadı!');
+      return null;
+    }
+    console.log('[KARAR] #excelInput bulundu:', input);
+    input.setAttribute('accept','.xls,.xlsx'); 
+    input.setAttribute('multiple','true'); 
+    return input;
   }
 
   function wire(){
-    const input = ensureInputSetup(); if (input) input.addEventListener('change',e => handleFiles(e.target.files));
-    const runBtn = $('#run'); if (runBtn) runBtn.addEventListener('click',recomputeFromSaved);
+    console.log('[KARAR] wire() fonksiyonu başlatıldı');
+    
+    const input = ensureInputSetup(); 
+    if (input) {
+      input.addEventListener('change', e => {
+        console.log('[KARAR] Input change event tetiklendi, dosya sayısı:', e.target.files.length);
+        handleFiles(e.target.files);
+      });
+      console.log('[KARAR] Input change listener eklendi');
+    }
+    
+    // Run butonu için retry mekanizması (dinamik script yüklemesi için)
+    function attachRunButton(retries = 10) {
+      const runBtn = $('#run'); 
+      if (runBtn) {
+        runBtn.addEventListener('click', function() {
+          console.log('[KARAR] Run butonu tıklandı');
+          recomputeFromSaved();
+        });
+        console.log('[KARAR] Run button listener eklendi');
+      } else {
+        if (retries > 0) {
+          console.warn('[KARAR] #run butonu bulunamadı, ' + retries + ' deneme kaldı, 100ms sonra tekrar denenecek');
+          setTimeout(function() { attachRunButton(retries - 1); }, 100);
+        } else {
+          console.error('[KARAR] #run butonu 10 denemeden sonra bulunamadı!');
+        }
+      }
+    }
+    
+    attachRunButton();
+
+    // Global drag/drop prevention
+    window.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }, false);
+    
+    window.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }, false);
 
     // Prevent browser from opening dropped files
     const dropZone = $('#dropZone');
     if (dropZone) {
+      console.log('[KARAR] Dropzone bulundu, event listener\'lar ekleniyor');
+      
       ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(eventName) {
         dropZone.addEventListener(eventName, function(e) {
           e.preventDefault();
@@ -563,23 +760,44 @@ function renderNoJudgeAlert_afterUpload(missingCount){
       });
 
       ['dragenter', 'dragover'].forEach(function(eventName) {
-        dropZone.addEventListener(eventName, function() {
+        dropZone.addEventListener(eventName, function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('[KARAR] Drag event:', eventName);
           dropZone.classList.add('drag-over');
         }, false);
       });
 
       ['dragleave', 'drop'].forEach(function(eventName) {
-        dropZone.addEventListener(eventName, function() {
+        dropZone.addEventListener(eventName, function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('[KARAR] Drag event:', eventName);
           dropZone.classList.remove('drag-over');
         }, false);
       });
 
       dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         const files = e.dataTransfer.files;
+        console.log('[KARAR] Drop event - dosya sayısı:', files ? files.length : 0);
         if (files && files.length > 0) {
           handleFiles(files);
         }
       }, false);
+      
+      // Click to upload
+      dropZone.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (input) {
+          input.click();
+        }
+      });
+      
+      console.log('[KARAR] Tüm dropzone event listener\'ları eklendi');
+    } else {
+      console.error('[KARAR] #dropZone bulunamadı!');
     }
   }
 
@@ -672,6 +890,8 @@ function renderNoJudgeAlert_afterUpload(missingCount){
     }
 
     function render(){
+      console.log('[KARAR] render() fonksiyonu başlatıldı');
+      
       // KULLANICI TARİH GİRDİYSE KORU
       const prevSD = (document.getElementById('startDate') || {}).value || '';
       const prevED = (document.getElementById('endDate')   || {}).value || '';
@@ -680,49 +900,103 @@ function renderNoJudgeAlert_afterUpload(missingCount){
       const built = buildGrid(rows);
       const grid = built.grid, outCols = built.columns, EMPTY = built.EMPTY_KEY;
 
-      const card = document.getElementById('result-card'); if (!card) return;
-      const body = document.createElement('div'); body.className = 'panel-body';
+      const card = document.getElementById('result-card'); 
+      if (!card) {
+        console.error('[KARAR] #result-card bulunamadı!');
+        return;
+      }
+      
+      // Card Header - Sadece Başlık
+      let headerHTML = '';
+      headerHTML += '<div class="card-header d-flex align-items-center gap-2">';
+      headerHTML += '<span class="material-symbols-rounded">analytics</span>';
+      headerHTML += '<strong>Rapor Özeti</strong>';
+      headerHTML += '</div>';
+      
+      const body = document.createElement('div'); 
+      body.className = 'card-body';
+      body.id = 'reportBody';
 
-      // başlık ve araçlar
+      // Bootstrap stil filtre ve butonlar
       let h = '';
-      h += '<div class="report-head"><div class="title-actions">';
-      h += '<input id="searchSicil" type="text" placeholder="Sicil ara (örn: 139329)" style="width:200px">';
-      h += '<button class="btn ghost" id="filterBtn">Filtrele</button>';
-      h += '<button class="btn ghost" id="clearFilterBtn">Temizle</button>';
-      h += '<button class="btn ghost" id="saveReportExcel">Kaydet (Excel)</button>';
-      h += '</div></div>';
-      h += '<div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">';
+      
+      // Filtre alanı (Tarih + Sicil + Butonlar)
+      h += '<div class="mb-3">';
+      h += '<div class="row g-2 align-items-end">';
 
       const initialMin = (window.__initialDateRange && window.__initialDateRange.min) ? window.__initialDateRange.min : minD;
       const initialMax = (window.__initialDateRange && window.__initialDateRange.max) ? window.__initialDateRange.max : maxD;
 
-      h += '<label for="startDate"><b>İlk tarih</b></label><input id="startDate" type="date" value="' + (prevSD || fmtYMD(initialMin) || '') + '">';
-      h += '<label for="endDate"><b>Son tarih</b></label><input id="endDate" type="date" value="' + (prevED || fmtYMD(initialMax) || '') + '">';
-      h += '<button id="dateFilterBtn" type="button" class="btn">Filtrele</button>';
-      // Removed ghost style per design system – use solid btn
-      h += '<button id="dateResetBtn" type="button" class="btn">Tümünü Göster</button>';
+      h += '<div class="col-6 col-md-2">';
+      h += '<label for="startDate" class="form-label small mb-1"><strong>İlk tarih</strong></label>';
+      h += '<input id="startDate" type="date" class="form-control form-control-sm" value="' + (prevSD || fmtYMD(initialMin) || '') + '">';
+      h += '</div>';
+      
+      h += '<div class="col-6 col-md-2">';
+      h += '<label for="endDate" class="form-label small mb-1"><strong>Son tarih</strong></label>';
+      h += '<input id="endDate" type="date" class="form-control form-control-sm" value="' + (prevED || fmtYMD(initialMax) || '') + '">';
+      h += '</div>';
+      
+      h += '<div class="col-12 col-md-3">';
+      h += '<label for="searchSicil" class="form-label small mb-1"><strong>Sicil Ara</strong></label>';
+      h += '<input id="searchSicil" type="text" class="form-control form-control-sm" placeholder="Sicil ara (örn: 139329)">';
+      h += '</div>';
+      
+      h += '<div class="col-12 col-md-5">';
+      h += '<div class="d-flex gap-2 justify-content-end flex-wrap">';
+      h += '<button id="filterBtn" type="button" class="btn btn-sm btn-primary">';
+      h += '<span class="material-symbols-rounded me-1" style="font-size:0.875rem;">filter_alt</span>';
+      h += 'Filtrele';
+      h += '</button>';
+      h += '<button id="clearFilterBtn" type="button" class="btn btn-sm btn-secondary">';
+      h += '<span class="material-symbols-rounded me-1" style="font-size:0.875rem;">filter_alt_off</span>';
+      h += 'Temizle';
+      h += '</button>';
+      h += '<button class="btn btn-sm btn-success" id="saveReportExcel">';
+      h += '<span class="material-symbols-rounded me-1" style="font-size:0.875rem;">download</span>';
+      h += 'Kaydet (Excel)';
+      h += '</button>';
+      h += '</div>';
+      h += '</div>';
+      
+      h += '</div>';
       h += '</div>';
 
-      // tablo (scroll/drag destekli)
-      h += '<div class="table-wrap"><table class="table" style="width:100%;border-collapse:collapse;"><thead><tr><th>Karar Türleri</th>';
+      // Bootstrap responsive tablo
+      h += '<div class="table-responsive" style="overflow-x:auto;">';
+      h += '<table class="table table-sm table-hover" style="white-space:nowrap;">';
+      h += '<thead class="table-light">';
+      h += '<tr>';
+      h += '<th class="sticky-col">Karar Türleri</th>';
       for (let i2 = 0;i2 < outCols.length;i2++){
         const label = (outCols[i2] === EMPTY) ? '(boş)' : '(' + outCols[i2] + ')';
-        const cls = (outCols[i2] === EMPTY) ? ' class="empty"' : '';
+        const cls = (outCols[i2] === EMPTY) ? ' class="text-muted"' : '';
         h += '<th' + cls + '>' + label + '</th>';
       }
-      h += '</tr></thead><tbody>';
+      h += '</tr>';
+      h += '</thead>';
+      h += '<tbody>';
+      
       const ORDER = ['Mahkumiyet','Beraat','Düşme/Cvyo/Diğer','Zamanaşımı','HAGB','Gör/Yet/Birleş','Red','Tazminat','Toplam'];
       for (let rix = 0; rix < ORDER.length; rix++){
         const rowT = ORDER[rix];
-        h += '<tr><td>' + rowT + '</td>';
+        const isTotal = (rowT === 'Toplam');
+        h += '<tr' + (isTotal ? ' class="table-secondary fw-bold"' : '') + '>';
+        h += '<td class="sticky-col' + (isTotal ? ' fw-bold' : '') + '">' + rowT + '</td>';
         for (let cix = 0;cix < outCols.length;cix++){
-          const key = outCols[cix]; const v = (grid[rowT] && grid[rowT][key]) ? grid[rowT][key] : 0;
-          const tcls = (key === EMPTY) ? ' class="empty clickable"' : ' class="clickable"';
-          h += '<td' + tcls + ' data-type="' + rowT + '" data-col="' + key + '" onclick="cellClickHandler(this)">' + v + '</td>';
+          const key = outCols[cix]; 
+          const v = (grid[rowT] && grid[rowT][key]) ? grid[rowT][key] : 0;
+          const tdClass = (key === EMPTY) ? 'text-muted' : '';
+          const clickable = !isTotal && v > 0 ? 'cursor-pointer' : '';
+          h += '<td class="' + tdClass + ' ' + clickable + '" data-type="' + rowT + '" data-col="' + key + '" onclick="cellClickHandler(this)">' + v + '</td>';
         }
         h += '</tr>';
       }
-      h += '</tbody></table></div>';
+      h += '</tbody>';
+      h += '</table>';
+      h += '</div>';
+      
+      console.log('[KARAR] Rapor HTML oluşturuldu');
 
       body.innerHTML = h;
 
@@ -731,7 +1005,18 @@ function renderNoJudgeAlert_afterUpload(missingCount){
       const edEl = document.getElementById('endDate');   if (prevED && edEl) edEl.value = prevED;
 
       if (window.enableTableWrapDrag) window.enableTableWrapDrag();
-      const old = card.querySelector('.panel-body'); if (old) old.replaceWith(body); else card.appendChild(body);
+        // Card header'ı ekle veya güncelle
+        let cardHeader = card.querySelector('.card-header');
+        if (!cardHeader) {
+          cardHeader = document.createElement('div');
+          cardHeader.className = 'card-header';
+          card.insertBefore(cardHeader, card.firstChild);
+        }
+        cardHeader.innerHTML = headerHTML;
+        // Body'yi ekle veya değiştir
+        const old = card.querySelector('.card-body');
+        if (old) old.replaceWith(body); 
+        else card.appendChild(body);
 
       // buton davranışları + Ek Özet’i filtreye göre güncelle
       const fBtn = $('#filterBtn'), clrBtn = $('#clearFilterBtn'), dBtn = $('#dateFilterBtn'), dReset = $('#dateResetBtn'), saveBtn = $('#saveReportExcel');

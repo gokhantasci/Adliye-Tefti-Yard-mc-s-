@@ -375,10 +375,13 @@
       });
       const durMs = Math.round(performance.now() - startedAt);
 
+      /* Debug log
+      console.log({
         status: res.status,
         contentType: res.headers.get('Content-Type'),
         disposition: res.headers.get('Content-Disposition')
       });
+      */
 
       const ct = (res.headers.get('Content-Type') || '').toLowerCase();
       const cd = res.headers.get('Content-Disposition') || '';
@@ -429,26 +432,27 @@
     const aralik = state.denetimAraligi || 'belirtilen';
     const count  = state.rows.length;
 
-    // Sayfadaki "Dosya Seç" alanıyla birebir görünüm için aynı kart/başlık yapısını kullan
+    // Bootstrap 5.3 ve Adalet Bakanlığı tasarım stiline uygun
     const html = `
-    <section class="card card-upload" id="exportInfoCard" style="margin-top:12px">
-      <div class="card-head">
+    <div class="card mt-3" id="exportInfoCard">
+      <div class="card-header d-flex align-items-center gap-2">
         <span class="material-symbols-rounded">description</span>
         <strong>Word Çıktısı</strong>
       </div>
-      <div class="card-body" style="display:block">
-        <div class="muted" style="margin-bottom:8px">
+      <div class="card-body">
+        <p class="text-muted mb-3">
           ${esc(birim)} – ${esc(aralik)} aralığında <b>${count}</b> satır hazır.
-        </div>
-        <div id="exportPickRow" style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center">
-          <label for="minSureGunInput" class="muted" style="margin-right:4px">Minimum Süre (Gün):</label>
-          <input type="number" id="minSureGunInput" value="0" min="0" step="1" style="width:120px">
-          <button class="btn" id="exportDocxBtn" type="button" style="display:inline-flex;align-items:center;gap:6px;">
-            <span class="material-symbols-rounded">description</span><span>Word'e Aktar</span>
+        </p>
+        <div class="d-flex gap-2 justify-content-end flex-wrap align-items-center">
+          <label for="minSureGunInput" class="text-muted mb-0 me-2">Minimum Süre (Gün):</label>
+          <input type="number" id="minSureGunInput" class="form-control form-control-sm" value="0" min="0" step="1" style="width: 120px;">
+          <button class="btn btn-primary btn-sm" id="exportDocxBtn" type="button">
+            <span class="material-symbols-rounded me-1" style="font-size: 1rem;">file_download</span>
+            Word'e Aktar
           </button>
         </div>
       </div>
-    </section>`;
+    </div>`;
 
     host.insertAdjacentHTML('afterend', html);
     document.getElementById('exportDocxBtn')?.addEventListener('click', exportToDocx);

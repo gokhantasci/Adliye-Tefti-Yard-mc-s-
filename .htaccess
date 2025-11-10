@@ -10,23 +10,30 @@
     RewriteBase /
 
     # ----------------------------------------
+    # Error Pages
+    # ----------------------------------------
+    ErrorDocument 404 /404.php
+    
+    # ----------------------------------------
     # Clean URL Rewrites (remove .php extension)
     # ----------------------------------------
     
-    # Redirect .php files to clean URLs
+    # Redirect .php files to clean URLs (API hariç - POST body korunmalı)
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+    RewriteCond %{REQUEST_URI} !^/api/
     RewriteRule ^ %1 [R=301,L]
     
-    # Rewrite clean URLs to .php files
+    # Rewrite clean URLs to index.php with page param (centralized layout)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME}.php -f
-    RewriteRule ^(.+)$ $1.php [L,QSA]
+    RewriteCond %{DOCUMENT_ROOT}/partials/pages/$1.php -f
+    RewriteRule ^([a-zA-Z0-9_-]+)$ index.php?page=$1 [L,QSA]
     
     # Special routes for common pages
     RewriteRule ^panel$ index.php [L]
     RewriteRule ^anasayfa$ index.php [L]
     RewriteRule ^home$ index.php [L]
+    RewriteRule ^index$ index.php [L]
     
     # API routes
     RewriteRule ^feed$ api/feed.php [L]
@@ -96,65 +103,77 @@
 </IfModule>
 
 # ----------------------------------------
-# Browser Caching
+# Browser Caching - DEVELOPMENT MODE (DISABLED)
 # ----------------------------------------
-<IfModule mod_expires.c>
-    ExpiresActive On
-    
-    # Default expiration: 1 hour
-    ExpiresDefault "access plus 1 hour"
-    
-    # HTML documents: 10 minutes
-    ExpiresByType text/html "access plus 10 minutes"
-    
-    # CSS and JavaScript: 1 week
-    ExpiresByType text/css "access plus 1 week"
-    ExpiresByType application/javascript "access plus 1 week"
-    ExpiresByType application/x-javascript "access plus 1 week"
-    
-    # Images: 1 month
-    ExpiresByType image/gif "access plus 1 month"
-    ExpiresByType image/jpeg "access plus 1 month"
-    ExpiresByType image/png "access plus 1 month"
-    ExpiresByType image/webp "access plus 1 month"
-    ExpiresByType image/svg+xml "access plus 1 month"
-    ExpiresByType image/x-icon "access plus 1 month"
-    
-    # Fonts: 1 year
-    ExpiresByType font/woff "access plus 1 year"
-    ExpiresByType font/woff2 "access plus 1 year"
-    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
-    ExpiresByType font/ttf "access plus 1 year"
-    ExpiresByType font/otf "access plus 1 year"
-    
-    # JSON data: 10 minutes
-    ExpiresByType application/json "access plus 10 minutes"
-    
-    # RSS/Atom feeds: 1 hour
-    ExpiresByType application/rss+xml "access plus 1 hour"
-    ExpiresByType application/atom+xml "access plus 1 hour"
+# Production için bu bölümü etkinleştirin
+# Development için cache devre dışı (dosya değişiklikleri anında yansır)
+<IfModule mod_headers.c>
+    # Disable caching for development
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
 </IfModule>
 
+# PRODUCTION CACHE (KAPATILDI - Gerekirse açın)
+# <IfModule mod_expires.c>
+#     ExpiresActive On
+#     
+#     # Default expiration: 1 hour
+#     ExpiresDefault "access plus 1 hour"
+#     
+#     # HTML documents: 10 minutes
+#     ExpiresByType text/html "access plus 10 minutes"
+#     
+#     # CSS and JavaScript: 1 week
+#     ExpiresByType text/css "access plus 1 week"
+#     ExpiresByType application/javascript "access plus 1 week"
+#     ExpiresByType application/x-javascript "access plus 1 week"
+#     
+#     # Images: 1 month
+#     ExpiresByType image/gif "access plus 1 month"
+#     ExpiresByType image/jpeg "access plus 1 month"
+#     ExpiresByType image/png "access plus 1 month"
+#     ExpiresByType image/webp "access plus 1 month"
+#     ExpiresByType image/svg+xml "access plus 1 month"
+#     ExpiresByType image/x-icon "access plus 1 month"
+#     
+#     # Fonts: 1 year
+#     ExpiresByType font/woff "access plus 1 year"
+#     ExpiresByType font/woff2 "access plus 1 year"
+#     ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+#     ExpiresByType font/ttf "access plus 1 year"
+#     ExpiresByType font/otf "access plus 1 year"
+#     
+#     # JSON data: 10 minutes
+#     ExpiresByType application/json "access plus 10 minutes"
+#     
+#     # RSS/Atom feeds: 1 hour
+#     ExpiresByType application/rss+xml "access plus 1 hour"
+#     ExpiresByType application/atom+xml "access plus 1 hour"
+# </IfModule>
+
 # ----------------------------------------
-# Cache-Control Headers
+# Cache-Control Headers - DEVELOPMENT MODE
 # ----------------------------------------
+# <IfModule mod_headers.c>
+#     # Versioned static assets (cache for 1 year)
+#     <FilesMatch "\.(js|css|png|jpg|jpeg|gif|webp|svg|woff|woff2|eot|ttf|otf)$">
+#         Header set Cache-Control "max-age=31536000, public, immutable"
+#     </FilesMatch>
+#     
+#     # HTML files (cache for 10 minutes)
+#     <FilesMatch "\.(html|htm|php)$">
+#         Header set Cache-Control "max-age=600, public, must-revalidate"
+#     </FilesMatch>
+#     
+#     # JSON data (cache for 10 minutes)
+#     <FilesMatch "\.json$">
+#         Header set Cache-Control "max-age=600, public, must-revalidate"
+#     </FilesMatch>
+# </IfModule>
+
+# Security headers
 <IfModule mod_headers.c>
-    # Versioned static assets (cache for 1 year)
-    <FilesMatch "\.(js|css|png|jpg|jpeg|gif|webp|svg|woff|woff2|eot|ttf|otf)$">
-        Header set Cache-Control "max-age=31536000, public, immutable"
-    </FilesMatch>
-    
-    # HTML files (cache for 10 minutes)
-    <FilesMatch "\.(html|htm|php)$">
-        Header set Cache-Control "max-age=600, public, must-revalidate"
-    </FilesMatch>
-    
-    # JSON data (cache for 10 minutes)
-    <FilesMatch "\.json$">
-        Header set Cache-Control "max-age=600, public, must-revalidate"
-    </FilesMatch>
-    
-    # Security headers
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set X-XSS-Protection "1; mode=block"
@@ -177,8 +196,11 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
-# Protect data directory
+# Protect data directory (except public JSON files)
 <IfModule mod_rewrite.c>
+    # Block access to all data files except allowed ones
+    RewriteCond %{REQUEST_URI} ^/data/
+    RewriteCond %{REQUEST_URI} !^/data/(teftis\.json|tatiller\.json|tebligatlar\.json)$
     RewriteRule ^data/.*$ - [F,L]
 </IfModule>
 

@@ -2,157 +2,149 @@
   ========================================
   YAN MENÜ / SIDEBAR (SIDEBAR.PHP)
   ========================================
-  Sol tarafta sabit konumda duran navigasyon menüsü
-  
-  Özellikler:
-  - Responsive: Mobilde gizli, buton ile açılır
-  - Aktif sayfa vurgulama: $active değişkeni ile kontrol
-  - Gruplandırılmış menü öğeleri
-  - Material Icons ile görsel zenginlik
-  
-  Menü Grupları:
-  1. Ana Sayfa
-  2. Teftiş Modülleri (Karar, İstinaf, İddianame)
-  3. Kontrol Modülleri (Harç, Kesinleşme, J-Robot)
-  4. Araçlar (Hesaplama araçları)
-  5. Diğer Uygulamalarımız (Harici linkler)
+  Bootstrap 5.3 Offcanvas Component
+  Mobilde offcanvas, desktop'ta static sidebar
   ========================================
 -->
-<aside id="sidebar" class="sidebar">
-  <nav class="menu">
-    <!-- 
-      ANA SAYFA 
-      Aktif sayfa kontrolü: PHP'de set edilen $active değişkeni ile yapılır
-      Örnek: $active = 'dashboard' olduğunda bu link 'active' class'ını alır
-    -->
-    <a class="menu-item <?= ($active ?? '')==='dashboard'?'active':'' ?>" href="/index.php">
-      <span class="material-symbols-rounded">space_dashboard</span>
-      <span class="label">Anasayfa</span>
-    </a>
-
-    <!-- ========== TEFTİŞ MODÜLLER GRUBU ========== -->
-    <h4 class="menu-group-title">Teftiş</h4>
-    
-    <!-- Karar Defteri: Karar verilerinin analizi ve raporlanması -->
-    <a class="menu-item <?= ($active ?? '')==='karar'?'active':'' ?>" href="/karar.php">
-      <span class="material-symbols-rounded">bar_chart_4_bars</span>
-      <span class="label">Karar Defteri</span>
-    </a>
-    
-    <!-- İstinaf Defteri: İstinaf işlemlerinin takibi -->
-    <a class="menu-item <?= ($active ?? '')==='istinaf'?'active':'' ?>" href="/istinaf.php">
-      <span class="material-symbols-rounded">checklist</span>
-      <span class="label">İstinaf Defteri</span>
-    </a>
-    
-    <!-- ========== DENETİM CETVELLERİ GRUBU ========== -->
-    <h4 class="menu-group-title">Denetim Cetvelleri</h4>
-
-    <!-- İddianame Değerlendirme: Zaman kontrolü ve analiz -->
-    <a class="menu-item <?= ($active ?? '')==='iddianame'?'active':'' ?>" href="/iddianame.php">
-      <span class="material-symbols-rounded">counter_1</span>
-      <span class="label">İddianame Değ.</span>
-    </a>
-
-    <!-- Tensip: Zaman kontrolü ve analiz -->
-    <a class="menu-item <?= ($active ?? '')==='tensip'?'active':'' ?>" href="/tensip.php">
-      <span class="material-symbols-rounded">counter_2</span>
-      <span class="label">Tensip</span>
-    </a>
-
-    <!-- Duruşma Kaçağı kontrolü ve analiz -->
-    <a class="menu-item <?= ($active ?? '')==='durusmakacagi'?'active':'' ?>" href="/durusmakacagi.php">
-      <span class="material-symbols-rounded">counter_3</span>
-      <span class="label">Duruşma Kaçağı</span>
-    </a>
-
-    <!-- BYU: Zaman kontrolü ve analiz -->
-    <a class="menu-item <?= ($active ?? '')==='byu'?'active':'' ?>" href="/byu.php">
-      <span class="material-symbols-rounded">counter_4</span>
-      <span class="label">Basit Yargılama</span>
-    </a>
-
-    <!-- Gerekçeli Karar: Zaman kontrolü ve analiz -->
-    <a class="menu-item <?= ($active ?? '')==='gerekcelikarar'?'active':'' ?>" href="/gerekcelikarar.php">
-      <span class="material-symbols-rounded">counter_5</span>
-      <span class="label">Gerekçeli Karar</span>
-    </a>
-
-    <!-- Kanun Yolu kontrolü ve analiz -->
-    <a class="menu-item <?= ($active ?? '')==='kanun_yolu'?'active':'' ?>" href="/kanunyolu.php">
-      <span class="material-symbols-rounded">counter_6</span>
-      <span class="label">Kanun Yolu</span>
-    </a>
-
-    <!-- Kesinleştirme ve İnfaza Verme: Zaman kontrolü ve analiz -->
-    <a class="menu-item <?= ($active ?? '')==='kesinlestirme'?'active':'' ?>" href="/kesinlestirme.php">
-      <span class="material-symbols-rounded">counter_7</span>
-      <span class="label">Kesinleştirme/İnfaz</span>
-    </a>
-
-    <!-- ========== KONTROL MODÜLLER GRUBU ========== -->
-    <h4 class="menu-group-title">Kontrol</h4>
-    
-    <!-- Harç Tahsil Kontrolü: Harç işlemlerinin denetimi -->
-    <a class="menu-item <?= ($active ?? '')==='harctahsil'?'active':'' ?>" href="/harctahsilkontrol.php">
-      <span class="material-symbols-rounded">request_quote</span>
-      <span class="label">Harç Tahsil</span>
-    </a>
-    
-    <!-- Kesinleşme Kontrolü: Karar kesinleşme sürelerinin takibi -->
-    <a class="menu-item <?= ($active ?? '')==='kesinlesmekontrol'?'active':'' ?>" href="/kesinlesmek.php">
-      <span class="material-symbols-rounded">event_available</span>
-      <span class="label">Kesinleşme Kontrol</span>
-    </a>
-    
-    <!-- JSON Robot: JSON dosyalarının işlenmesi ve analizi -->
-    <a class="menu-item <?= ($active ?? '')==='jrobot'?'active':'' ?>" href="/jrobot.php">
-      <span class="material-symbols-rounded" style="color:#F48FB1">smart_toy</span>
-      <span class="label">JSON Robot</span>
-    </a>
-
-    <!-- ========== ARAÇLAR GRUBU ========== -->
-    <h4 class="menu-group-title">Araçlar</h4>
-    
-    <!-- Kesinleşme Hesaplama: Karar kesinleşme tarihi hesaplama aracı -->
-    <a class="menu-item <?= ($active ?? '')==='kesinlesme'?'active':'' ?>" href="/kesinlesme.php">
-      <span class="material-symbols-rounded">work_history</span>
-      <span class="label">Kesinleşme Hesapla</span>
-    </a>
-    
-    <!-- Yargılama Gideri: Yargılama gideri hesaplama aracı -->
-    <a class="menu-item <?= ($active ?? '')==='yargilama'?'active':'' ?>" href="/yargilamagideri.php">
-      <span class="material-symbols-rounded">calculate</span>
-      <span class="label">Yargılama Gideri</span>
-    </a>
-
-    <!-- ========== DİĞER UYGULAMALAR (HARİCİ LİNKLER) ========== -->
-    <h4 class="menu-group-title">Diğer Uygulamalarımız</h4>
-    <div class="menu">
-      <!-- 657.com.tr - Devlet Memurları Ana Sitesi -->
-      <a class="menu-item" href="https://657.com.tr/" target="_blank" rel="noopener noreferrer">
-        <span class="material-symbols-rounded" aria-hidden="true" style="color:#F44336">badge</span>
-        <span class="label">657 - Devlet Memurları</span>
-      </a>
-      
-      <!-- Müdürün Dolabı - Dosya takip ve hatırlatma programı -->
-      <a class="menu-item" href="https://657.com.tr/mudurun-dolabi-adliye-dosya-takip-hatirlatma-programi/" target="_blank" rel="noopener noreferrer">
-        <span class="material-symbols-rounded" aria-hidden="true" style="color:#3F51B5">inventory_2</span>
-        <span class="label">Müdürün Dolabı</span>
-      </a>
-      
-      <!-- Yargılama Gideri Hesap Makinesi (Harici Versiyon) -->
-      <a class="menu-item" href="https://657.com.tr/yargilama-gideri-hesap-makinesi/" target="_blank" rel="noopener noreferrer">
-        <span class="material-symbols-rounded" aria-hidden="true" style="color:#4CAF50">request_quote</span>
-        <span class="label">Yargılama Gideri</span>
-      </a>
-      
-      <!-- Kesinleşme Hesaplama (Harici Versiyon) -->
-      <a class="menu-item" href="https://657.com.tr/kesinlesme-hesaplama/" target="_blank" rel="noopener noreferrer">
-        <span class="material-symbols-rounded" aria-hidden="true" style="color:#FF9800">check_circle</span>
-        <span class="label">Kesinleşme Hesapla</span>
-      </a>
+<!-- Desktop: d-lg-block ile lg ve üstünde görünür, Mobil: offcanvas -->
+<aside id="sidebar" class="offcanvas offcanvas-start d-lg-block" tabindex="-1" data-bs-scroll="true" data-bs-backdrop="false" aria-labelledby="sidebarLabel">
+  <div class="offcanvas-header border-bottom">
+    <div class="d-flex align-items-center gap-2">
+      <img src="/assets/img/favicon.svg" alt="Adalet Bakanlığı" width="24" height="24" />
+      <h5 class="offcanvas-title mb-0" id="sidebarLabel">Teftiş - 657.com.tr</h5>
     </div>
-  </nav>
+    <button type="button" class="btn-close d-lg-none" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    <nav class="nav flex-column">
+      <!-- ANA SAYFA -->
+  <a class="nav-link <?= ($active ?? '')==='dashboard'?'active':'' ?>" href="/index">
+        <span class="material-symbols-rounded me-2">space_dashboard</span>
+        <span>Anasayfa</span>
+      </a>
+
+      <!-- TEFTİŞ GRUBU -->
+      <div class="menu-group">
+        <h6 class="menu-group-title collapsible px-3 pt-3 pb-2 text-muted text-uppercase small fw-bold">
+          <span>Teftiş</span>
+          <span class="material-symbols-rounded toggle-icon">expand_more</span>
+        </h6>
+        <div class="menu-group-items">
+          <a class="nav-link <?= ($active ?? '')==='karar'?'active':'' ?>" href="/karar">
+            <span class="material-symbols-rounded me-2">bar_chart_4_bars</span>
+            <span>Karar Defteri</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='istinaf'?'active':'' ?>" href="/istinaf">
+            <span class="material-symbols-rounded me-2">checklist</span>
+            <span>İstinaf Defteri</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- DENETİM CETVELLERİ GRUBU -->
+      <div class="menu-group">
+        <h6 class="menu-group-title collapsible collapsed px-3 pt-3 pb-2 text-muted text-uppercase small fw-bold">
+          <span>Denetim Cetvelleri</span>
+          <span class="material-symbols-rounded toggle-icon">expand_more</span>
+        </h6>
+        <div class="menu-group-items" style="display: none;">
+          <a class="nav-link <?= ($active ?? '')==='iddianame'?'active':'' ?>" href="/iddianame">
+            <span class="material-symbols-rounded me-2">counter_1</span>
+            <span>İddianame Değ.</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='tensip'?'active':'' ?>" href="/tensip">
+            <span class="material-symbols-rounded me-2">counter_2</span>
+            <span>Tensip</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='durusmakacagi'?'active':'' ?>" href="/durusmakacagi">
+            <span class="material-symbols-rounded me-2">counter_3</span>
+            <span>Duruşma Kaçağı</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='byu'?'active':'' ?>" href="/byu">
+            <span class="material-symbols-rounded me-2">counter_4</span>
+            <span>Basit Yargılama</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='gerekcelikarar'?'active':'' ?>" href="/gerekcelikarar">
+            <span class="material-symbols-rounded me-2">counter_5</span>
+            <span>Gerekçeli Karar</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='kanun_yolu'?'active':'' ?>" href="/kanunyolu">
+            <span class="material-symbols-rounded me-2">counter_6</span>
+            <span>Kanun Yolu</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='kesinlestirme'?'active':'' ?>" href="/kesinlestirme">
+            <span class="material-symbols-rounded me-2">counter_7</span>
+            <span>Kesinleştirme/İnfaz</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- KONTROL GRUBU -->
+      <div class="menu-group">
+        <h6 class="menu-group-title collapsible px-3 pt-3 pb-2 text-muted text-uppercase small fw-bold">
+          <span>Kontrol</span>
+          <span class="material-symbols-rounded toggle-icon">expand_more</span>
+        </h6>
+        <div class="menu-group-items">
+          <a class="nav-link <?= ($active ?? '')==='harctahsil'?'active':'' ?>" href="/harctahsilkontrol">
+            <span class="material-symbols-rounded me-2">request_quote</span>
+            <span>Harç Tahsil</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='kesinlesmekontrol'?'active':'' ?>" href="/kesinlesmek">
+            <span class="material-symbols-rounded me-2">event_available</span>
+            <span>Kesinleşme Kontrol</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='jrobot'?'active':'' ?>" href="/jrobot">
+            <span class="material-symbols-rounded me-2" style="color:#F48FB1">smart_toy</span>
+            <span>JSON Robot</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- ARAÇLAR GRUBU -->
+      <div class="menu-group">
+        <h6 class="menu-group-title collapsible px-3 pt-3 pb-2 text-muted text-uppercase small fw-bold">
+          <span>Araçlar</span>
+          <span class="material-symbols-rounded toggle-icon">expand_more</span>
+        </h6>
+        <div class="menu-group-items">
+          <a class="nav-link <?= ($active ?? '')==='kesinlesme'?'active':'' ?>" href="/kesinlesme">
+            <span class="material-symbols-rounded me-2">work_history</span>
+            <span>Kesinleşme Hesapla</span>
+          </a>
+          <a class="nav-link <?= ($active ?? '')==='yargilama'?'active':'' ?>" href="/yargilamagideri">
+            <span class="material-symbols-rounded me-2">calculate</span>
+            <span>Yargılama Gideri</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- DİĞER UYGULAMALAR -->
+      <div class="menu-group">
+        <h6 class="menu-group-title collapsible px-3 pt-3 pb-2 text-muted text-uppercase small fw-bold">
+          <span>Diğer Uygulamalarımız</span>
+          <span class="material-symbols-rounded toggle-icon">expand_more</span>
+        </h6>
+        <div class="menu-group-items">
+          <a class="nav-link" href="https://657.com.tr/" target="_blank" rel="noopener noreferrer">
+            <span class="material-symbols-rounded me-2" style="color:#F44336">badge</span>
+            <span>657 - Devlet Memurları</span>
+          </a>
+          <a class="nav-link" href="https://657.com.tr/mudurun-dolabi-adliye-dosya-takip-hatirlatma-programi/" target="_blank" rel="noopener noreferrer">
+            <span class="material-symbols-rounded me-2" style="color:#3F51B5">inventory_2</span>
+            <span>Müdürün Dolabı</span>
+          </a>
+          <a class="nav-link" href="https://657.com.tr/yargilama-gideri-hesap-makinesi/" target="_blank" rel="noopener noreferrer">
+            <span class="material-symbols-rounded me-2" style="color:#4CAF50">request_quote</span>
+            <span>Yargılama Gideri</span>
+          </a>
+          <a class="nav-link" href="https://657.com.tr/kesinlesme-hesaplama/" target="_blank" rel="noopener noreferrer">
+            <span class="material-symbols-rounded me-2" style="color:#FF9800">check_circle</span>
+            <span>Kesinleşme Hesapla</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+  </div>
 </aside>
 

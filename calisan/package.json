@@ -1,0 +1,29 @@
+{
+  "name": "adliye-teftis-yardimcisi",
+  "version": "1.1.0",
+  "type": "module",
+  "description": "Adliye teftiş işlemlerini kolaylaştırmak ve hızlandırmak için geliştirilmiş kapsamlı bir web uygulaması",
+  "main": "index.php",
+  "scripts": {
+    "lint": "eslint 'assets/js/**/*.js' --ignore-pattern '*.min.js' --ignore-pattern 'vendor/**'",
+    "lint:fix": "eslint 'assets/js/**/*.js' --ignore-pattern '*.min.js' --ignore-pattern 'vendor/**' --fix",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
+  },
+  "keywords": [
+    "adliye",
+    "teftiş",
+    "judiciary",
+    "inspection",
+    "turkish"
+  ],
+  "author": "Gökhan TAŞÇI",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "eslint": "^9.39.1",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0"
+  }
+}

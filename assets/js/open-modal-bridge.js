@@ -352,7 +352,7 @@ function computeKararNo(r){
 
       render();
       table.__pagerApplied = true;
-    } catch (e){ // Error handled silently }
+    } catch (e){ /* Error handled silently */ }
   }
   window.__obApplyPager = obApplyPager;
 

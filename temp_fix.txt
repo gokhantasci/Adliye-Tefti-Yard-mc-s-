@@ -1,0 +1,10 @@
+      if (fBtn) fBtn.onclick = function(){ render(); const filtered = applyFilters(used); updateSummaryFor(filtered); };
+      if (clrBtn) clrBtn.onclick = function(){ 
+        const s = \#searchSicil, sd = \#startDate, ed = \#endDate; 
+        if (s) s.value = ''; 
+        if (sd) sd.value = ''; 
+        if (ed) ed.value = ''; 
+        render(); 
+        updateExtraSummaryByRows(used, minD, maxD); 
+      };
+      if (saveBtn) saveBtn.onclick = function(){ if (!window.XLSX) return; const table = card.querySelector('table'); if (!table) return; const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(table); XLSX.utils.book_append_sheet(wb, ws, 'Rapor'); XLSX.writeFile(wb,'rapor.xlsx'); };

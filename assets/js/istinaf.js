@@ -5,9 +5,8 @@
 
   // ---- DOM elemanları
   const dropZone = $('#dropZone');
-  const fileInput = $('#fileInput');
+  const fileInput = $('#excelInput');
   const hintEl = $('#selectedFilesHint');
-  const statsBody = $('#cardUstSol .panel-body'); // KPI & karar türleri (üst sağ)
 
   // ---- Sabitler
   const REQUIRED_SHEET = 'czmIstinafDefteriRaporu';
@@ -39,6 +38,10 @@
   }
 
   function toastWithIcon(type, title, msg, delay = 5000) {
+    if (typeof window.toast !== 'function') {
+      console.warn('[Toast] window.toast fonksiyonu henüz yüklenmedi');
+      return;
+    }
     const bodyHtml = `<div style="display:flex;align-items:flex-start;gap:.5rem;">
       <span class="material-symbols-rounded" style="font-size:22px;">${iconFor(type)}</span>
       <div>${msg}</div></div>`;
@@ -82,50 +85,49 @@
 	  // Filtre: "Red - …" veya "Ret - …"
 	  const rows = (items || []).filter(it => isRedOrRet(it.netice));
 
-	  // Kart konumu: KPI grid’in hemen altı (Alt Sol kartının body’si)
-	  const hostCard = document.querySelector('#cardAltSol .card-body');
-	  if (!hostCard) return;
+	  // Kart konumu: reportContainer içine
+	  const reportContainer = document.getElementById('reportContainer');
+	  if (!reportContainer) return;
 
 	  // Eski kartı sil, temiz kur
 	  let card = document.getElementById('kesinKararCard');
 	  if (card) card.remove();
 
-	  card = document.createElement('section');
-	  card.className = 'panel';
+	  card = document.createElement('div');
+	  card.className = 'card mb-3';
 	  card.id = 'kesinKararCard';
-	  card.style.marginTop = '0.5rem'; // 🔹 üstten boşluk
-
-	  const labelText = '1-  Karar kesin olmasına veya öngörülen süre dolmasına rağmen kanun yolu merciine (Yargıtay veya Bölge Adliye Mahkemesi) gönderilen dosyalar';
 
 	  card.innerHTML = `
-	  <div class="panel-head" style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">
-		<h3 style="margin:0;">1-  Karar kesin olmasına veya öngörülen süre dolmasına rağmen kanun yolu merciine (Yargıtay veya Bölge Adliye Mahkemesi) gönderilen dosyalar</h3>
-		<div class="title-actions">
-		  <button id="btnCopyKesin" class="btn btn--sm" type="button">Kopyala</button>
+	  <div class="card-header d-flex justify-content-between align-items-center">
+		<div class="d-flex align-items-center gap-2">
+		  <span class="material-symbols-rounded">gavel</span>
+		  <strong>1- Karar kesin olmasına veya öngörülen süre dolmasına rağmen kanun yolu merciine gönderilen dosyalar</strong>
 		</div>
+		<button id="btnCopyKesin" class="btn btn-outline-primary btn-sm" type="button">
+		  <span class="material-symbols-rounded me-1" style="font-size: 1rem;">content_copy</span>
+		  Kopyala
+		</button>
 	  </div>
-	  <div class="panel-body">
-		<table class="table" id="kesinKararTable" style="width:100%;border-collapse:collapse">
-		  <thead>
-			<tr>
-			  <th>SIRA</th>
-			  <th>ESAS NO</th>
-			  <th>KARAR NO</th>
-			  <th>KARARIN KESİN OLMA SEBEBİ AÇIKLAMA</th>
-			</tr>
-		  </thead>
-		  <tbody></tbody>
-		</table>
-		${rows.length ? '' : `<div class="muted">Uygun kayıt bulunamadı.</div>`}
+	  <div class="card-body">
+		<div class="table-responsive">
+		  <table class="table table-hover" id="kesinKararTable">
+			<thead>
+			  <tr>
+				<th>SIRA</th>
+				<th>ESAS NO</th>
+				<th>KARAR NO</th>
+				<th>KARARIN KESİN OLMA SEBEBİ AÇIKLAMA</th>
+			  </tr>
+			</thead>
+			<tbody></tbody>
+		  </table>
+		  ${rows.length ? '' : `<div class="text-muted">Uygun kayıt bulunamadı.</div>`}
+		</div>
 	  </div>
 	`;
 
-	  // KPI grid'in hemen altına yerleştir; yoksa body'nin sonuna ekle
-	  //const kpiGrid = hostCard.querySelector(".kpi-grid");
-	  //if (kpiGrid) kpiGrid.insertAdjacentElement("afterend", card);
-	  //else hostCard.appendChild(card);
-	  const gokhan = document.getElementById('gokhan');
-	  gokhan.insertAdjacentElement('afterend', card);
+	  // reportContainer'a ekle
+	  reportContainer.appendChild(card);
 
 	  if (!rows.length) return;
 
@@ -223,49 +225,52 @@
       return c && c.bucket === 'not_sent';
 	  });
 
-	  // Hedef: kesinKararCard'ın hemen altı; yoksa Alt Sol kart body
-	  const hostBody = document.querySelector('#cardAltSol .card-body');
-	  if (!hostBody) return;
+	  // Hedef: reportContainer içine, kesinKararCard'ın altına
+	  const reportContainer = document.getElementById('reportContainer');
+	  if (!reportContainer) return;
 
 	  // Eski kart varsa temizle
 	  let card = document.getElementById('notSentCard');
 	  if (card) card.remove();
 
 	  // Yeni kart
-	  card = document.createElement('section');
-	  card.className = 'panel';
+	  card = document.createElement('div');
+	  card.className = 'card mb-3';
 	  card.id = 'notSentCard';
-	  card.style.marginTop = '1rem'; // KPI/üst karttan nefes payı
-
-	  const label = '2- Kanun yolu merciine (Yargıtay veya Bölge Adliye Mahkemesi) henüz gönderilmeyen dosyalar;';
 
 	  card.innerHTML = `
-	  <div class="panel-head" style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">
-		<h3 style="margin:0;">2- Kanun yolu merciine (Yargıtay veya Bölge Adliye Mahkemesi) henüz gönderilmeyen dosyalar;</h3>
-		<div class="title-actions">
-		  <button id="btnCopyNotSent" class="btn btn--sm" type="button">Kopyala</button>
+	  <div class="card-header d-flex justify-content-between align-items-center">
+		<div class="d-flex align-items-center gap-2">
+		  <span class="material-symbols-rounded">schedule_send</span>
+		  <strong>2- Kanun yolu merciine henüz gönderilmeyen dosyalar</strong>
 		</div>
+		<button id="btnCopyNotSent" class="btn btn-outline-primary btn-sm" type="button">
+		  <span class="material-symbols-rounded me-1" style="font-size: 1rem;">content_copy</span>
+		  Kopyala
+		</button>
 	  </div>
-	  <div class="panel-body">
-		<table class="table" id="notSentTable" style="width:100%;border-collapse:collapse">
-		  <thead>
-			<tr>
-			  <th>SIRA</th>
-			  <th>ESAS NO</th>
-			  <th>KARAR NO</th>
-			  <th>KANUN YOLUNA BAŞVURMA TARİHİ</th>
-			</tr>
-		  </thead>
-		  <tbody></tbody>
-		</table>
-		${notSentRows.length ? '' : `<div class="muted">Uygun kayıt bulunamadı.</div>`}
+	  <div class="card-body">
+		<div class="table-responsive">
+		  <table class="table table-hover" id="notSentTable">
+			<thead>
+			  <tr>
+				<th>SIRA</th>
+				<th>ESAS NO</th>
+				<th>KARAR NO</th>
+				<th>KANUN YOLUNA BAŞVURMA TARİHİ</th>
+			  </tr>
+			</thead>
+			<tbody></tbody>
+		  </table>
+		  ${notSentRows.length ? '' : `<div class="text-muted">Uygun kayıt bulunamadı.</div>`}
+		</div>
 	  </div>
 	`;
 
 	  // kesinKararCard'ın hemen altına yerleştir
 	  const kesin = document.getElementById('kesinKararCard');
 	  if (kesin) kesin.insertAdjacentElement('afterend', card);
-	  else hostBody.appendChild(card);
+	  else reportContainer.appendChild(card);
 
 	  if (!notSentRows.length) return;
 
@@ -538,11 +543,11 @@
 		<table class="table table-ozet" id="daireOzetTable" style="width:100%;border-collapse:collapse">
 		  <thead>
 			<tr>
-			  <th data-key="court"       class="orderable">Daire</th>
-			  <th data-key="incelemede"  class="orderable">İncelemede</th>
-			  <th data-key="esastanRed"  class="orderable">Esastan Red</th>
-			  <th data-key="bozma"       class="orderable">Bozma</th>
-			  <th data-key="kismen"      class="orderable">Kısmen</th>
+			  <th data-key="court"       class="orderable" style="width:40%">Daire</th>
+			  <th data-key="incelemede"  class="orderable" style="width:15%">İncelemede</th>
+			  <th data-key="esastanRed"  class="orderable" style="width:15%">Esastan Red</th>
+			  <th data-key="bozma"       class="orderable" style="width:15%">Bozma</th>
+			  <th data-key="kismen"      class="orderable" style="width:15%">Kısmen</th>
 			</tr>
 		  </thead>
 		  <tbody></tbody>
@@ -742,31 +747,39 @@
   }
 
   // ---- Üst Sağ (detay) ve Üst Sol (KPI) render
-  function renderStatsPanels(stats) {
-    // ÜST SAĞ: detay + karar türleri (eski düzen)
-    if (statsBody) {
-      statsBody.innerHTML = `
-        <section class="panel">
-          <div class="panel-head"><h3>Karar Türleri</h3></div>
-          <div class="panel-body">
-            <table class="table"><thead><tr><th>Tür</th><th>Adet</th></tr></thead><tbody>
-              ${
-  Object.keys(stats.decisions).length
-    ? Object.keys(stats.decisions).sort().map(k => `<tr><td>${escapeHtml(k)}</td><td class="num">${stats.decisions[k]}</td></tr>`).join('')
-    : `<tr><td colspan="2" class="muted">Henüz karar yok</td></tr>`
-  }
-            </tbody></table>
-          </div>
-        </section>`;
+  function renderStatsPanels(stats, fileCount, totalRows, emptyRows, duplicateRows) {
+    // KPI kartlarını render et (yeni istinaf-kpi.js kullanarak)
+    if (typeof window.istinafRenderKPICards === 'function') {
+      window.istinafRenderKPICards(stats);
     }
-
-    // ÜST SOL: KPI kartları
-    ensureKpiCards();
-    $('#kpiIstinafEdilen') && ($('#kpiIstinafEdilen').textContent = stats.total.toLocaleString('tr-TR'));
-    $('#kpiVazgecilen') && ($('#kpiVazgecilen').textContent = stats.withdrawn.toLocaleString('tr-TR'));
-    $('#kpiNotSent') && ($('#kpiNotSent').textContent = stats.not_sent.toLocaleString('tr-TR'));
-    $('#kpiPending') && ($('#kpiPending').textContent = stats.pending_review.toLocaleString('tr-TR'));
-    $('#kpiDecided') && ($('#kpiDecided').textContent = stats.decided.toLocaleString('tr-TR'));
+    
+    // Rapor Özeti Kartını reportContainer'a ekle
+    const reportContainer = document.getElementById('reportContainer');
+    if (reportContainer) {
+      let raporOzetCard = document.getElementById('raporOzetCard');
+      if (raporOzetCard) raporOzetCard.remove();
+      
+      raporOzetCard = document.createElement('div');
+      raporOzetCard.className = 'card mb-3';
+      raporOzetCard.id = 'raporOzetCard';
+      
+      raporOzetCard.innerHTML = `
+        <div class="card-header">
+          <div class="d-flex align-items-center gap-2">
+            <span class="material-symbols-rounded">summarize</span>
+            <strong>Rapor Özeti</strong>
+          </div>
+        </div>
+        <div class="card-body" id="raporOzetBody">
+          <!-- renderRaporOzet tarafından doldurulacak -->
+        </div>
+      `;
+      
+      reportContainer.insertBefore(raporOzetCard, reportContainer.firstChild);
+      
+      // Rapor özetini doldur
+      renderRaporOzet(stats, fileCount, totalRows, emptyRows, duplicateRows);
+    }
   }
 
   // ---- Dedupe: (Esas No + Karar No + Karar Tarihi), en eski İstinaf Dilekçesi
@@ -794,7 +807,8 @@
     };
   }
 
-  // ---- Üst Sol KPI: card-head'i kaldır, KPI grid ekle
+  // ---- Eski KPI fonksiyonu (artık kullanılmıyor - istinaf-kpi.js kullanılıyor)
+  /*
   function ensureKpiCards() {
     const ustSol = $('#cardAltSol');
     if (!ustSol) return;
@@ -855,6 +869,7 @@
 		`;
 
   }
+  */
 
 
   // ---- Modal: gerçek overlay + backdrop (benzersiz id’ler)
@@ -863,24 +878,130 @@
     const css = `
       body.modal-open { overflow: hidden; }
       .ozet-backdrop {
-        position: fixed; inset: 0; background: rgba(0,0,0,.45);
-        z-index: 9998; display:none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.5);
+        z-index: 1040;
+        display: none;
+      }
+      .ozet-backdrop.show {
+        display: block;
       }
       .modal-card.ozet-modal {
-        position: fixed; z-index: 9999;
-        inset: 50% auto auto 50%; transform: translate(-50%,-50%);
+        position: fixed;
+        z-index: 1050;
+        inset: 50% auto auto 50%;
+        transform: translate(-50%,-50%);
         width: min(1100px, 96vw);
-        max-height: 86vh; display: none;
-        background: var(--surface, #101418); color: inherit;
-        border-radius: 14px; box-shadow: 0 10px 40px rgba(0,0,0,.5);
+        max-height: 90vh;
+        display: none;
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0,0,0,.3);
         overflow: hidden;
       }
-      .modal-head, .modal-foot { padding: .8rem 1rem; background: rgba(255,255,255,.04); }
-      .modal-body { padding: 1rem; overflow: auto; max-height: calc(86vh - 110px); }
-      .modal-head h2 { margin: 0; font-size: 1.1rem; }
-      .title-actions { display:flex; gap:.5rem; align-items:center; }
-      .pager { display:flex; align-items:center; gap:.5rem; }
-      #ozet-table td, #ozet-table th { white-space: nowrap; }
+      .modal-card.ozet-modal.show {
+        display: flex;
+        flex-direction: column;
+      }
+      [data-bs-theme="dark"] .modal-card.ozet-modal {
+        background: var(--adalet-card-bg, #1E1E1E);
+        color: var(--adalet-text, #E0E0E0);
+        border: 1px solid var(--adalet-border, #34495E);
+      }
+      [data-bs-theme="light"] .modal-card.ozet-modal,
+      :root:not([data-bs-theme="dark"]) .modal-card.ozet-modal {
+        background: #fff;
+        color: #212529;
+        border: 1px solid var(--adalet-border, #BDC3C7);
+      }
+      [data-bs-theme="dark"] .modal-card .modal-head {
+        border-bottom-color: var(--adalet-border, #34495E);
+        background: var(--adalet-card-bg, #1E1E1E);
+      }
+      [data-bs-theme="dark"] .modal-card .modal-foot {
+        border-top-color: var(--adalet-border, #34495E);
+        background: var(--adalet-card-bg, #1E1E1E);
+      }
+      [data-bs-theme="dark"] #ozet-table {
+        color: var(--adalet-text, #E0E0E0);
+      }
+      [data-bs-theme="dark"] #ozet-table thead {
+        background: var(--adalet-light, #2C3E50);
+        border-color: var(--adalet-border, #34495E);
+        color: var(--adalet-text, #E0E0E0);
+      }
+      [data-bs-theme="dark"] #ozet-table thead.table-light {
+        background: var(--adalet-light, #2C3E50);
+      }
+      [data-bs-theme="dark"] #ozet-table th,
+      [data-bs-theme="dark"] #ozet-table td {
+        border-color: var(--adalet-border, #34495E);
+      }
+      [data-bs-theme="dark"] #ozet-table tbody tr:hover {
+        background: rgba(196, 30, 58, 0.1);
+      }
+      [data-bs-theme="dark"] #ozet-table.table-striped tbody tr:nth-of-type(odd) {
+        background: rgba(255,255,255,.02);
+      }
+      [data-bs-theme="dark"] #ozet-search {
+        background: var(--adalet-light, #2C3E50);
+        border-color: var(--adalet-border, #34495E);
+        color: var(--adalet-text, #E0E0E0);
+      }
+      [data-bs-theme="dark"] #ozet-search::placeholder {
+        color: var(--adalet-text-light, #95A5A6);
+      }
+      [data-bs-theme="dark"] #ozet-search:focus {
+        background: var(--adalet-light, #2C3E50);
+        border-color: var(--adalet-primary, #C41E3A);
+        box-shadow: 0 0 0 0.2rem rgba(196, 30, 58, 0.25);
+      }
+      [data-bs-theme="dark"] #ozet-pager-meta {
+        color: var(--adalet-text-light, #95A5A6);
+      }
+      .modal-card .modal-head {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--bs-border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .modal-card .modal-head h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+      .modal-card .modal-body {
+        padding: 1.5rem;
+        overflow: auto;
+        flex: 1;
+      }
+      .modal-card .modal-foot {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--bs-border-color);
+      }
+      .modal-card .title-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .modal-card .pager {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      #ozet-table {
+        width: 100%;
+        font-size: 0.875rem;
+      }
+      #ozet-table td,
+      #ozet-table th {
+        white-space: nowrap;
+        padding: 0.5rem;
+      }
     `;
     const style = document.createElement('style');
     style.id = 'kanunyolu-modal-style';
@@ -899,29 +1020,52 @@
     <div class="modal-head">
       <h2>İstinaf Özet Tablosu</h2>
       <div class="title-actions">
-        <input id="ozet-search" class="input input--sm" placeholder="Ara...">
-        <button id="ozet-export-xls" class="btn btn--sm">Excel'e Aktar</button>
-        <button id="ozet-print-all" class="btn btn--sm">Yazdır</button>
-        <button id="ozet-close-top" class="btn btn--sm btn--icon" aria-label="Kapat">✕</button>
+        <input id="ozet-search" class="form-control form-control-sm" placeholder="Ara..." style="width: 200px;">
+        <button id="ozet-export-xls" class="btn btn-success btn-sm">
+          <span class="material-symbols-rounded me-1" style="font-size: 1rem;">download</span>
+          Excel
+        </button>
+        <button id="ozet-print-all" class="btn btn-primary btn-sm">
+          <span class="material-symbols-rounded me-1" style="font-size: 1rem;">print</span>
+          Yazdır
+        </button>
+        <button id="ozet-close-top" class="btn btn-sm btn-outline-secondary" aria-label="Kapat">
+          <span class="material-symbols-rounded">close</span>
+        </button>
       </div>
     </div>
     <div class="modal-body">
-      <div id="ozet-pager-meta" class="muted" style="margin-bottom:.5rem;"></div>
-      <table id="ozet-table" class="table">
-        <thead><tr>
-          <th>Esas No</th><th>Karar No</th><th>Karar Tarihi</th>
-          <th>İstinaf Dilekçesi Tarihi</th><th>Netice</th><th>Hakim</th>
-        </tr></thead><tbody></tbody>
-      </table>
+      <div id="ozet-pager-meta" class="text-muted mb-2"></div>
+      <div class="table-responsive">
+        <table id="ozet-table" class="table table-striped table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Esas No</th>
+              <th>Karar No</th>
+              <th>Karar Tarihi</th>
+              <th>İstinaf Dilekçesi Tarihi</th>
+              <th>Netice</th>
+              <th>Hakim</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
-        <div class="modal-foot d-flex justify-content-between align-items-center">
-            <div class="pager">
-                <div><button id="ozet-page-prev" class="btn ghost">◀ Önceki</button></div>
-                <div><span id="ozet-page-info" class="muted" style="margin:0 .5rem;"></span></div>
-                <div><button id="ozet-page-next" class="btn ghost">Sonraki ▶</button></div>
-            </div>
-            <button id="ozet-close-foot" class="btn btn--sm">Kapat</button>
-        </div>`;
+    <div class="modal-foot d-flex justify-content-between align-items-center">
+      <div class="pager">
+        <button id="ozet-page-prev" class="btn btn-outline-secondary btn-sm">
+          <span class="material-symbols-rounded me-1" style="font-size: 1rem;">chevron_left</span>
+          Önceki
+        </button>
+        <span id="ozet-page-info" class="text-muted mx-2"></span>
+        <button id="ozet-page-next" class="btn btn-outline-secondary btn-sm">
+          Sonraki
+          <span class="material-symbols-rounded ms-1" style="font-size: 1rem;">chevron_right</span>
+        </button>
+      </div>
+      <button id="ozet-close-foot" class="btn btn-secondary btn-sm">Kapat</button>
+    </div>`;
   document.body.appendChild(modal);
 
   // Modal scoped elemanlar (ID çakışması önlendi)
@@ -938,14 +1082,14 @@
 
   function openModal() {
     document.body.classList.add('modal-open');
-    backdrop.style.display = 'block';
-    modal.style.display = 'block';
+    backdrop.classList.add('show');
+    modal.classList.add('show');
     renderModalPage();
   }
 
   function closeModal() {
-    modal.style.display = 'none';
-    backdrop.style.display = 'none';
+    modal.classList.remove('show');
+    backdrop.classList.remove('show');
     document.body.classList.remove('modal-open');
   }
   backdrop.addEventListener('click', closeModal);
@@ -1054,11 +1198,16 @@
     if (!$('#btnOpenOzet')) {
       const btn = document.createElement('button');
       btn.id = 'btnOpenOzet';
-      btn.className = 'btn btn--sm';
-      btn.textContent = '📊 Özet Tabloyu Aç';
+      btn.className = 'btn btn-outline-primary w-100';
+      btn.innerHTML = '<span class="material-symbols-rounded me-1" style="font-size: 1rem;">table_chart</span>Özet Tabloyu Aç';
       btn.addEventListener('click', openModal);
-      if (hintEl) hintEl.insertAdjacentElement('afterend', btn);
-      else document.body.appendChild(btn);
+      
+      const container = document.getElementById('btnOzetContainer');
+      if (container) {
+        container.appendChild(btn);
+      } else {
+        document.body.appendChild(btn);
+      }
     }
   }
 
@@ -1106,8 +1255,8 @@
 
 
   function renderDateFilterZone() {
-    const dz = document.getElementById('dropZone');
-    if (!dz) return;
+    const container = document.getElementById('dateFilterContainer');
+    if (!container) return;
 
     // Eski zone varsa kaldır
     let wrap = document.getElementById('dateFilterZone');
@@ -1115,7 +1264,7 @@
 
     wrap = document.createElement('div');
     wrap.id = 'dateFilterZone';
-    wrap.className = 'date-filter-wrap';
+    wrap.className = 'mt-3';
 
     // Varsayılan min/max: ozetData içindeki Karar Tarihi'nden
     let minVal = '',
@@ -1128,16 +1277,30 @@
     }
 
     wrap.innerHTML = `
-		<div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:10px;">
-		  <label for="startDate"><b>İlk tarih</b></label>
-		  <input id="startDate" type="date" value="${minVal}">
-		  <label for="endDate"><b>Son tarih</b></label>
-		  <input id="endDate" type="date" value="${maxVal}">
-		  <button id="dateFilterBtn" type="button" class="btn">Filtrele</button>
-          <button id="dateResetBtn" type="button" class="btn">Tümünü Göster</button>
+		<div class="row g-2">
+		  <div class="col-12">
+		    <label for="startDate" class="form-label small mb-1">İlk Tarih</label>
+		    <input id="startDate" type="date" class="form-control" value="${minVal}">
+		  </div>
+		  <div class="col-12">
+		    <label for="endDate" class="form-label small mb-1">Son Tarih</label>
+		    <input id="endDate" type="date" class="form-control" value="${maxVal}">
+		  </div>
+		  <div class="col-6">
+		    <button id="dateFilterBtn" type="button" class="btn btn-primary w-100">
+		      <span class="material-symbols-rounded me-1" style="font-size: 1rem;">filter_alt</span>
+		      Filtrele
+		    </button>
+		  </div>
+		  <div class="col-6">
+		    <button id="dateResetBtn" type="button" class="btn btn-outline-secondary w-100">
+		      <span class="material-symbols-rounded me-1" style="font-size: 1rem;">refresh</span>
+		      Sıfırla
+		    </button>
+		  </div>
 		</div>
 	  `;
-    dz.insertAdjacentElement('afterend', wrap);
+    container.appendChild(wrap);
 
     const btnFilter = document.getElementById('dateFilterBtn');
     const btnReset = document.getElementById('dateResetBtn');
@@ -1340,15 +1503,13 @@
     // mevcutlar:
     showOzetButton();
     const stats = computeStats(deduped);
-    renderStatsPanels(stats);
+    renderStatsPanels(stats, excelFiles.length, totalRowsRead, skippedEmpty, dupRemoved);
     renderDaireOzetTablo(ozetData);
     renderKesinKararTablo(ozetData);
     renderNotSentTablo(ozetData);
 
-    // Toast
-    const bodyTxt = `<span class=\"material-symbols-rounded\" style=\"vertical-align:middle;font-size:20px;\">task_alt</span> ${totalRowsRead} satır okundu; ${skippedEmpty} boş; ${dupRemoved} mükerrer temizlendi. Kalan: ${deduped.length}. Özet tabloyu açabilirsiniz.`;
+    // Toast sadece bir kez
     toastWithIcon('success', 'Rapor Hazır', bodyTxt, 7500);
-
   }
 
   // ---- Olaylar
@@ -1441,8 +1602,32 @@
       .catch(onError);
   }
 
+  // Event listeners
+  if (dropZone) {
+    ['dragenter', 'dragover'].forEach(ev => dropZone.addEventListener(ev, e => {
+      e.preventDefault();
+      dropZone.style.opacity = '0.7';
+    }));
+    ['dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, e => {
+      e.preventDefault();
+      dropZone.style.opacity = '1';
+    }));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      const files = Array.from(e.dataTransfer?.files || []);
+      processFiles(files);
+    });
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      const files = Array.from(fileInput.files || []);
+      processFiles(files);
+    });
+  }
+
   // Sayfa açılışında bir kere çağır
-  ensureKpiCards(); // grid hazır değilse oluştursun
+  // ensureKpiCards(); // artık gerekmiyor, istinaf-kpi.js kullanıyoruz
   updateIslemSayaci();
 
 })();

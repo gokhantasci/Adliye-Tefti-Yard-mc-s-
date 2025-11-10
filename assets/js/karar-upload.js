@@ -3,9 +3,21 @@
   const input = $('#excelInput');
   const runBtn = $('#run');
   if (!input) return;
+  // Prevent the browser default behavior of opening files when dropped outside the drop zone
+  // (drops on the document can navigate to the file). We prevent default globally and
+  // let the dropzone handle the actual files.
+  function _globalPrevent(e){ e.preventDefault(); e.stopPropagation && e.stopPropagation(); }
+  document.addEventListener('dragover', _globalPrevent);
+  document.addEventListener('drop', _globalPrevent);
   const dropZone = document.getElementById('dropZone');
   let resultCard = $('#resultCard');
-  if (!resultCard){
+  // References to parts of the result card; will be set when the card is created.
+  let headEl = null;
+  let bodyEl = null;
+
+  // Factory: create the results panel only when the first file is processed.
+  function createResultCard(){
+    if (resultCard) return;
     const panel = document.createElement('section');
     panel.className = 'panel';
     panel.id = 'resultCard';
@@ -30,12 +42,21 @@
           </table>
         </div>
       </div>`;
-    const host = document.querySelector('.panel-body');
-    (host && host.parentElement ? host.parentElement.after(panel) : document.body.appendChild(panel));
+    // Prefer the left-column report container when present so results appear in the main report area
+    const preferredHost = document.getElementById('reportContainer') || document.querySelector('.panel-body');
+    if (preferredHost && typeof preferredHost.appendChild === 'function') {
+      preferredHost.appendChild(panel);
+    } else if (preferredHost && preferredHost.parentElement) {
+      preferredHost.parentElement.after(panel);
+    } else {
+      document.body.appendChild(panel);
+    }
     resultCard = panel;
+    headEl = resultCard.querySelector('#resultHead');
+    bodyEl = resultCard.querySelector('#resultBody');
+    // hide initially until first render
+    resultCard.style.display = 'none';
   }
-  const headEl = $('#resultHead');
-  const bodyEl = $('#resultBody');
   function parseCSV(text){
     const hasSemicolon = text.indexOf(';') > -1;
     const hasComma = text.indexOf(',') > -1;
@@ -43,18 +64,42 @@
     const rows = text.split(/\r?\n/).filter(r => r.trim().length > 0).map(r => r.split(sep).map(c => c.replace(/^\uFEFF/, '').trim()));
     return {header: rows[0] || [], rows: rows.slice(1)};
   }
+  // Wait for the xlsx-loader to initialize (fires 'xlsx-ready' CustomEvent)
+  let _xlsxReady = null;
+  function waitForXlsxReady(timeout = 3000){
+    if (_xlsxReady) return _xlsxReady;
+    _xlsxReady = new Promise(resolve => {
+      // If XLSX already present, resolve true
+      if (window.XLSX && typeof XLSX.read === 'function') return resolve(true);
+      // Listen for loader event
+      function onReady(e){
+        try { document.removeEventListener('xlsx-ready', onReady); } catch (e){}
+        resolve(!!(e && e.detail && e.detail.ok));
+      }
+      document.addEventListener('xlsx-ready', onReady);
+      // Fallback timeout
+      setTimeout(() => {
+        // If XLSX is now present, ok; otherwise resolve false
+        resolve(!!(window.XLSX && typeof XLSX.read === 'function'));
+      }, timeout);
+    });
+    return _xlsxReady;
+  }
+
   async function parseXLSX(file){
-    if (window.XLSX){
-      const data = await file.arrayBuffer();
-      const wb = XLSX.read(data, {type:'array'});
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(sheet, {header:1, raw:true});
-      const header = (json[0] || []).map(String);
-      const rows = json.slice(1).map(r => r.map(v => (v == null ? '' : v)));
-      return {header, rows};
-    } else {
-      throw new Error('xlsx.min.js bulunamadı (assets/js/vendor/xlsx.min.js). Lütfen .csv kullanın veya vendor dosyasını ekleyin.');
+    console.debug('[karar-upload] parseXLSX start', file && file.name);
+    const ok = await waitForXlsxReady();
+    if (!ok || !(window.XLSX && typeof XLSX.read === 'function')){
+      console.error('[karar-upload] XLSX not available');
+      throw new Error('XLSX kütüphanesi yüklenemedi. Lütfen internet bağlantınızı veya /assets/js/xlsx.full.min.js dosyasını kontrol edin. Alternatif olarak .csv kullanabilirsiniz.');
     }
+    const data = await file.arrayBuffer();
+    const wb = XLSX.read(data, {type:'array'});
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet, {header:1, raw:true});
+    const header = (json[0] || []).map(String);
+    const rows = json.slice(1).map(r => r.map(v => (v == null ? '' : v)));
+    return {header, rows};
   }
   function toNumber(v){
     const n = Number(String(v).replace(/\./g,'').replace(',','.'));
@@ -105,6 +150,9 @@
     return 'Düşme/Cvyo/Diğer';
   }
   function render(header, rows, idx){
+    console.debug('[karar-upload] render', { headerLength: (header||[]).length, rowsLength: (rows||[]).length });
+    // Ensure results panel exists before attempting to render
+    if (!resultCard || !headEl || !bodyEl) createResultCard();
     headEl.innerHTML = '';
     const head = document.createDocumentFragment();
     header.forEach(h => { const th = document.createElement('th'); th.textContent = h; head.appendChild(th); });
@@ -135,22 +183,56 @@
     resultCard.style.display = '';
   }
   async function runFromFile(f){
+    console.debug('[karar-upload] runFromFile called', f && f.name);
     let parsed;
     const ext = (f.name.split('.').pop() || '').toLowerCase();
-    if (ext === 'xlsx' || ext === 'xls'){
-      parsed = await parseXLSX(f);
-    } else if (ext === 'csv'){
-      parsed = parseCSV(await f.text());
-    } else {
-      alert('Desteklenen uzantılar: .xlsx, .xls, .csv');
-      return;
+    // Helper: show a small inline spinner inside the report container or next to the drop zone
+    function createInlineSpinner(host){
+      try {
+        if (!host) return null;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'inline-xls-spinner';
+        wrapper.innerHTML = `
+          <div class="d-flex align-items-center gap-2 p-2" style="background:var(--adalet-card-bg);border-radius:8px;border:1px solid var(--adalet-border);">
+            <div class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></div>
+            <div class="small text-muted">Veriler hazırlanıyor…</div>
+          </div>`;
+        host.appendChild(wrapper);
+        return wrapper;
+      } catch (e) { return null; }
     }
+
+    function removeInlineSpinner(sp){ if (!sp) return; try { sp.remove(); } catch(e){} }
+
+    // Show inline spinner
+    const reportHost = document.getElementById('reportContainer') || document.querySelector('.panel-body') || document.body;
+    const _spinner = createInlineSpinner(reportHost);
+    try {
+      if (ext === 'xlsx' || ext === 'xls'){
+        parsed = await parseXLSX(f);
+      } else if (ext === 'csv'){
+        parsed = parseCSV(await f.text());
+      } else {
+        const msg = 'Desteklenen uzantılar: .xlsx, .xls, .csv';
+        if (window.toast) window.toast({type:'warning', title:'Dosya Türü', body: msg}); else console.warn(msg);
+        return;
+      }
+    } catch (err){
+      const msg = err && err.message ? err.message : 'Dosya okunamadı.';
+      console.error('[karar-upload] runFromFile error', err);
+      if (window.toast) window.toast({type:'danger', title:'Hata', body: msg}); else console.error(msg);
+      return;
+    } finally {
+      // Remove spinner regardless of success/failure
+      removeInlineSpinner(_spinner);
+    }
+
     const idx = resolveIndexes(parsed.header);
     render(parsed.header, parsed.rows, idx);
   }
   function onInputChanged(e){
     const f = e.target.files && e.target.files[0];
-    if (f) runFromFile(f).catch(err => { // Error: err); alert(err.message || 'Dosya okunamadı.'); }
+    if (f) runFromFile(f);
   }
   input.addEventListener('change', onInputChanged);
   if (runBtn){
@@ -167,9 +249,11 @@
     ['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('is-over'); }));
     ['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('is-over'); }));
     dropZone.addEventListener('drop', e => {
+      e.preventDefault(); e.stopPropagation && e.stopPropagation();
       const dt = e.dataTransfer; if (!dt || !dt.files || dt.files.length === 0) return;
       const f = dt.files[0];
-      runFromFile(f).catch(err => { // Error: err); alert(err.message || 'Dosya okunamadı.'); }
+      // Fire and forget - runFromFile handles errors and toasts
+      runFromFile(f);
     });
   }
 })();

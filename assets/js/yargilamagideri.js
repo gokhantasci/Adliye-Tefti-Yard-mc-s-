@@ -44,13 +44,13 @@
 
   // ---- sayısal input kısıtları (diğer giderler)
   const OTHER_INPUT_IDS = [
-    'postagideri',
-    'ilangideri',
-    'yasagideri',
-    'atkgideri',
-    'kesifgideri',
-    'uzlasmagideri',
-    'bilirkisigideri'
+    'postaGideri',
+    'ilanGideri',
+    'yasaYolu',
+    'atkGideri',
+    'kesifGideri',
+    'uzlastirmaci',
+    'bilirkisi'
   ];
   function bindNumericInputs() {
     OTHER_INPUT_IDS.forEach((id) => {
@@ -123,7 +123,7 @@
     const lab = el('label', '', label);
     lab.htmlFor = idVisible;
 
-    const inp = el('input', 'input input-center');
+    const inp = el('input', 'form-control text-center');
     inp.type = 'number';
     inp.id = idVisible;
     inp.placeholder = '0';
@@ -141,55 +141,111 @@
   }
 
   function buildColumn(container, items, idPrefixVisible, idPrefixHidden, title, defaultCurrency) {
-    const col = el('div', 'ustsol-col');
-    col.append(el('h3', '', title));
-
+    const col = el('div', 'col-md-6');
+    
+    const card = el('div', 'card');
+    const cardHeader = el('div', 'card-header d-flex align-items-center justify-content-between');
+    const headerLeft = el('div', 'd-flex align-items-center gap-2');
+    const headerTitle = el('strong', '', title);
+    headerLeft.append(headerTitle);
+    
+    const badge = el('span', 'badge bg-secondary');
+    badge.id = `badge_${idPrefixVisible}`;
+    badge.textContent = items.length.toString();
+    
+    cardHeader.append(headerLeft, badge);
+    
+    const cardBody = el('div', 'card-body p-2');
     const list = el('div', 'field-list');
+    
+    const itemsPerPage = 5;
+    let currentPage = 0;
+    const totalPages = Math.ceil(items.length / itemsPerPage);
+    
+    const allFieldGroups = [];
+    
+    let prevBtn, nextBtn, pageInfo;
+    
     items.forEach((row, i) => {
       const idV = `${idPrefixVisible}${i + 1}`;
       const idH = `${idPrefixHidden}${i + 1}`;
-      const rowEl = makeFieldRow({
-        idVisible: idV,
-        idHidden: idH,
-        label: toLabel(row.from, row.to, row.currency, defaultCurrency),
-        amount: row.amount ?? 0,
-        index: i
-      });
-      list.append(rowEl);
+      
+      const fieldGroup = el('div', 'mb-2');
+      const label = el('label', 'form-label small mb-1', toLabel(row.from, row.to, row.currency, defaultCurrency));
+      label.htmlFor = idV;
+      
+      const inp = el('input', 'form-control form-control-sm text-center');
+      inp.type = 'number';
+      inp.id = idV;
+      inp.placeholder = '0';
+      inp.min = '0';
+      inp.step = '1';
+      inp.value = '0';
+      inp.inputMode = 'numeric';
+      
+      const hid = el('input');
+      hid.type = 'hidden';
+      hid.id = idH;
+      hid.value = row.amount ?? 0;
+      
+      fieldGroup.append(label, inp, hid);
+      allFieldGroups.push(fieldGroup);
     });
-
-    attachScrollReveal(list, items.length);
-
-    if (items.length > INITIAL_VISIBLE) {
-      const more = el('div', 'more-wrap');
-      const btn = el('button', 'btn-more', 'Daha Fazla');
-      btn.addEventListener('click', () => {
-        const vis = parseInt(list.dataset.visible || '0', 10);
-        if (vis < items.length) {
-          for (let i = vis; i < items.length; i++) {
-            list.querySelector(`.field-row[data-index="${i}"]`)?.style &&
-              (list.querySelector(`.field-row[data-index="${i}"]`).style.display =
-                'flex');
-          }
-          list.dataset.visible = String(items.length);
-          btn.textContent = 'Daha Az';
-        } else {
-          for (let i = 0; i < items.length; i++) {
-            const row = list.querySelector(`.field-row[data-index="${i}"]`);
-            if (row) row.style.display = i < INITIAL_VISIBLE ? 'flex' : 'none';
-          }
-          list.dataset.visible = String(INITIAL_VISIBLE);
-          btn.textContent = 'Daha Fazla';
-          list.scrollTop = 0;
+    
+    const renderPage = (page) => {
+      list.innerHTML = '';
+      const start = page * itemsPerPage;
+      const end = Math.min(start + itemsPerPage, items.length);
+      
+      for (let i = start; i < end; i++) {
+        list.append(allFieldGroups[i]);
+      }
+      
+      // Update pagination buttons
+      if (prevBtn) prevBtn.disabled = page === 0;
+      if (nextBtn) nextBtn.disabled = page === totalPages - 1;
+      if (pageInfo) pageInfo.textContent = `${page + 1} / ${totalPages}`;
+    };
+    
+    cardBody.append(list);
+    
+    // Pagination controls
+    if (totalPages > 1) {
+      const paginationDiv = el('div', 'd-flex justify-content-between align-items-center mt-2 pt-2 border-top');
+      
+      prevBtn = el('button', 'btn btn-outline-secondary btn-sm');
+      prevBtn.type = 'button';
+      prevBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size:1rem;">chevron_left</span>';
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 0) {
+          currentPage--;
+          renderPage(currentPage);
         }
       });
-      more.append(btn);
-      col.append(list, more);
-    } else {
-      col.append(list);
+      
+      pageInfo = el('span', 'text-muted small');
+      pageInfo.textContent = '1 / ' + totalPages;
+      
+      nextBtn = el('button', 'btn btn-outline-secondary btn-sm');
+      nextBtn.type = 'button';
+      nextBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size:1rem;">chevron_right</span>';
+      nextBtn.addEventListener('click', () => {
+        if (currentPage < totalPages - 1) {
+          currentPage++;
+          renderPage(currentPage);
+        }
+      });
+      
+      paginationDiv.append(prevBtn, pageInfo, nextBtn);
+      cardBody.append(paginationDiv);
     }
-
+    
+    card.append(cardHeader, cardBody);
+    col.append(card);
     container.append(col);
+    
+    // Initial render
+    renderPage(0);
   }
 
   function buildUstSolTwoCols() {
@@ -197,21 +253,21 @@
     if (!mount) return;
     mount.innerHTML = '';
 
-    const grid = el('div', '');
-    grid.id = 'ustsolGrid';
-    mount.append(grid);
+    const row = el('div', 'row g-3');
+    row.id = 'ustsolGrid';
 
     const posta = Array.isArray(FEE?.tables?.posta) ? FEE.tables.posta : [];
     const eteb = Array.isArray(FEE?.tables?.etebligat) ? FEE.tables.etebligat : [];
 
-    buildColumn(grid, posta, 'gteb', 'uteb', LEFT_TITLE, FEE?.currency);
-    grid.append(el('div', 'divider'));
-    buildColumn(grid, eteb, 'geteb', 'ueteb', RIGHT_TITLE, FEE?.currency);
+    buildColumn(row, posta, 'gteb', 'uteb', 'Tebligatlar (Posta)', FEE?.currency);
+    buildColumn(row, eteb, 'geteb', 'ueteb', 'Elektronik Tebligatlar', FEE?.currency);
+    
+    mount.append(row);
   }
 
   // ========== HESAPLAMA ==========
   function calculate() {
-    const asSeparate = !!document.getElementById('tebligatlarbir')?.checked;
+    const asSeparate = !!document.getElementById('asSeparateSwitch')?.checked;
 
     let tebligatCount = 0,
       tebligatSum = 0;
@@ -271,13 +327,13 @@
         total += v;
       }
     };
-    addLine('postagideri', 'Posta Gideri');
-    addLine('ilangideri', 'İlan Gideri');
-    addLine('yasagideri', 'Yasa Yolu Gidiş Dönüş Gideri');
-    addLine('atkgideri', 'ATK Gideri');
-    addLine('kesifgideri', 'Keşif Gideri');
-    addLine('uzlasmagideri', 'Uzlaşma Gideri');
-    addLine('bilirkisigideri', 'Bilirkişi Gideri');
+    addLine('postaGideri', 'Posta Gideri');
+    addLine('ilanGideri', 'İlan Gideri');
+    addLine('yasaYolu', 'Yasa Yolu Gidiş Dönüş Gideri');
+    addLine('atkGideri', 'ATK Gideri');
+    addLine('kesifGideri', 'Keşif Gideri');
+    addLine('uzlastirmaci', 'Uzlaşma Gideri');
+    addLine('bilirkisi', 'Bilirkişi Gideri');
 
     lines.push('--------------------------');
     lines.push(`TOPLAM : ${fmtTL(total)} TL`);
@@ -651,7 +707,7 @@
     const btnClear = document.getElementById('btnClear');
     if (btnClear) btnClear.addEventListener('click', clearAll);
 
-    const sw = document.getElementById('tebligatlarbir');
+    const sw = document.getElementById('asSeparateSwitch');
     if (sw) {
       sw.addEventListener('change', () => {
         const oc = document.getElementById('opencount');

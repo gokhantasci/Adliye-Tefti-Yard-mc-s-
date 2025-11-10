@@ -21,7 +21,7 @@
   <meta name="author" content="Gökhan TAŞÇI" />
   
   <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json" />
+  <link rel="manifest" href="/manifest.json?v=3" />
   
   <!-- PWA Theme colors -->
   <meta name="theme-color" content="#F44336" media="(prefers-color-scheme: dark)" />
@@ -31,16 +31,14 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Teftiş" />
-  <link rel="apple-touch-icon" href="/assets/img/icon-192.png" />
-  <link rel="apple-touch-icon" sizes="152x152" href="/assets/img/icon-152.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/icon-192.png" />
+  <link rel="apple-touch-icon" href="/assets/img/favicon.svg" />
   
   <!-- Safari pinned tab icon -->
   <link rel="mask-icon" href="/assets/img/favicon.svg" color="#F44336" />
   
   <!-- Microsoft Tiles -->
   <meta name="msapplication-TileColor" content="#F44336" />
-  <meta name="msapplication-TileImage" content="/assets/img/icon-144.png" />
+  <meta name="msapplication-TileImage" content="/assets/img/favicon.svg" />
   
   <!-- Mobile optimization -->
   <meta name="format-detection" content="telephone=no" />
@@ -85,13 +83,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@0..1" rel="stylesheet" />
   
-  <!-- Ana stil dosyası (CSS Variables ile tema yönetimi) -->
-  <link rel="stylesheet" href="/assets/css/style.css?v=3" />
-  <link rel="stylesheet" href="/assets/css/mobile-safari.css?v=1" />
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Custom CSS (minimal) -->
+  <link rel="stylesheet" href="/assets/css/style.css?v=34&t=<?php echo time(); ?>" />
   
   <!-- Preload critical resources for better performance -->
   <link rel="preload" href="/assets/js/utils.js?v=1" as="script" />
-  <link rel="preload" href="/assets/css/style.css?v=3" as="style" />
   
   <!-- 
     JavaScript dosyaları
@@ -102,15 +101,28 @@
     - jQuery: Bazı eski modüller için gerekli
   -->
   <script src="/assets/js/utils.js?v=1"></script>
-  <script defer src="/assets/js/app.js?v=9"></script>
+  <script defer src="/assets/js/theme-manager.js?v=1&t=<?php echo time(); ?>"></script>
+  <script defer src="/assets/js/app.js?v=21&t=<?php echo time(); ?>"></script>
   <script defer src="/assets/js/footer-slider.js?v=1"></script>
-  <script src="/assets/js/vendor/xlsx.min.js"></script>
+  <!-- SheetJS (xlsx) - use CDN to ensure library is available in containerized environments -->
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script defer src="/assets/js/open-modal-bridge.js?v=1"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   
   <!-- Service Worker Registration for PWA -->
   <script>
-    // Register service worker for PWA functionality
+    // Service Worker geçici olarak devre dışı - cache sorunları için
+    // Eski SW'leri temizle
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister();
+          console.log('ServiceWorker unregistered');
+        }
+      });
+    }
+    
+    /* Service Worker kapalı
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw.js').then(function(registration) {
@@ -120,48 +132,11 @@
         });
       });
     }
+    */
   </script>
 </head>
 <body>
 <!-- Accessibility: Skip to main content link -->
-<a href="#main-content" class="skip-to-main">Ana içeriğe geç</a>
+<a href="#main-content" class="visually-hidden-focusable">Ana içeriğe geç</a>
 
-<!-- Ana uygulama kapsayıcısı: Grid layout ile navbar, sidebar, content düzeni -->
-<div id="app" class="layout">
-
-<!-- XLS Loading Overlay (shown while parsing Excel) -->
-<div id="xlsLoadingOverlay">
-  <div class="box">
-    <div class="spinner-icon"></div>
-    <h3>Veriler hazırlanıyor…</h3>
-    <p>Lütfen bekleyiniz, Excel işleniyor.</p>
-  </div>
-  <div class="sr-only" aria-live="polite">Veriler hazırlanıyor, lütfen bekleyiniz.</div>
-  <script>
-    // tiny inline controller to avoid race conditions before page JS loads
-      (function(){
-        let visibleSince = 0; const MIN_MS = 350; // minimum görünürlük süresi
-        function show(){
-          const el = document.getElementById('xlsLoadingOverlay'); if(!el) return;
-          if(!el.classList.contains('active')){ el.classList.add('active'); visibleSince = performance.now(); }
-        }
-        function hide(){
-          const el = document.getElementById('xlsLoadingOverlay'); if(!el) return;
-          const elapsed = performance.now() - visibleSince;
-          if (elapsed < MIN_MS){
-            setTimeout(()=>{ el.classList.remove('active'); }, MIN_MS - elapsed);
-          } else {
-            el.classList.remove('active');
-          }
-        }
-        window.XlsSpinner = { show, hide };
-      })();
-      // inline helper to activate an inline spinner element
-      window.setInlineXlsLoading = function(container, active){
-        try {
-          if(!container) return; const el = (typeof container === 'string') ? document.querySelector(container) : container;
-          if(!el) return; el.classList.toggle('active', !!active);
-        } catch(e) { /* noop */ }
-      };
-  </script>
-</div>
+<!-- Partials (navbar, sidebar, main, footer) buraya include edilecek -->

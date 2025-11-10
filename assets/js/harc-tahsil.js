@@ -510,10 +510,11 @@
   // =========================
   async function onUdfFilesPicked(files) {
 	  const hint = $('#udfChosen');
-	  if (hint) hint.innerHTML = files.map(f => `• ${escapeHtml(f.name)}`).join('<br>');
+	  if (hint) hint.innerHTML = files.map(f => escapeHtml(f.name)).join(', ');
 
 	  udfIndex = new Map();
 	  let totalRows = 0, tableCount = 0;
+	  let successCount = 0, errorFiles = [];
 
 	  for (const f of files) {
       try {
@@ -561,10 +562,25 @@
           totalRows += Math.max(0, tRows.length - 1);
 		  }
 
-		  window.toast?.({ type:'success', title:'UDF okundu', body:`${escapeHtml(f.name)} işlendi` });
+		  successCount++;
       } catch (e) {
-		  window.toast?.({ type:'danger', title:'UDF okunamadı', body:`${escapeHtml(f.name)} — ${e.message || e}` });
+		  errorFiles.push({ name: f.name, error: e.message || e });
       }
+	  }
+
+	  // Tek bir özet toast göster
+	  if (successCount > 0) {
+		  const msg = successCount === 1 
+			  ? `1 UDF dosyası başarıyla işlendi` 
+			  : `${successCount} UDF dosyası başarıyla işlendi`;
+		  window.toast?.({ type:'success', title:'UDF okundu', body: msg });
+	  }
+	  
+	  if (errorFiles.length > 0) {
+		  const msg = errorFiles.length === 1
+			  ? `${escapeHtml(errorFiles[0].name)} okunamadı`
+			  : `${errorFiles.length} dosya okunamadı`;
+		  window.toast?.({ type:'danger', title:'Hata', body: msg });
 	  }
 
 	  // Excel kartını hazırla + alert + bilgilendirme kartını gizle
@@ -911,27 +927,26 @@
     showExcelAlert("UYAP'tan Harç Tahsil Müzekkeresi yazılmayanlar raporunu EXCEL formatında alıp buradan yükleyiniz", 'info');
     const info = $('#udfInfoCard'); if (info) info.style.display = 'none';
 
-    const wrap = document.createElement('section');
-    wrap.className = 'card card-upload';
+    const wrap = document.createElement('div');
+    wrap.className = 'card mt-3';
     wrap.id = 'excelUploadCard';
     wrap.innerHTML = `
-      <div class="card-head">
+      <div class="card-header d-flex align-items-center gap-2">
         <span class="material-symbols-rounded">description</span>
         <strong>EXCEL Yükleme</strong>
       </div>
-      <div class="card-body" style="display:block">
-        <div id="excelDrop" class="placeholder" style="text-align:center;padding:18px;cursor:pointer">
-          <span class="material-symbols-rounded">drive_folder_upload</span>
-          <div>Excel dosyalarını buraya sürükleyip bırakın</div>
-          <small class="muted">veya tıklayıp seçin</small>
+      <div class="card-body">
+        <div id="excelDrop" class="border border-2 border-dashed rounded p-4 text-center mb-3" style="cursor:pointer; transition: all 0.2s;">
+          <span class="material-symbols-rounded d-block mb-2" style="font-size: 3rem; opacity: 0.5;">folder_open</span>
+          <div class="mb-1">Excel dosyalarını buraya sürükleyip bırakın</div>
+          <small class="text-muted">veya tıklayıp seçin</small>
         </div>
         <input id="excelInput" type="file" accept=".xls,.xlsx" multiple hidden>
-        <div id="excelPickRow" style="margin-top:10px;text-align:right">
-          <label class="btn" for="excelInput">
-            <span class="material-symbols-rounded">folder_open</span> Dosya Seç
-          </label>
-        </div>
-        <div id="excelChosen" class="muted" style="margin-top:8px"></div>
+        <button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" onclick="document.getElementById('excelInput').click()">
+          <span class="material-symbols-rounded" style="font-size: 1rem;">folder_open</span>
+          <span>Dosya Seç</span>
+        </button>
+        <div id="excelChosen" class="text-muted mt-2 small"></div>
       </div>
     `;
     host.appendChild(wrap);

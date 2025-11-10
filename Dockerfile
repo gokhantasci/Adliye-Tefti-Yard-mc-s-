@@ -39,9 +39,23 @@ RUN echo "upload_max_filesize = 10M" > /usr/local/etc/php/conf.d/uploads.ini \
     && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo "date.timezone = Europe/Istanbul" >> /usr/local/etc/php/conf.d/timezone.ini
 
+# Disable OPcache for development (auto-reload PHP files)
+RUN echo "opcache.enable=0" > /usr/local/etc/php/conf.d/opcache-dev.ini \
+    && echo "opcache.enable_cli=0" >> /usr/local/etc/php/conf.d/opcache-dev.ini \
+    && echo "opcache.validate_timestamps=1" >> /usr/local/etc/php/conf.d/opcache-dev.ini \
+    && echo "opcache.revalidate_freq=0" >> /usr/local/etc/php/conf.d/opcache-dev.ini
+
 # Configure Apache
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+
+# Disable Apache cache for development
+RUN echo "<IfModule mod_headers.c>" >> /etc/apache2/conf-available/no-cache.conf \
+    && echo "    Header set Cache-Control \"no-cache, no-store, must-revalidate\"" >> /etc/apache2/conf-available/no-cache.conf \
+    && echo "    Header set Pragma \"no-cache\"" >> /etc/apache2/conf-available/no-cache.conf \
+    && echo "    Header set Expires 0" >> /etc/apache2/conf-available/no-cache.conf \
+    && echo "</IfModule>" >> /etc/apache2/conf-available/no-cache.conf \
+    && a2enconf no-cache
 
 # Expose port
 EXPOSE 80

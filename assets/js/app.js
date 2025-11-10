@@ -1,43 +1,117 @@
 // formatRetryMessage is now in utils.js - use window.formatRetryMessage
 
+// Theme management moved to theme-manager.js to avoid conflicts
+// This IIFE only handles sidebar toggle and collapsible menus
 
 (function(){
-  const root = document.documentElement;
-  const themeKey = 'minimal-theme';
-  let saved = localStorage.getItem(themeKey);
-  if (saved !== 'light' && saved !== 'dark') {
-    saved = 'dark';
-    localStorage.setItem(themeKey, saved);
-  }
-  document.documentElement.setAttribute('data-theme', saved);
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
   const sidebar = document.getElementById('sidebar');
   const sidebarToggle = document.getElementById('sidebarToggle');
-  function applyIcon(){
-    const mode = root.getAttribute('data-theme') || 'dark';
-    if (themeIcon) themeIcon.textContent = (mode === 'dark' ? 'dark_mode' : 'light_mode');
-    if (themeToggle) {
-      const next = (mode === 'dark' ? 'light' : 'dark');
-      themeToggle.setAttribute('aria-pressed', mode === 'dark' ? 'false' : 'true');
-      themeToggle.setAttribute('aria-label', next === 'light' ? 'Açık temaya geç' : 'Koyu temaya geç');
-      themeToggle.setAttribute('title', next === 'light' ? 'Açık tema' : 'Koyu tema');
-    }
-  }
-  function toggleTheme(){
-    const cur = root.getAttribute('data-theme') || 'dark';
-    const next = cur === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', next);
-    localStorage.setItem(themeKey, next);
-    applyIcon();
-  }
+  const navbarBrandText = document.getElementById('navbarBrandText');
+  let bsOffcanvas = null;
+  
   function toggleSidebar(){
     if (!sidebar) return;
-    sidebar.classList.toggle('open');
+    
+    // Bootstrap Offcanvas kullan (mobil için)
+    if (window.innerWidth <= 1400) {
+      if (!bsOffcanvas) {
+        bsOffcanvas = new bootstrap.Offcanvas(sidebar);
+      }
+      bsOffcanvas.toggle();
+    } else {
+      // Desktop'ta class toggle
+      const isOpen = sidebar.classList.toggle('open');
+      if (navbarBrandText) {
+        navbarBrandText.textContent = isOpen ? 'Menü' : 'Teftiş - 657.com.tr';
+      }
+    }
   }
-  if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+  
+  // Küçük ekranlarda sidebar'ı otomatik kapat
+  function handleResponsiveSidebar() {
+    if (!sidebar) return;
+    // 1400px altında sidebar otomatik kapansın (main taşmasını önler)
+    if (window.innerWidth <= 1400) {
+      sidebar.classList.remove('open');
+      if (navbarBrandText) {
+        navbarBrandText.textContent = 'Teftiş - 657.com.tr';
+      }
+    } else {
+      // Geniş ekranlarda sidebar her zaman açık (statik)
+      sidebar.classList.remove('open');
+      if (navbarBrandText) {
+        navbarBrandText.textContent = 'Teftiş - 657.com.tr';
+      }
+    }
+  }
+  
+  // Sayfa yüklendiğinde ve resize olduğunda kontrol et
+  handleResponsiveSidebar();
+  window.addEventListener('resize', handleResponsiveSidebar);
+  
+  // Mobilde sidebar dışına tıklayınca kapat
+  document.addEventListener('click', (e) => {
+    if (!sidebar) return;
+    if (window.innerWidth > 1400) return; // Geniş ekranlarda aktif değil
+    if (!sidebar.classList.contains('open')) return; // Sidebar kapalıysa zaten
+    
+    // Sidebar veya toggle butonuna tıklanmadıysa kapat
+    const clickedSidebar = sidebar.contains(e.target);
+    const clickedToggle = sidebarToggle && sidebarToggle.contains(e.target);
+    
+    if (!clickedSidebar && !clickedToggle) {
+      sidebar.classList.remove('open');
+      if (navbarBrandText) {
+        navbarBrandText.textContent = 'Teftiş - 657.com.tr';
+      }
+    }
+  });
+  
   if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
-  applyIcon();
+  
+  // Collapsible menu groups
+  document.querySelectorAll('.menu-group-title.collapsible').forEach(title => {
+    const items = title.nextElementSibling;
+    if (items && items.classList.contains('menu-group-items')) {
+      // Aktif menu item bu grup içinde mi kontrol et
+      const hasActiveItem = items.querySelector('.nav-link.active');
+      
+      // Title text içeriğini al (sadece span içindeki text)
+      const titleText = title.querySelector('span:first-child')?.textContent.trim() || '';
+      const isDenetimCetvelleri = titleText === 'Denetim Cetvelleri';
+      
+      // Eğer bu grupta aktif sayfa varsa, grubu aç
+      if (hasActiveItem) {
+        // Aktif sayfa varsa açık bırak ve collapsed'ı kaldır
+        title.classList.remove('collapsed');
+        items.style.display = '';
+      } else if (isDenetimCetvelleri) {
+        // Denetim Cetvelleri aktif sayfa yoksa kapalı başlasın
+        title.classList.add('collapsed');
+        items.style.display = 'none';
+      } else {
+        // Diğer gruplar açık başlasın
+        title.classList.remove('collapsed');
+        items.style.display = '';
+      }
+      
+      // Click event - toggle
+      title.addEventListener('click', () => {
+        const isCollapsed = title.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          // Şu anda kapalı, aç
+          title.classList.remove('collapsed');
+          items.style.display = '';
+        } else {
+          // Şu anda açık, kapat
+          title.classList.add('collapsed');
+          items.style.display = 'none';
+        }
+      });
+    }
+  });
+  
   const notesEl = document.getElementById('notes');
   const notesKey = 'minimal-notes';
   const readNotes = () => JSON.parse(localStorage.getItem(notesKey) || '[]');
@@ -103,7 +177,7 @@
           document.dispatchEvent(ev);
         }
       }
-    } catch (e){ // Error handled silently }
+    } catch (e){ /* Error handled silently */ }
   }
   async function pushAdd(text){
     try {
@@ -145,7 +219,7 @@
       if (!raw) return;
       const data = JSON.parse(raw);
       ids.forEach(k => { if ($(k) && Object.prototype.hasOwnProperty.call(data, k)) $(k).value = data[k]; });
-    } catch (e){ // Error handled silently }
+    } catch (e){ /* Error handled silently */ }
   }
   function save(){
     const data = {};
@@ -192,15 +266,15 @@
     const msg = opts.message || '';
     const icon = opts.icon || 'info';
     const dismiss = opts.dismissible !== false;
-    const wrap = el('div', {class: 'alert alert-' + type});
-    const icn = el('span', {class: 'material-symbols-rounded alert-icon'}, icon);
-    const body = el('div', {class: 'alert-body'});
-    if (title) body.appendChild(el('div', {class:'alert-title'}, title));
+    const wrap = el('div', {class: 'alert alert-' + type + ' d-flex align-items-start position-relative'});
+    const icn = el('span', {class: 'material-symbols-rounded alert-icon me-3'}, icon);
+    const body = el('div', {class: 'alert-body flex-grow-1'});
+    if (title) body.appendChild(el('div', {class:'alert-title fw-bold mb-1'}, title));
     body.appendChild(el('div', null, msg));
     wrap.appendChild(icn);
     wrap.appendChild(body);
     if (dismiss) {
-      const btn = el('button', {class:'btn-close', type:'button', 'aria-label':'Kapat'}, '&times;');
+      const btn = el('button', {class:'btn-close position-absolute top-0 end-0 m-2', type:'button', 'aria-label':'Kapat'});
       btn.addEventListener('click', function(){ wrap.remove(); });
       wrap.appendChild(btn);
     }
@@ -209,6 +283,11 @@
     host.appendChild(wrap);
     return wrap;
   };
+  /**
+   * Toast System (AdminLTE-like)
+   * Kullanım: window.toast({ type: 'success', title: 'Başarılı', body: 'İşlem tamamlandı', delay: 5000 })
+   * type: 'success', 'error', 'warning', 'info', 'primary'
+   */
   window.toast = function(opts){
     opts = opts || {};
     const type = opts.type || 'primary';
@@ -217,21 +296,55 @@
     const autohide = opts.autohide !== false;
     const delay = (typeof opts.delay === 'number') ? opts.delay : 5000;
 
-    let c = document.querySelector('.toast-container');
-    if (!c) { c = el('div', {class:'toast-container'}); document.body.appendChild(c); }
-    const t = el('div', {class:'toast toast-' + type});
-    const head = el('div', {class:'toast-head'});
-    head.appendChild(el('div', {class:'toast-title'}, title));
-    const close = el('button', {class:'btn-close', type:'button', 'aria-label':'Kapat'}, '&times;');
-    close.addEventListener('click', function(){ t.remove(); });
-    head.appendChild(close);
-    const bodyEl = el('div', {class:'toast-body'}, body);
-    t.appendChild(head); t.appendChild(bodyEl);
-    c.appendChild(t);
-    if (autohide){
-      setTimeout(function(){ if (t && t.parentNode) t.remove(); }, delay);
+    // Toast container
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'toast-container';
+      document.body.appendChild(container);
     }
-    return t;
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    
+    const head = document.createElement('div');
+    head.className = 'toast-head';
+    
+    const titleEl = document.createElement('div');
+    titleEl.className = 'toast-title';
+    titleEl.textContent = title;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn-close';
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Kapat');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', function() {
+      toast.remove();
+    });
+    
+    head.appendChild(titleEl);
+    head.appendChild(closeBtn);
+    
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'toast-body';
+    bodyEl.innerHTML = body;
+    
+    toast.appendChild(head);
+    toast.appendChild(bodyEl);
+    container.appendChild(toast);
+
+    // Auto-hide
+    if (autohide) {
+      setTimeout(function() {
+        if (toast && toast.parentNode) {
+          toast.remove();
+        }
+      }, delay);
+    }
+
+    return toast;
   };
 })();
 function dismissTestAlert() {
@@ -256,7 +369,7 @@ function debounce(fn, delay){ let t; return function(){ clearTimeout(t); t = set
       } else {
         root.style.removeProperty('--settings-target-height');
       }
-    } catch (e){ // Error handled silently }
+    } catch (e){ /* Error handled silently */ }
   }
   const run = debounce(equalizeSettingsToUpload, 100);
   window.addEventListener('load', run);
@@ -273,7 +386,7 @@ if (typeof dismissTestAlert !== 'function') {
     try {
       const el = document.getElementById('testDataAlert');
       if (el){ el.remove(); }
-    } catch (e){ // Error handled silently }
+    } catch (e){ /* Error handled silently */ }
   }
 }
 (function(){
@@ -281,7 +394,7 @@ if (typeof dismissTestAlert !== 'function') {
     try {
       const el = document.getElementById('testDataAlert');
       if (el){ el.remove(); }
-    } catch (e){ // Error handled silently }
+    } catch (e){ /* Error handled silently */ }
   };
 })();
 (function() {
@@ -397,6 +510,27 @@ if (typeof dismissTestAlert !== 'function') {
     const start = (page - 1) * PAGE_SIZE;
     const end = start + PAGE_SIZE;
     const slice = items.slice(start, end);
+    
+    // Haberleri render et
+    listEl.innerHTML = '';
+    slice.forEach(function(item) {
+      const newsItem = document.createElement('div');
+      newsItem.className = 'news-item';
+      
+      const dateEl = document.createElement('div');
+      dateEl.className = 'news-date muted';
+      dateEl.textContent = item.tarih;
+      
+      const contentEl = document.createElement('div');
+      contentEl.className = 'news-content';
+      // \n karakterlerini <br> ile değiştir
+      contentEl.innerHTML = (item.icerik || '').replace(/\n/g, '<br>');
+      
+      newsItem.appendChild(dateEl);
+      newsItem.appendChild(contentEl);
+      listEl.appendChild(newsItem);
+    });
+    
     pagerEl.innerHTML = '';
     pagerEl.style.display = (totalPages <= 1 ? 'none' : '');
     if (totalPages > 1) {
@@ -1105,22 +1239,279 @@ function __applyPager(tableSelector, pageSize){
 
 // ========================================
 // Log Panel Interaction
+// NOT: Toggle işlevi theme-manager.js'de yönetiliyor
 // ========================================
 (function initLogPanel(){
-  const toggle = document.getElementById('logToggle');
-  const panel = document.getElementById('logPanel');
-  const clearBtn = document.getElementById('logClearBtn');
-  if (!toggle || !panel) return;
-  function open(){ panel.hidden = false; logEvent('ui','Log panel açıldı'); }
-  function close(){ panel.hidden = true; logEvent('ui','Log panel kapatıldı'); }
-  toggle.addEventListener('click', () => { panel.hidden ? open() : close(); });
-  clearBtn?.addEventListener('click', () => {
-    const body = document.getElementById('logPanelBody');
-    if (body){ body.innerHTML = ''; }
-    if (window.__LOG_BUFFER__) window.__LOG_BUFFER__.length = 0;
-    const stats = document.getElementById('logStats'); if (stats) stats.textContent = '0 kayıt';
-    // localStorage'dan da temizle
-    try { localStorage.removeItem('app_logs'); } catch (_){}
-    logEvent('ui','Loglar temizlendi');
-  });
+  const badge = document.getElementById('logBadge');
+  
+  // Badge güncelleme fonksiyonu
+  function updateLogBadge() {
+    const logCount = (window.__LOG_BUFFER__ || []).length;
+    if (badge) {
+      if (logCount > 0) {
+        badge.textContent = logCount > 99 ? '99+' : logCount;
+        badge.hidden = false;
+      } else {
+        badge.hidden = true;
+      }
+    }
+  }
+  
+  // İlk badge güncellemesi
+  updateLogBadge();
+  // Periyodik badge güncellemesi (her 2 saniyede)
+  setInterval(updateLogBadge, 2000);
+})();
+
+// ========================================
+// News Dropdown Panel
+// NOT: Toggle işlevi theme-manager.js'de yönetiliyor
+// ========================================
+(function initNewsDropdown(){
+  const dropdown = document.getElementById('newsDropdown');
+  const badge = document.getElementById('newsBadge');
+  const metaEl = document.getElementById('newsDropdownMeta');
+  const listEl = document.getElementById('newsDropdownList');
+  const pagerEl = document.getElementById('newsDropdownPager');
+  
+  if (!dropdown) return;
+  
+  const NEWS_URL = '/data/teftis.json';
+  const PAGE_SIZE = 5;
+  let newsItems = [];
+  let currentPage = 1;
+  
+  function updateBadge() {
+    if (badge && newsItems.length > 0) {
+      badge.textContent = newsItems.length > 99 ? '99+' : newsItems.length;
+      badge.hidden = false;
+    } else if (badge) {
+      badge.hidden = true;
+    }
+  }
+  
+  function loadNews() {
+    if (metaEl) metaEl.textContent = 'Yükleniyor...';
+    
+    fetch(NEWS_URL, { cache: 'no-store' })
+      .then(res => res.ok ? res.json() : Promise.reject('HTTP ' + res.status))
+      .then(data => {
+        console.log('[News] Haberler yüklendi:', data);
+        // data direkt array veya {haberler: [...]} formatında olabilir
+        const haberler = Array.isArray(data) ? data : (data.haberler || []);
+        newsItems = haberler.map(h => ({
+          tarih: h.tarih || h.Tarih || h.date || '',
+          icerik: h.icerik || h.İcerik || h.content || ''
+        })).filter(h => h.tarih && h.icerik);
+        
+        console.log('[News] İşlenmiş haberler:', newsItems);
+        
+        // Tarihe göre sırala (yeni → eski)
+        newsItems.sort((a, b) => {
+          const dateA = new Date(a.tarih).getTime() || 0;
+          const dateB = new Date(b.tarih).getTime() || 0;
+          return dateB - dateA;
+        });
+        
+        updateBadge();
+        renderNews(1);
+        addNewsToFooterSlider();
+        console.log('[News] Footer slider\'a eklendi');
+      })
+      .catch(err => {
+        console.error('[News] Yükleme hatası:', err);
+        if (metaEl) metaEl.textContent = 'Haberler yüklenemedi.';
+        if (listEl) listEl.innerHTML = '<p class="muted">Bir hata oluştu.</p>';
+      });
+  }
+  
+  function formatDateWithDay(dateStr) {
+    try {
+      // Tarihi YYYY-MM-DD veya YYYY-M-D formatından parse et
+      if (dateStr && /^\d{4}-\d{1,2}-\d{1,2}$/.test(dateStr)) {
+        const parts = dateStr.split('-');
+        const year = parts[0];
+        const month = parts[1].padStart(2, '0');
+        const day = parts[2].padStart(2, '0');
+        dateStr = `${year}-${month}-${day}`;
+      }
+      
+      const date = new Date(dateStr);
+      if (!isNaN(date.getTime())) {
+        const formatted = date.toLocaleDateString('tr-TR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        const dayName = date.toLocaleDateString('tr-TR', { weekday: 'long' });
+        const capitalizedDay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+        return `${formatted} - ${capitalizedDay}`;
+      }
+    } catch {
+      return dateStr;
+    }
+    return dateStr;
+  }
+  
+  function addNewsToFooterSlider() {
+    console.log('[News] addNewsToFooterSlider çağrıldı');
+    console.log('[News] appendFooterItems mevcut mu?', typeof window.appendFooterItems);
+    console.log('[News] newsItems:', newsItems);
+    
+    if (typeof window.appendFooterItems !== 'function') {
+      console.warn('[News] appendFooterItems fonksiyonu bulunamadı');
+      return;
+    }
+    if (!newsItems || newsItems.length === 0) {
+      console.warn('[News] newsItems boş');
+      return;
+    }
+    
+    const sliderItems = [];
+    newsItems.forEach(item => {
+      const formattedDate = formatDateWithDay(item.tarih);
+      const lines = item.icerik.split('\n').filter(line => line.trim());
+      
+      lines.forEach(line => {
+        const html = `${formattedDate} - ${line.trim()}`;
+        sliderItems.push(html);
+      });
+    });
+    
+    console.log('[News] Slider\'a eklenecek item sayısı:', sliderItems.length);
+    window.appendFooterItems(sliderItems);
+  }
+  
+  function renderNews(page) {
+    if (!newsItems || newsItems.length === 0) {
+      if (metaEl) metaEl.textContent = 'Haber bulunamadı.';
+      if (listEl) listEl.innerHTML = '';
+      if (pagerEl) pagerEl.innerHTML = '';
+      return;
+    }
+    
+    const total = newsItems.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+    currentPage = page;
+    
+    const start = (page - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    const slice = newsItems.slice(start, end);
+    
+    // Meta güncelle
+    if (metaEl) {
+      const now = new Date().toLocaleDateString('tr-TR', { 
+        year: 'numeric', month: '2-digit', day: '2-digit' 
+      });
+      metaEl.textContent = `${total} haber · Son güncelleme: ${now}`;
+    }
+    
+    // Liste render et
+    if (listEl) {
+      listEl.innerHTML = '';
+      console.log('[News] Rendering news items, slice:', slice);
+      
+      slice.forEach(item => {
+        // Tarihi Türkçe formata çevir (gün adıyla)
+        const formattedDate = formatDateWithDay(item.tarih);
+        console.log('[News] Formatted date:', formattedDate);
+        
+        // Dropdown'da haber bölünmeden gösterilir
+        const newsItem = document.createElement('div');
+        newsItem.className = 'news-item';
+        
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'news-date muted';
+        dateDiv.textContent = formattedDate;
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'news-content';
+        // \n karakterlerini <br> ile değiştir
+        contentDiv.innerHTML = (item.icerik || '').replace(/\n/g, '<br>');
+        
+        newsItem.appendChild(dateDiv);
+        newsItem.appendChild(contentDiv);
+        listEl.appendChild(newsItem);
+      });
+      
+      console.log('[News] Rendered items count:', listEl.children.length);
+    }
+    
+    // Pager render et
+    if (pagerEl && totalPages > 1) {
+      pagerEl.innerHTML = '';
+      
+      const prevDiv = document.createElement('div');
+      const prevBtn = document.createElement('button');
+      prevBtn.type = 'button';
+      prevBtn.className = 'btn ghost';
+      prevBtn.textContent = 'Önceki';
+      prevBtn.disabled = page === 1;
+      prevBtn.onclick = () => renderNews(currentPage - 1);
+      prevDiv.appendChild(prevBtn);
+      
+      const centerDiv = document.createElement('div');
+      const pageInfo = document.createElement('div');
+      pageInfo.className = 'muted';
+      pageInfo.textContent = `Sayfa ${page} / ${totalPages}`;
+      centerDiv.appendChild(pageInfo);
+      
+      const nextDiv = document.createElement('div');
+      const nextBtn = document.createElement('button');
+      nextBtn.type = 'button';
+      nextBtn.className = 'btn ghost';
+      nextBtn.textContent = 'Sonraki';
+      nextBtn.disabled = page === totalPages;
+      nextBtn.onclick = () => renderNews(currentPage + 1);
+      nextDiv.appendChild(nextBtn);
+      
+      pagerEl.appendChild(prevDiv);
+      pagerEl.appendChild(centerDiv);
+      pagerEl.appendChild(nextDiv);
+    } else if (pagerEl) {
+      pagerEl.innerHTML = '';
+    }
+  }
+  
+  // İlk yükleme
+  loadNews();
+  
+  // Global fonksiyonları expose et (theme-manager.js kullanabilsin)
+  window.newsDropdownLoadNews = loadNews;
+  window.newsDropdownRenderNews = renderNews;
+})();
+
+/* ========================================
+   SCROLL TO TOP BUTTON
+   ======================================== */
+
+(function() {
+  const scrollBtn = document.getElementById('scrollToTop');
+  if (!scrollBtn) return;
+  
+  // Scroll pozisyonunu kontrol et
+  function checkScroll() {
+    if (window.pageYOffset > 300) {
+      scrollBtn.classList.add('show');
+    } else {
+      scrollBtn.classList.remove('show');
+    }
+  }
+  
+  // Yukarı scroll
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+  
+  // Event listeners
+  window.addEventListener('scroll', checkScroll);
+  scrollBtn.addEventListener('click', scrollToTop);
+  
+  // İlk kontrol
+  checkScroll();
 })();

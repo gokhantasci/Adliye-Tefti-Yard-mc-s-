@@ -328,29 +328,30 @@
     const birim = state.birimAdi || 'Belirtilmeyen birim';
     const aralik = state.denetimAraligi || 'belirtilmeyen aralık';
     const count = state.rows.length;
-    const html = `<section class="card card-upload" id="exportInfoCard" style="margin-top:12px">
-      <div class="card-head">
+    const html = `<div class="card mt-3" id="exportInfoCard">
+      <div class="card-header d-flex align-items-center gap-2">
         <span class="material-symbols-rounded">description</span>
         <strong>Word Çıktısı</strong>
       </div>
-      <div class="card-body" style="display:block">
-        <div class="muted" style="margin-bottom:12px">${esc(birim)} – ${esc(aralik)} aralığında <b>${count}</b> satır hazır.</div>
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-          <label for="dusulenSureInput" class="muted" style="white-space:nowrap;font-size:13px">Düşülecek Süre (Gün):</label>
-          <input type="number" id="dusulenSureInput" value="30" min="0" step="1" style="width:100px">
+      <div class="card-body">
+        <div class="text-muted mb-3">${esc(birim)} – ${esc(aralik)} aralığında <b>${count}</b> satır hazır.</div>
+        
+        <div class="mb-2">
+          <label for="dusulenSureInput" class="form-label text-muted small mb-1">Düşülecek Süre (Gün):</label>
+          <input type="number" id="dusulenSureInput" class="form-control form-control-sm" value="30" min="0" step="1" style="width:120px">
         </div>
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-          <label for="minSureGunInput" class="muted" style="white-space:nowrap;font-size:13px">Minimum Süre (Gün):</label>
-          <input type="number" id="minSureGunInput" value="0" min="0" step="1" style="width:100px">
+        
+        <div class="mb-3">
+          <label for="minSureGunInput" class="form-label text-muted small mb-1">Minimum Süre (Gün):</label>
+          <input type="number" id="minSureGunInput" class="form-control form-control-sm" value="0" min="0" step="1" style="width:120px">
         </div>
-        <div id="exportPickRow" style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
-          <button class="btn" id="exportDocxBtn" type="button" style="display:inline-flex;align-items:center;gap:6px;">
-            <span class="material-symbols-rounded">description</span>
-            <span>Word'e Aktar</span>
-          </button>
-        </div>
+        
+        <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" id="exportDocxBtn" type="button">
+          <span class="material-symbols-rounded" style="font-size: 1rem;">description</span>
+          <span>Word'e Aktar</span>
+        </button>
       </div>
-    </section>`;
+    </div>`;
     host.insertAdjacentHTML('afterend', html);
     document.getElementById('exportDocxBtn')?.addEventListener('click', exportToDocx);
 
@@ -414,14 +415,17 @@
 
   // Upload UI
   const elDrop = $('#udfDrop'); const elInput = $('#udfInput'); const elChosen = $('#xlsChosen'); const setChosenText = t => { if (elChosen) elChosen.textContent = t || ''; };
+  const xlsSpinner = $('#xlsInlineSpinnerByu');
+  const setSpinner = (show) => { if (xlsSpinner) xlsSpinner.style.display = show ? 'inline-block' : 'none'; };
+  
   function isExcelFile(f){ if (!f) return false; const nameOk = /\.xlsx?$/i.test(f.name); const typeOk = /sheet|excel|spreadsheet/i.test(f.type || '') || nameOk; return nameOk || typeOk; }
   function pickFirstExcelFile(list){ if (!list || list.length === 0) return null; if (list.length > 1) toast('warning','Tek Dosya','Yalnızca 1 adet XLS/XLSX seçebilirsiniz. İlk dosya işlendi.'); const f = list[0]; if (!isExcelFile(f)){ toast('warning','Dosya Türü','Lütfen XLS/XLSX dosyası seçiniz.'); return null;} return f; }
   function handleFiles(list){
     const f = pickFirstExcelFile(list);
     if (!f){ setChosenText(''); return; }
     setChosenText(`Seçilen: ${f.name}`);
-    window.setInlineXlsLoading('#xlsInlineSpinnerByu', true);
-    Promise.resolve().then(() => processExcel(f)).finally(() => window.setInlineXlsLoading('#xlsInlineSpinnerByu', false));
+    setSpinner(true);
+    Promise.resolve().then(() => processExcel(f)).finally(() => setSpinner(false));
     if (window.jQuery && typeof window.jQuery.getJSON === 'function') {
       window.jQuery.getJSON('https://sayac.657.com.tr/arttirkarar', function(response) {
         try {
@@ -451,13 +455,22 @@
     });
   }
 
-  // BYU Warning Modal - Her sayfaya girişte göster
+  // BYU Warning Modal - Sayfa açıldığında otomatik göster
   (function initByuWarningModal(){
     const modal = $('#byuWarningModal');
     const checkbox = $('#byuWarningCheckbox');
     const okBtn = $('#byuWarningOkBtn');
 
     if (!modal || !checkbox || !okBtn) return;
+
+    // Bootstrap modal instance oluştur
+    let bsModal = null;
+    if (typeof window.bootstrap !== 'undefined') {
+      bsModal = new bootstrap.Modal(modal, {
+        backdrop: 'static',  // Dışarı tıklamayla kapanmayı engelle
+        keyboard: false      // ESC ile kapanmayı engelle
+      });
+    }
 
     // Checkbox değiştiğinde buton durumunu güncelle
     checkbox.addEventListener('change', () => {
@@ -466,18 +479,26 @@
 
     // Tamam butonuna tıklandığında
     okBtn.addEventListener('click', () => {
-      if (checkbox.checked){
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
+      if (checkbox.checked) {
+        if (bsModal) {
+          bsModal.hide();
+        } else {
+          modal.style.display = 'none';
+          document.body.classList.remove('modal-open');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
+        }
       }
     });
 
-    // Modal backdrop blur
-    modal.style.backdropFilter = 'blur(4px)';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-
-    // Sayfa yüklendiğinde her zaman göster
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    // Sayfa yüklendiğinde modalı göster
+    if (bsModal) {
+      bsModal.show();
+    } else {
+      modal.style.display = 'flex';
+      modal.style.backdropFilter = 'blur(4px)';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      document.body.style.overflow = 'hidden';
+    }
   })();
 })();

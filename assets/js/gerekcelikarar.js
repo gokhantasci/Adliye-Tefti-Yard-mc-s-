@@ -362,6 +362,7 @@
       });
       const durMs = Math.round(performance.now() - startedAt);
 
+      console.log('[GKarar Export]', {
         status: res.status,
         contentType: res.headers.get('Content-Type'),
         disposition: res.headers.get('Content-Disposition')
@@ -416,31 +417,32 @@
     const count  = state.rows.length;
 
     const html = `
-    <section class="card card-upload" id="exportInfoCard" style="margin-top:12px">
-      <div class="card-head">
+    <div class="card mt-3" id="exportInfoCard">
+      <div class="card-header d-flex align-items-center gap-2">
         <span class="material-symbols-rounded">description</span>
         <strong>Word Çıktısı</strong>
       </div>
-      <div class="card-body" style="display:block">
-        <div class="muted" style="margin-bottom:8px">
+      <div class="card-body">
+        <div class="text-muted mb-3">
           ${esc(birim)} – <b>${count}</b> satır hazır.
         </div>
-        <div style="margin-bottom:10px">
-          <label for="minDelayInput" style="display:block;margin-bottom:4px;font-size:13px;color:var(--muted)">
+        
+        <div class="mb-3">
+          <label for="minDelayInput" class="form-label text-muted small mb-1">
             Minimum Gecikme Süresi (Gün)
           </label>
-          <input type="number" id="minDelayInput" class="input" value="0" min="0" step="1" 
-                 style="width:100%;max-width:200px" 
+          <input type="number" id="minDelayInput" class="form-control form-control-sm" value="0" min="0" step="1" 
+                 style="width:120px" 
                  placeholder="0">
-          <small class="muted" style="display:block;margin-top:4px">Bu değer ve üzeri gecikme olanlar aktarılır</small>
+          <small class="text-muted d-block mt-1">Bu değer ve üzeri gecikme olanlar aktarılır</small>
         </div>
-        <div id="exportPickRow" style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
-          <button class="btn" id="exportDocxBtn" type="button" style="display:inline-flex;align-items:center;gap:6px;">
-            <span class="material-symbols-rounded">description</span><span>Word'e Aktar</span>
-          </button>
-        </div>
+        
+        <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" id="exportDocxBtn" type="button">
+          <span class="material-symbols-rounded" style="font-size: 1rem;">description</span>
+          <span>Word'e Aktar</span>
+        </button>
       </div>
-    </section>`;
+    </div>`;
 
     host.insertAdjacentHTML('afterend', html);
     document.getElementById('exportDocxBtn')?.addEventListener('click', exportToDocx);
@@ -476,6 +478,8 @@
   const elInput  = $('#udfInput');
   const elChosen = $('#xlsChosen');
   const setChosenText = (t) => { if (elChosen) elChosen.textContent = t || ''; };
+  const xlsSpinner = $('#xlsInlineSpinnerGk');
+  const setSpinner = (show) => { if (xlsSpinner) xlsSpinner.style.display = show ? 'inline-block' : 'none'; };
 
   function isExcelFile(f){
     if (!f) return false;
@@ -494,8 +498,8 @@
     const f = pickFirstExcelFile(fl);
     if (!f){ setChosenText(''); return; }
     setChosenText(`Seçilen: ${f.name}`);
-    window.setInlineXlsLoading('#xlsInlineSpinnerGk', true);
-    Promise.resolve().then(() => processExcel(f)).finally(() => window.setInlineXlsLoading('#xlsInlineSpinnerGk', false));
+    setSpinner(true);
+    Promise.resolve().then(() => processExcel(f)).finally(() => setSpinner(false));
     if (window.jQuery && typeof window.jQuery.getJSON === 'function') {
 		  window.jQuery.getJSON('https://sayac.657.com.tr/arttirkarar', function(response) {
         try {
@@ -518,8 +522,7 @@
     elDrop.addEventListener('drop', e => {
       const files = e.dataTransfer?.files;
       if (!files || files.length === 0){ toast('warning','Dosya','Bırakılan dosya algılanamadı.'); return; }
-      window.setInlineXlsLoading('#xlsInlineSpinnerGk', true);
-      Promise.resolve().then(() => handleFiles(files)).finally(() => window.setInlineXlsLoading('#xlsInlineSpinnerGk', false));
+      handleFiles(files);
     });
   }
   if (elInput){

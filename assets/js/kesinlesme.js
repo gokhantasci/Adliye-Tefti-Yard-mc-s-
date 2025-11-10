@@ -307,37 +307,35 @@
   function mountForm() {
     const todayISO = toISO(new Date());
     $('#formMount').innerHTML = `
-	  <div class="form-row">
-		<label class="row-label" for="tebligTarihi">Tebliğ Tarihi</label>
-		<div class="row-field">
-          <input id="tebligTarihi" type="date" class="input"/>
-          <div class="date-actions">
-            <button class="btn small" data-delta="-7">-1 Hf</button>
-            <button class="btn small" data-delta="-1">-1 G</button>
-            <button class="btn small" data-today="1">Bugün</button>
-            <button class="btn small" data-delta="1">+1 G</button>
-            <button class="btn small" data-delta="7">+1 Hf</button>
-          </div>
+	  <div class="mb-3">
+		<label class="form-label" for="tebligTarihi">Tebliğ Tarihi</label>
+		<input id="tebligTarihi" type="date" class="form-control mb-2"/>
+		<div class="d-flex gap-2 flex-wrap">
+		  <button class="btn btn-outline-secondary btn-sm" data-delta="-7">-1 Hafta</button>
+		  <button class="btn btn-outline-secondary btn-sm" data-delta="-1">-1 Gün</button>
+		  <button class="btn btn-outline-primary btn-sm" data-today="1">Bugün</button>
+		  <button class="btn btn-outline-secondary btn-sm" data-delta="1">+1 Gün</button>
+		  <button class="btn btn-outline-secondary btn-sm" data-delta="7">+1 Hafta</button>
 		</div>
 	  </div>
-      <div class="form-row">
-        <label class="row-label" for="sureSayi">Süre (Sayı)</label>
-        <div class="row-field"><input id="sureSayi" type="number" class="input" min="1" step="1" value="2"/></div>
-      </div>
-      <div class="form-row">
-        <label class="row-label" for="sureTur">Süre Türü</label>
-        <div class="row-field">
-          <select id="sureTur" class="input">
-            <option value="gun">Gün</option>
-            <option value="hafta" selected>Hafta</option>
-            <option value="ay">Ay</option>
-          </select>
-        </div>
-      </div>
+	  <div class="row g-3">
+		<div class="col-md-6">
+		  <label class="form-label" for="sureSayi">Süre (Sayı)</label>
+		  <input id="sureSayi" type="number" class="form-control" min="1" step="1" value="2"/>
+		</div>
+		<div class="col-md-6">
+		  <label class="form-label" for="sureTur">Süre Türü</label>
+		  <select id="sureTur" class="form-select">
+			<option value="gun">Gün</option>
+			<option value="hafta" selected>Hafta</option>
+			<option value="ay">Ay</option>
+		  </select>
+		</div>
+	  </div>
     `;
     $('#tebligTarihi').value = todayISO;
 
-    $('#formMount').querySelectorAll('.date-actions .btn').forEach(btn => {
+    $('#formMount').querySelectorAll('[data-delta], [data-today]').forEach(btn => {
       btn.addEventListener('click', () => {
 		  const inp = $('#tebligTarihi');
 		  let d = fromISO(inp.value) || new Date();
@@ -391,7 +389,7 @@
       const inner = list.map(renderTag).join('');
       return `<div class="holiday-group" tabindex="0">${head}<div class="holiday-group-inner">${inner}</div></div>`;
     }
-    const toolbar = `<div class="holiday-groups-toolbar"><button class="toggle-all-btn" type="button" id="btnToggleAll"><span class="material-symbols-rounded" style="font-size:16px;"> unfold_more </span><span>Tümünü aç</span></button><div id="holidayInfoInline" class="muted small"></div></div>`;
+    const toolbar = `<div class="holiday-groups-toolbar d-flex justify-content-between align-items-center gap-2 mb-2 flex-wrap"><button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2" type="button" id="btnToggleAll"><span class="material-symbols-rounded" style="font-size:1rem;">unfold_more</span><span>Tümünü aç</span></button><div id="holidayInfoInline" class="text-muted small"></div></div>`;
     const html = toolbar + groupHtml(past, 'Geçmiş') + groupHtml(future, 'Gelecek');
     mount.innerHTML = html || '<em>Tanımlı yok</em>';
 
@@ -538,10 +536,8 @@
 		  icon = '🔴';
     }
 
-    $('#resultBox').innerHTML = `
-		  <div class="kpi-value">${fmt_ddmm(kesin)}</div>
-		  <div class="kpi-label">${dayName} <span class="status-chip ${colorClass}">– ${phrase} ${icon}</span></div>
-		`;
+    $('#resultValue').textContent = fmt_ddmm(kesin);
+    $('#resultLabel').innerHTML = `${dayName} <span class="${colorClass}">– ${phrase} ${icon}</span>`;
 
 
 	  // --- Açıklamalar: whitespace temizle; tek öğe kalırsa gizle; linkleri HTML render et ---
@@ -578,9 +574,8 @@
     $('#tebligTarihi').value = todayISO;
     $('#sureSayi').value = 2;
     $('#sureTur').value  = 'hafta';
-    $('#resultBox').innerHTML = `
-      <div class="kpi-value muted">—</div>
-      <div class="kpi-label">—</div>`;
+    $('#resultValue').textContent = '—';
+    $('#resultLabel').textContent = '—';
     $('#explainList').innerHTML = '';
     refreshOpsCounter();
     if (window.toast) {window.toast({ type: 'warning', title: 'Form sıfırlandı', body: 'Alanlar temizlendi' });}
