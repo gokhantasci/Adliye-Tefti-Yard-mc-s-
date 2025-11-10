@@ -6,7 +6,8 @@
 <main class="flex-grow-1 overflow-auto">
 	<div class="container-fluid py-4">
 		<header class="page-header mb-4">
-			<h1>Yargılama Gideri Hesaplama</h1>
+			<h2 class="mb-1">Yargılama Gideri Hesaplama</h2>
+			<p class="text-muted mb-0">UYAP tebligat sorgulamasından elde ettiğiniz EXCEL dosyasını yükleyerek tüm tebligatları hesaplayabilirsiniz.</p>
 		</header>
 
 		<div class="row">
@@ -166,25 +167,6 @@
 			</div>
 
 			<aside class="col-12 col-xl-4">
-				<div class="card mb-3" id="tebligatUploadCard">
-					<div class="card-header d-flex align-items-center gap-2">
-						<span class="material-symbols-rounded">upload_file</span>
-						<strong>Tebligat Dosyası Yükle</strong>
-					</div>
-					<div class="card-body">
-						<div id="dropZone" class="border border-2 border-dashed rounded p-4 text-center mb-3" style="cursor:pointer; transition: all 0.2s;">
-							<span class="material-symbols-rounded d-block mb-2" style="font-size: 3rem; opacity: 0.5;">cloud_upload</span>
-							<div class="mb-1">XLS, XLSX veya UDF dosyalarını buraya sürükleyip bırakın</div>
-							<small class="text-muted">veya aşağıdan dosya seçin</small>
-						</div>
-						<input type="file" id="fileInput" accept=".xls,.xlsx,.udf" hidden>
-						<button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" onclick="document.getElementById('fileInput').click()">
-							<span class="material-symbols-rounded" style="font-size: 1rem;">folder_open</span>
-							<span>Dosya Seç</span>
-						</button>
-					</div>
-				</div>
-
 				<div class="card mb-3">
 					<div class="card-body">
 						<div class="d-grid gap-2">
@@ -200,7 +182,7 @@
 					</div>
 				</div>
 
-				<div class="card">
+				<div class="card mb-3">
 					<div class="card-header d-flex align-items-center gap-2">
 						<span class="material-symbols-rounded">summarize</span>
 						<strong>Özet</strong>
@@ -231,6 +213,25 @@
 						<button id="btnCopyDokum" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2">
 							<span class="material-symbols-rounded" style="font-size: 1rem;">content_copy</span>
 							<span>Kopyala</span>
+						</button>
+					</div>
+				</div>
+
+				<div class="card" id="tebligatUploadCard">
+					<div class="card-header d-flex align-items-center gap-2">
+						<span class="material-symbols-rounded">upload_file</span>
+						<strong>Tebligat Dosyası Yükle</strong>
+					</div>
+					<div class="card-body">
+						<div id="dropZone" class="border border-2 border-dashed rounded p-4 text-center mb-3" style="cursor:pointer; transition: all 0.2s;">
+							<span class="material-symbols-rounded d-block mb-2" style="font-size: 3rem; opacity: 0.5;">cloud_upload</span>
+							<div class="mb-1">XLS, XLSX veya UDF dosyalarını buraya sürükleyip bırakın</div>
+							<small class="text-muted">veya aşağıdan dosya seçin</small>
+						</div>
+						<input type="file" id="fileInput" accept=".xls,.xlsx,.udf" hidden>
+						<button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" onclick="document.getElementById('fileInput').click()">
+							<span class="material-symbols-rounded" style="font-size: 1rem;">folder_open</span>
+							<span>Dosya Seç</span>
 						</button>
 					</div>
 				</div>

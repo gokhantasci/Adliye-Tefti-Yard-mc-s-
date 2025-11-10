@@ -21,9 +21,6 @@
           // Markdown -> HTML dönüşümü
           const html = parseMarkdown(markdown);
           aboutContent.innerHTML = html;
-          
-          // Scroll-to-top butonu ekle
-          addScrollToTop();
         })
         .catch(function(error) {
           /* README yükleme hatası - sessizce ele al */
@@ -196,32 +193,6 @@
       .join('\n');
 
     return html;
-  }
-
-  // Scroll-to-top butonu ekle
-  function addScrollToTop() {
-    const button = document.createElement('button');
-    button.textContent = '↑ Yukarı';
-    button.style.cssText = 'position:fixed;bottom:80px;right:20px;padding:12px 20px;background:var(--primary,#4f46e5);color:white;border:none;border-radius:6px;cursor:pointer;display:none;z-index:1000;font-size:14px;box-shadow:0 4px 6px rgba(0,0,0,0.1);transition:opacity 0.3s ease;';
-    
-    button.onclick = function() {
-      // Smooth scroll - modern yaklaşım
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    };
-
-    // Scroll olayını dinle
-    window.addEventListener('scroll', function() {
-      if (window.scrollY > 300) {
-        button.style.display = 'block';
-      } else {
-        button.style.display = 'none';
-      }
-    });
-
-    document.body.appendChild(button);
   }
 
   // Sayfa yüklendiğinde çalıştır

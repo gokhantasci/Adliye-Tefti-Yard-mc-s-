@@ -593,7 +593,7 @@ if (typeof dismissTestAlert !== 'function') {
           track.appendChild(div);
         });
         window.__footerNewsApplied = true;
-      } catch (e){ console.error('[FooterNews]', e); }
+      } catch (e){ }
     })();
   }
   // Toast queue & throttle (max 2 concurrent, 500ms interval)
@@ -1009,7 +1009,7 @@ if (typeof dismissTestAlert !== 'function') {
         pager.appendChild(right);
       }
       renderPage();
-    } catch (e){ console.error('pager error', e); }
+    } catch (e){ }
   };
 
   function watch(tableSelector){
@@ -1146,7 +1146,7 @@ function __applyPager(tableSelector, pageSize){
       pager.appendChild(right);
     }
     renderPage();
-  } catch (e){ console.error('pager error', e); }
+  } catch (e){ }
 }
 
 // Auto-paginate #noJudgeTable when caseModal opens
@@ -1268,7 +1268,9 @@ function __applyPager(tableSelector, pageSize){
 // NOT: Toggle işlevi theme-manager.js'de yönetiliyor
 // ========================================
 (function initNewsDropdown(){
+  const dropdownToggle = document.getElementById('newsDropdownToggle');
   const dropdown = document.getElementById('newsDropdown');
+  const dropdownCloseBtn = document.getElementById('newsDropdownCloseBtn');
   const badge = document.getElementById('newsBadge');
   const metaEl = document.getElementById('newsDropdownMeta');
   const listEl = document.getElementById('newsDropdownList');
@@ -1296,15 +1298,12 @@ function __applyPager(tableSelector, pageSize){
     fetch(NEWS_URL, { cache: 'no-store' })
       .then(res => res.ok ? res.json() : Promise.reject('HTTP ' + res.status))
       .then(data => {
-        console.log('[News] Haberler yüklendi:', data);
         // data direkt array veya {haberler: [...]} formatında olabilir
         const haberler = Array.isArray(data) ? data : (data.haberler || []);
         newsItems = haberler.map(h => ({
           tarih: h.tarih || h.Tarih || h.date || '',
           icerik: h.icerik || h.İcerik || h.content || ''
         })).filter(h => h.tarih && h.icerik);
-        
-        console.log('[News] İşlenmiş haberler:', newsItems);
         
         // Tarihe göre sırala (yeni → eski)
         newsItems.sort((a, b) => {
@@ -1316,10 +1315,8 @@ function __applyPager(tableSelector, pageSize){
         updateBadge();
         renderNews(1);
         addNewsToFooterSlider();
-        console.log('[News] Footer slider\'a eklendi');
       })
       .catch(err => {
-        console.error('[News] Yükleme hatası:', err);
         if (metaEl) metaEl.textContent = 'Haberler yüklenemedi.';
         if (listEl) listEl.innerHTML = '<p class="muted">Bir hata oluştu.</p>';
       });
@@ -1354,16 +1351,10 @@ function __applyPager(tableSelector, pageSize){
   }
   
   function addNewsToFooterSlider() {
-    console.log('[News] addNewsToFooterSlider çağrıldı');
-    console.log('[News] appendFooterItems mevcut mu?', typeof window.appendFooterItems);
-    console.log('[News] newsItems:', newsItems);
-    
     if (typeof window.appendFooterItems !== 'function') {
-      console.warn('[News] appendFooterItems fonksiyonu bulunamadı');
       return;
     }
     if (!newsItems || newsItems.length === 0) {
-      console.warn('[News] newsItems boş');
       return;
     }
     
@@ -1378,7 +1369,6 @@ function __applyPager(tableSelector, pageSize){
       });
     });
     
-    console.log('[News] Slider\'a eklenecek item sayısı:', sliderItems.length);
     window.appendFooterItems(sliderItems);
   }
   
@@ -1411,12 +1401,10 @@ function __applyPager(tableSelector, pageSize){
     // Liste render et
     if (listEl) {
       listEl.innerHTML = '';
-      console.log('[News] Rendering news items, slice:', slice);
       
       slice.forEach(item => {
         // Tarihi Türkçe formata çevir (gün adıyla)
         const formattedDate = formatDateWithDay(item.tarih);
-        console.log('[News] Formatted date:', formattedDate);
         
         // Dropdown'da haber bölünmeden gösterilir
         const newsItem = document.createElement('div');
@@ -1435,8 +1423,6 @@ function __applyPager(tableSelector, pageSize){
         newsItem.appendChild(contentDiv);
         listEl.appendChild(newsItem);
       });
-      
-      console.log('[News] Rendered items count:', listEl.children.length);
     }
     
     // Pager render et
@@ -1478,7 +1464,34 @@ function __applyPager(tableSelector, pageSize){
   // İlk yükleme
   loadNews();
   
-  // Global fonksiyonları expose et (theme-manager.js kullanabilsin)
+  // Event listeners
+  if (dropdownToggle) {
+    dropdownToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      dropdown.hidden = !dropdown.hidden;
+      if (!dropdown.hidden) {
+        loadNews();
+      }
+    });
+  }
+  
+  if (dropdownCloseBtn) {
+    dropdownCloseBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      dropdown.hidden = true;
+    });
+  }
+  
+  // Panel dışına tıklandığında kapat
+  document.addEventListener('click', function(e) {
+    if (dropdown && !dropdown.hidden && 
+        !dropdown.contains(e.target) && 
+        dropdownToggle && !dropdownToggle.contains(e.target)) {
+      dropdown.hidden = true;
+    }
+  });
+  
+  // Global fonksiyonları expose et (gerekirse kullanılabilsin)
   window.newsDropdownLoadNews = loadNews;
   window.newsDropdownRenderNews = renderNews;
 })();

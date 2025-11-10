@@ -1,5 +1,0 @@
-# Docker build artifacts
-.env
-
-# Logs
-*.log

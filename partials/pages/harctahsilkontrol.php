@@ -7,8 +7,8 @@
 	<div class="container-fluid py-4">
 		<header class="page-header d-flex justify-content-between align-items-center mb-4">
 			<div>
-				<h1>Harç Tahsil Kontrol</h1>
-				<p class="text-muted">UDF ve EXCEL dosyalarından özet üreterek Harç Tahsil Müzekkeresi Yazılmayanları analiz eder.</p>
+				<h2 class="mb-1">Harç Tahsil Kontrol</h2>
+				<p class="text-muted mb-0">UDF ve EXCEL dosyalarından özet üreterek Harç Tahsil Müzekkeresi yazılmayanları analiz eder.</p>
 			</div>
 		</header>
 

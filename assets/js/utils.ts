@@ -7,21 +7,6 @@
  * ========================================
  */
 
-type ToastType = 'success' | 'danger' | 'warning' | 'info';
-
-interface ToastOptions {
-  type: ToastType;
-  title: string;
-  body: string;
-  delay?: number;
-}
-
-interface LogEntry {
-  time: Date;
-  type: string;
-  message: string;
-}
-
 (function(window: Window): void {
   'use strict';
 

@@ -22,14 +22,12 @@
 
     const data = window.__kesinlestirmeData;
 
-    let html = '<section class="panel" id="todoListPanel">';
-    html += '<div class="panel-head">';
-    html += '<div style="display:flex;align-items:center;gap:8px;">';
+    let html = '<div class="card mb-3" id="todoListPanel">';
+    html += '<div class="card-header d-flex align-items-center gap-2">';
     html += '<span class="material-symbols-rounded">checklist</span>';
     html += '<strong>Bilgi</strong>';
     html += '</div>';
-    html += '</div>';
-    html += '<div class="panel-body">';
+    html += '<div class="card-body">';
     html += '<ol style="margin:0;padding-left:24px;line-height:2;">';
 
     // Step 1
@@ -70,7 +68,7 @@
 
     html += '</ol>';
     html += '</div>';
-    html += '</section>';
+    html += '</div>';
 
     container.innerHTML = html;
   }
@@ -94,20 +92,18 @@
     const container = $('#resultsContainer');
     if (!container) return;
 
-    let html = '<section class="panel" id="mergedResultPanel">';
-    html += '<div class="panel-head">';
-    html += '<div style="display:flex;align-items:center;gap:8px;">';
+    let html = '<div class="card mb-3" id="mergedResultPanel">';
+    html += '<div class="card-header d-flex align-items-center justify-content-between">';
+    html += '<div class="d-flex align-items-center gap-2">';
     html += '<span class="material-symbols-rounded">table_chart</span>';
     html += '<strong>Birleştirilmiş Özet</strong>';
     html += '</div>';
-    html += '<div class="title-actions">';
-    html += '<button class="btn ghost" id="exportMergedExcel">';
-    html += '<span class="material-symbols-rounded">download</span> Excel İndir';
+    html += '<button class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" id="exportMergedExcel">';
+    html += '<span class="material-symbols-rounded" style="font-size: 1rem;">download</span> Excel';
     html += '</button>';
     html += '</div>';
-    html += '</div>';
-    html += '<div class="panel-body">';
-    html += '<div class="table-wrap">';
+    html += '<div class="card-body">';
+    html += '<div class="table-responsive">';
     html += '<table class="table" style="width:100%;border-collapse:collapse;">';
     html += '<thead><tr>';
     html += '<th>SIRA</th>';
@@ -167,7 +163,7 @@
     html += '</tbody></table>';
     html += '</div>';
     html += '</div>';
-    html += '</section>';
+    html += '</div>';
 
     container.innerHTML = html;
 
@@ -229,6 +225,20 @@
     if (window.XLSX){
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(excelData);
+      
+      // Sütun genişliklerini otomatik ayarla
+      const colWidths = [];
+      excelData.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          const cellValue = String(cell || '');
+          const cellLength = cellValue.length;
+          if (!colWidths[colIndex] || colWidths[colIndex] < cellLength) {
+            colWidths[colIndex] = cellLength;
+          }
+        });
+      });
+      ws['!cols'] = colWidths.map(w => ({ wch: Math.min(Math.max(w + 2, 10), 50) }));
+      
       XLSX.utils.book_append_sheet(wb, ws, 'Kesinleşme İnfaz');
       XLSX.writeFile(wb, 'kesinlesme-infaz-raporu.xlsx');
 
@@ -1548,8 +1558,8 @@
     const totalPages = Math.ceil(mergedData.length / itemsPerPage);
 
     function renderTable(page){
-      let html = '<section class="panel" id="mergedResultPanel">';
-      html += '<div class="panel-head">';
+      let html = '<div class="card mb-3" id="mergedResultPanel">';
+      html += '<div class="card-header d-flex align-items-center justify-content-between">';
       html += '<div style="display:flex;align-items:center;gap:8px;">';
       html += '<h3 style="margin:0;flex:1;">Birleştirilmiş Özet</h3>';
       html += '<button class="btn btn-sm btn-success" onclick="window.kesinlestirmeExportToExcel()" title="Excel\'e Aktar">';
@@ -1623,7 +1633,7 @@
       html += '</div>';
       html += '</div>';
 
-      html += '</section>';
+      html += '</div>';
 
       container.innerHTML = html;
 
@@ -1665,8 +1675,8 @@
     const totalPages = Math.ceil(kesinlestirmeData.length / itemsPerPage);
 
     function renderTable(page){
-      let html = '<section class="panel" id="mergedResultPanel">';
-      html += '<div class="panel-head">';
+      let html = '<div class="card mb-3" id="mergedResultPanel">';
+      html += '<div class="card-header d-flex align-items-center justify-content-between">';
       html += '<div style="display:flex;align-items:center;gap:8px;">';
       html += '<span class="material-symbols-rounded">table_chart</span>';
       html += '<strong>Birleştirilmiş Özet</strong>';
@@ -1678,7 +1688,7 @@
       html += '</button>';
       html += '</div>';
       html += '</div>';
-      html += '<div class="panel-body">';
+      html += '<div class="card-body">';
 
       // Pagination controls - top
       html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:12px;background:var(--bg-secondary,#f5f5f5);border-radius:4px;">';
@@ -1746,7 +1756,7 @@
       html += '</div>';
 
       html += '</div>';
-      html += '</section>';
+      html += '</div>';
 
       container.innerHTML = html;
 
@@ -1920,3 +1930,4 @@
   window.kesinlestirmeExportToExcel = exportMergedToExcel;
 
 })();
+

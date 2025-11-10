@@ -11,7 +11,7 @@ $active = "karar";
     
     <!-- Sayfa başlığı -->
     <div class="mb-4">
-      <h1 class="h2 mb-1">Karar Defteri Kontrolü</h1>
+      <h2 class="mb-1">Karar Defteri Kontrolü</h2>
       <p class="text-muted mb-0">Yüklediğiniz tabloyu işler ve dosya bazlı karar sayılarını hazırlar.</p>
     </div>
 
@@ -202,32 +202,16 @@ $active = "karar";
 
 	</div>
 	
-	<!-- Scroll to Top Button -->
-	<button id="scrollToTop" class="scroll-to-top" aria-label="Yukarı git" title="Yukarı git">
-		<span class="material-symbols-rounded">arrow_upward</span>
-	</button>
-	
 </main>
 
 <!-- Page Scripts -->
 <script>
-console.log('[KARAR PAGE] Sayfa yüklendi');
-console.log('[KARAR PAGE] XLSX mevcut mu?', typeof XLSX !== 'undefined');
-
 // XLSX yüklenmesini bekle
 (function checkXLSX() {
   if (typeof XLSX !== 'undefined') {
-    console.log('[KARAR PAGE] XLSX hazır, script\'ler yükleniyor');
-    
     // Karar KPI script'ini yükle
     const script1 = document.createElement('script');
     script1.src = '/assets/js/karar-excel-kpis.js?v=3';
-    script1.onload = function() {
-      console.log('[KARAR PAGE] karar-excel-kpis.js yüklendi');
-    };
-    script1.onerror = function() {
-      console.error('[KARAR PAGE] karar-excel-kpis.js yüklenemedi!');
-    };
     document.body.appendChild(script1);
     
     // Diğer script'ler
@@ -243,7 +227,6 @@ console.log('[KARAR PAGE] XLSX mevcut mu?', typeof XLSX !== 'undefined');
       document.body.appendChild(script);
     });
   } else {
-    console.warn('[KARAR PAGE] XLSX henüz hazır değil, 100ms sonra tekrar denenecek');
     setTimeout(checkXLSX, 100);
   }
 })();

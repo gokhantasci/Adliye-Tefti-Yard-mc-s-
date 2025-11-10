@@ -6,7 +6,7 @@
     */
    
   // Sayfa başlığını ayarla (header.php'de kullanılacak)
-  $pageTitle = "Panel";
+  $pageTitle = "Anasayfa";
   $active = "dashboard";
 
 ?>
@@ -16,8 +16,8 @@
   <div class="container-fluid py-4">
     <!-- Sayfa başlığı -->
     <div class="mb-4">
-      <h1 class="h2 mb-1">Panel</h1>
-      <p class="text-muted mb-0">Uygulama güncellemeleri ve e-posta bırakma kutusu</p>
+      <h1 class="h2 mb-1">Anasayfa</h1>
+      <p class="text-muted mb-0">Ceza Mahkemeleri Teftiş Yardımcısı</p>
     </div>
     
     <div class="row g-4">
@@ -25,7 +25,7 @@
       <!-- E-POSTA BIRAKMA KUTUSU - Ortalanmış 3 col -->
       <div class="col-12">
         <div class="row justify-content-center">
-          <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+          <div class="col-12 col-md-6 col-lg-4 col-xl-6">
             <div class="card h-100" id="mailDropBox">
               <div class="card-body">
                 <div class="d-flex align-items-start gap-3 mb-3">

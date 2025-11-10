@@ -743,20 +743,20 @@
 	  if (!toolbar) {
       toolbar = document.createElement('div');
       toolbar.id = 'combinedToolbar';
-      toolbar.className = 'toolbar';
+      toolbar.className = 'mb-3';
       toolbar.style.display = 'flex';
       toolbar.style.flexWrap = 'wrap';
-      toolbar.style.gap = '8px';
-      toolbar.style.margin = '0 0 8px 0';
+      toolbar.style.gap = '0.5rem';
+      toolbar.style.alignItems = 'center';
       toolbar.innerHTML = `
-		  <input id="combSearch" class="input" type="search" placeholder="Ara (Esas/Karar/Statü)" style="min-width:260px">
-		  <select id="combStatus" class="input"></select>
-		  <select id="combOneri" class="input"></select>
-		  <button id="combToggleUnmatched" class="btn btn-ghost"></button>
-		  <button id="combReset" class="btn">Tümünü Göster</button>
-		  <button id="combExportXls" class="btn">
-			<span class="material-symbols-rounded" style="vertical-align:middle;margin-right:6px">download</span>
-			Tümünü XLS Kaydet
+		  <input id="combSearch" class="form-control form-control-sm" type="search" placeholder="Ara (Esas/Karar/Statü)" style="max-width:260px">
+		  <select id="combStatus" class="form-select form-select-sm" style="max-width:180px"></select>
+		  <select id="combOneri" class="form-select form-select-sm" style="max-width:200px"></select>
+		  <button id="combToggleUnmatched" class="btn btn-sm btn-outline-secondary"></button>
+		  <button id="combReset" class="btn btn-sm btn-secondary">Tümünü Göster</button>
+		  <button id="combExportXls" class="btn btn-sm btn-primary">
+			<span class="material-symbols-rounded" style="vertical-align:middle;margin-right:4px;font-size:1rem">download</span>
+			XLS Kaydet
 		  </button>
 		`;
       const wrap = document.querySelector('#combinedTableWrap');
@@ -775,8 +775,8 @@
 	  onSel.value = COMB.oneri;
 
 	  const tgBtn = document.querySelector('#combToggleUnmatched');
-	  tgBtn.textContent = COMB.showUnmatched ? 'Eşleşmeyenleri Gösteriliyor' : 'Eşleşmeyenleri Gizle';
-	  tgBtn.className = COMB.showUnmatched ? 'btn' : 'btn btn-ghost';
+	  tgBtn.textContent = COMB.showUnmatched ? 'Eşleşmeyenleri Göster' : 'Eşleşmeyenleri Gizle';
+	  tgBtn.className = COMB.showUnmatched ? 'btn btn-sm btn-outline-secondary' : 'btn btn-sm btn-secondary';
 
 	  const qEl = document.querySelector('#combSearch');
 	  qEl.value = COMB.q;
@@ -841,28 +841,30 @@
 	  const pageRows = COMB.filtered.slice(start, start + COMB.pageSize);
 
 	  const html = `
-		<table class="table report-table">
-		  <thead>
-			<tr>
-			  <th>#</th>
-			  <th>Esas No</th>
-			  <th>Karar No (UDF)</th>
-			  <th>Statü (UDF)</th>
-			  <th>Öneri</th>
-			</tr>
-		  </thead>
-		  <tbody>
-			${pageRows.map((r,i) => `
+		<div class="table-responsive">
+		  <table class="table table-sm table-hover">
+			<thead class="table-light">
 			  <tr>
-				<td class="num">${start + i + 1}</td>
-				<td>${escapeHtml(r.esasNo)}</td>
-				<td>${escapeHtml(r.kararNo || '-')}</td>
-				<td>${escapeHtml(r.statu || '-')}</td>
-				<td>${r.oneriHtml || ''}</td>
+				<th style="width:60px">#</th>
+				<th style="width:120px">Esas No</th>
+				<th style="width:140px">Karar No (UDF)</th>
+				<th style="width:180px">Statü (UDF)</th>
+				<th>Öneri</th>
 			  </tr>
-			`).join('')}
-		  </tbody>
-		</table>
+			</thead>
+			<tbody>
+			  ${pageRows.map((r,i) => `
+				<tr>
+				  <td class="text-center">${start + i + 1}</td>
+				  <td>${escapeHtml(r.esasNo)}</td>
+				  <td>${escapeHtml(r.kararNo || '-')}</td>
+				  <td>${escapeHtml(r.statu || '-')}</td>
+				  <td>${r.oneriHtml || ''}</td>
+				</tr>
+			  `).join('')}
+			</tbody>
+		  </table>
+		</div>
 	  `;
 	  wrap.innerHTML = html;
   }
@@ -883,19 +885,15 @@
 
 	  pg = document.createElement('div');
 	  pg.id = 'combinedPager';
-	  pg.className = 'pager';
-	  pg.style.display = 'flex';
-	  pg.style.justifyContent = 'space-between';
-	  pg.style.alignItems = 'center';
-	  pg.style.margin = '8px 0 0 0';
+	  pg.className = 'd-flex justify-content-between align-items-center mt-3';
 
 	  pg.innerHTML = `
-		<div class="muted">Toplam: ${fmtInt(total)} kayıt • Sayfa ${COMB.page}/${pages}</div>
-		<div class="pager-buttons" style="display:flex; gap:6px">
-		  <button id="pgFirst" class="btn btn-ghost" ${COMB.page === 1 ? 'disabled' : ''}>« İlk</button>
-		  <button id="pgPrev"  class="btn btn-ghost" ${COMB.page === 1 ? 'disabled' : ''}>‹ Önceki</button>
-		  <button id="pgNext"  class="btn btn-ghost" ${COMB.page === pages ? 'disabled' : ''}>Sonraki ›</button>
-		  <button id="pgLast"  class="btn btn-ghost" ${COMB.page === pages ? 'disabled' : ''}>Son »</button>
+		<div class="text-muted small">Toplam: <b>${fmtInt(total)}</b> kayıt • Sayfa <b>${COMB.page}/${pages}</b></div>
+		<div class="btn-group btn-group-sm" role="group">
+		  <button id="pgFirst" class="btn btn-outline-secondary" ${COMB.page === 1 ? 'disabled' : ''}>« İlk</button>
+		  <button id="pgPrev"  class="btn btn-outline-secondary" ${COMB.page === 1 ? 'disabled' : ''}>‹ Önceki</button>
+		  <button id="pgNext"  class="btn btn-outline-secondary" ${COMB.page === pages ? 'disabled' : ''}>Sonraki ›</button>
+		  <button id="pgLast"  class="btn btn-outline-secondary" ${COMB.page === pages ? 'disabled' : ''}>Son »</button>
 		</div>
 	  `;
 	  wrap.parentNode.appendChild(pg);

@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "title": "🎨 Yeni Tema",
+    "content": "Uygulama fonksiyonları iyileştirilerek yeni temaya geçiş sağlandı.",
+    "type": "feature",
+    "icon": "new_releases"
+  },
+  {
+    "id": 2,
+    "title": "� Müdürün Dolabı Uygulaması",
+    "content": "Dolabınızdaki dosyaları kolaylıkla takip edin ve yönetin.",
+    "type": "app",
+    "icon": "folder_managed",
+    "link": "https://657.com.tr/mudurun-dolabi-adliye-dosya-takip-hatirlatma-programi/"
+  },    
+  {
+    "id": 3,
+    "title": "🤖 jRobot İstatistikçi",
+    "content": "Ceza Mahkemeleri WEB ile tam uyumlu istatistik yazılımı.",
+    "type": "app",
+    "icon": "smart_toy",
+    "link": "https://657.com.tr/uyap-jrobot-ceza/"
+  },
+  {
+    "id": 4,
+    "title": "✅ Kesinleşme Hesaplama Uygulaması",
+    "content": "Kesinleşme işlemlerinizi takip edin ve yönetin.",
+    "type": "app",
+    "icon": "verified",
+    "link": "https://657.com.tr/kesinlesme-hesaplama/"
+  },
+  {
+    "id": 5,
+    "title": "🎓 GYS Tercih Robotu Simülasyonu",
+    "content": "GYS tercihlerinizi kolaylaştıran simülasyon aracı.",
+    "type": "app",
+    "icon": "school",
+    "link": "https://657.com.tr/gys-tercih-robotu-simulasyonu/"
+  },
+  {
+    "id": 6,
+    "title": "🧮 Yargılama Gideri Hesap Makinesi",
+    "content": "Yargılama giderlerinizi hızlıca hesaplayın.",
+    "type": "app",
+    "icon": "calculate",
+    "link": "https://657.com.tr/yargilama-gideri-hesap-makinesi/"
+  }
+]  
+

@@ -184,8 +184,8 @@
       const firstDiff = discrepancies[0].diff;
       const allSame = discrepancies.every(d => d.diff === firstDiff);
       if (allSame){
-        toast('warning', 'Süre Uyumsuzluğu',
-          `Tablodaki sürelerden ${firstDiff} gün düşüldüğü tespit edilmiştir. (İlk ${discrepancies.length} kayıtta aynı fark)`);
+        toast('warning', 'Düşülen Sürelerin Tespiti',
+          `Tablodaki sürelerden ${firstDiff} gün düşüldüğü tespit edilmiştir. (İlk ${discrepancies.length} kayıt kontrol edildi)`);
       }
     }
   }
@@ -374,14 +374,6 @@
         body: bodyStr
       });
       const durMs = Math.round(performance.now() - startedAt);
-
-      /* Debug log
-      console.log({
-        status: res.status,
-        contentType: res.headers.get('Content-Type'),
-        disposition: res.headers.get('Content-Disposition')
-      });
-      */
 
       const ct = (res.headers.get('Content-Type') || '').toLowerCase();
       const cd = res.headers.get('Content-Disposition') || '';

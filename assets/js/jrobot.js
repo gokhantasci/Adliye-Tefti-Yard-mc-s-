@@ -1127,9 +1127,9 @@
                 <table class="table table-sm table-hover mb-0">
                   <thead class="table-light sticky-top">
                     <tr>
-                      <th style="width:60px;">#</th>
-                      <th>Dosya No</th>
-                      <th>Karar No</th>
+                      <th style="width:20%;">#</th>
+                      <th style="width:40%;">Dosya No</th>
+                      <th style="width:40%;">Karar No</th>
                     </tr>
                   </thead>
                   <tbody id="jrListTbody"></tbody>

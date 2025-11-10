@@ -530,16 +530,12 @@ function renderNoJudgeAlert_afterUpload(missingCount){
   function updateKPIs(total,savciCount,hakimCount){ text($('#kpiTotal'),total); text($('#kpiSavci'),savciCount); text($('#kpiHakim'),hakimCount); }
 
   function buildResultCard(total,savciCount,hakimCount,info){
-    console.log('[KARAR] buildResultCard çağrıldı - total:', total, 'savci:', savciCount, 'hakim:', hakimCount);
     
     // Bootstrap layout için reportContainer
     const host = document.getElementById('reportContainer');
     if (!host) {
-      console.error('[KARAR] #reportContainer bulunamadı!');
       return;
     }
-    
-    console.log('[KARAR] #reportContainer bulundu, rapor oluşturuluyor');
     
     let card = document.getElementById('result-card'); 
     if (!card) { 
@@ -554,8 +550,6 @@ function renderNoJudgeAlert_afterUpload(missingCount){
                      '<strong>Rapor Özeti</strong>' +
                      '</div>' +
                      '<div class="card-body" id="reportBody"></div>';
-                     
-    console.log('[KARAR] Rapor kartı oluşturuldu');
   }
 
   function readAsArrayBuffer(file){
@@ -691,28 +685,22 @@ function renderNoJudgeAlert_afterUpload(missingCount){
   }
 
   function ensureInputSetup(){
-    console.log('[KARAR] ensureInputSetup başlatıldı');
     const input = $('#excelInput'); 
     if (!input) {
-      console.error('[KARAR] #excelInput bulunamadı!');
       return null;
     }
-    console.log('[KARAR] #excelInput bulundu:', input);
     input.setAttribute('accept','.xls,.xlsx'); 
     input.setAttribute('multiple','true'); 
     return input;
   }
 
   function wire(){
-    console.log('[KARAR] wire() fonksiyonu başlatıldı');
     
     const input = ensureInputSetup(); 
     if (input) {
       input.addEventListener('change', e => {
-        console.log('[KARAR] Input change event tetiklendi, dosya sayısı:', e.target.files.length);
         handleFiles(e.target.files);
       });
-      console.log('[KARAR] Input change listener eklendi');
     }
     
     // Run butonu için retry mekanizması (dinamik script yüklemesi için)
@@ -720,16 +708,11 @@ function renderNoJudgeAlert_afterUpload(missingCount){
       const runBtn = $('#run'); 
       if (runBtn) {
         runBtn.addEventListener('click', function() {
-          console.log('[KARAR] Run butonu tıklandı');
           recomputeFromSaved();
         });
-        console.log('[KARAR] Run button listener eklendi');
       } else {
         if (retries > 0) {
-          console.warn('[KARAR] #run butonu bulunamadı, ' + retries + ' deneme kaldı, 100ms sonra tekrar denenecek');
           setTimeout(function() { attachRunButton(retries - 1); }, 100);
-        } else {
-          console.error('[KARAR] #run butonu 10 denemeden sonra bulunamadı!');
         }
       }
     }
@@ -750,8 +733,6 @@ function renderNoJudgeAlert_afterUpload(missingCount){
     // Prevent browser from opening dropped files
     const dropZone = $('#dropZone');
     if (dropZone) {
-      console.log('[KARAR] Dropzone bulundu, event listener\'lar ekleniyor');
-      
       ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(eventName) {
         dropZone.addEventListener(eventName, function(e) {
           e.preventDefault();
@@ -763,7 +744,6 @@ function renderNoJudgeAlert_afterUpload(missingCount){
         dropZone.addEventListener(eventName, function(e) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('[KARAR] Drag event:', eventName);
           dropZone.classList.add('drag-over');
         }, false);
       });
@@ -772,7 +752,6 @@ function renderNoJudgeAlert_afterUpload(missingCount){
         dropZone.addEventListener(eventName, function(e) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('[KARAR] Drag event:', eventName);
           dropZone.classList.remove('drag-over');
         }, false);
       });
@@ -781,7 +760,6 @@ function renderNoJudgeAlert_afterUpload(missingCount){
         e.preventDefault();
         e.stopPropagation();
         const files = e.dataTransfer.files;
-        console.log('[KARAR] Drop event - dosya sayısı:', files ? files.length : 0);
         if (files && files.length > 0) {
           handleFiles(files);
         }
@@ -794,10 +772,6 @@ function renderNoJudgeAlert_afterUpload(missingCount){
           input.click();
         }
       });
-      
-      console.log('[KARAR] Tüm dropzone event listener\'ları eklendi');
-    } else {
-      console.error('[KARAR] #dropZone bulunamadı!');
     }
   }
 
@@ -890,7 +864,6 @@ function renderNoJudgeAlert_afterUpload(missingCount){
     }
 
     function render(){
-      console.log('[KARAR] render() fonksiyonu başlatıldı');
       
       // KULLANICI TARİH GİRDİYSE KORU
       const prevSD = (document.getElementById('startDate') || {}).value || '';
@@ -902,7 +875,6 @@ function renderNoJudgeAlert_afterUpload(missingCount){
 
       const card = document.getElementById('result-card'); 
       if (!card) {
-        console.error('[KARAR] #result-card bulunamadı!');
         return;
       }
       
@@ -995,8 +967,6 @@ function renderNoJudgeAlert_afterUpload(missingCount){
       h += '</tbody>';
       h += '</table>';
       h += '</div>';
-      
-      console.log('[KARAR] Rapor HTML oluşturuldu');
 
       body.innerHTML = h;
 
@@ -1201,3 +1171,4 @@ function initSayacAndExample(){
   });
 }
 // initSayacAndExample(); // Removed: no longer auto-loading ornek.xls on page load
+

@@ -81,19 +81,26 @@
   }
 
   const toTRDate = (iso) => {
-    if (!iso) return 'halen';
-    const d = new Date(iso + 'T00:00:00');
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yyyy = d.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
+    if (!iso || iso === 'undefined') return '-';
+    try {
+      const d = new Date(iso + 'T00:00:00');
+      if (isNaN(d.getTime())) return '-';
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    } catch (e) {
+      return '-';
+    }
   };
 
   function toLabel(from, to, currency, defaultCurrency) {
     const isYTL = (currency || defaultCurrency || 'TRY') !== 'TRY';
     const cur = isYTL ? currency || 'YTL' : '';
     const right = cur ? ` ${cur}` : '';
-    return `${toTRDate(from)} - ${toTRDate(to)}${right}`;
+    const toDate = to ? toTRDate(to) : 'Halen';
+    const fromDate = toTRDate(from);
+    return `${fromDate} - ${toDate}${right}`;
   }
 
   function attachScrollReveal(listEl, total, initial = INITIAL_VISIBLE, step = REVEAL_STEP) {
@@ -145,22 +152,20 @@
     
     const card = el('div', 'card');
     const cardHeader = el('div', 'card-header d-flex align-items-center justify-content-between');
-    const headerLeft = el('div', 'd-flex align-items-center gap-2');
+    
     const headerTitle = el('strong', '', title);
-    headerLeft.append(headerTitle);
     
     const badge = el('span', 'badge bg-secondary');
     badge.id = `badge_${idPrefixVisible}`;
     badge.textContent = items.length.toString();
     
-    cardHeader.append(headerLeft, badge);
+    cardHeader.append(headerTitle, badge);
     
     const cardBody = el('div', 'card-body p-2');
     const list = el('div', 'field-list');
     
     const itemsPerPage = 5;
     let currentPage = 0;
-    const totalPages = Math.ceil(items.length / itemsPerPage);
     
     const allFieldGroups = [];
     
@@ -171,6 +176,7 @@
       const idH = `${idPrefixHidden}${i + 1}`;
       
       const fieldGroup = el('div', 'mb-2');
+      
       const label = el('label', 'form-label small mb-1', toLabel(row.from, row.to, row.currency, defaultCurrency));
       label.htmlFor = idV;
       
@@ -194,6 +200,7 @@
     
     const renderPage = (page) => {
       list.innerHTML = '';
+      const totalPages = Math.ceil(items.length / itemsPerPage);
       const start = page * itemsPerPage;
       const end = Math.min(start + itemsPerPage, items.length);
       
@@ -210,6 +217,7 @@
     cardBody.append(list);
     
     // Pagination controls
+    const totalPages = Math.ceil(items.length / itemsPerPage);
     if (totalPages > 1) {
       const paginationDiv = el('div', 'd-flex justify-content-between align-items-center mt-2 pt-2 border-top');
       

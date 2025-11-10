@@ -5,14 +5,14 @@
   --bs-font-sans-serif: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   
   /* Adalet Bakanlığı Ana Renkler - Light Mode */
-  --adalet-primary: #8B0000;        /* Koyu kırmızı - Ana renk */
-  --adalet-primary-dark: #6B0000;   /* Daha koyu kırmızı */
+  --adalet-primary: #C41E3A;        /* Adalet Bakanlığı Resmi Kırmızısı */
+  --adalet-primary-dark: #9B1829;   /* Daha koyu kırmızı */
   --adalet-secondary: #2C3E50;      /* Koyu gri-mavi */
-  --adalet-light: #ECF0F1;          /* Açık gri */
+  --adalet-light: #F5F6F8;          /* Çok açık gri */
   --adalet-white: #FFFFFF;
-  --adalet-text: #2C3E50;
-  --adalet-text-light: #7F8C8D;
-  --adalet-border: #BDC3C7;
+  --adalet-text: #212529;
+  --adalet-text-light: #6C757D;
+  --adalet-border: #DEE2E6;
   --adalet-bg: #F8F9FA;
   --adalet-card-bg: #FFFFFF;
   --adalet-sidebar-bg: #FFFFFF;
@@ -20,40 +20,40 @@
   --adalet-dropdown-shadow: rgba(0,0,0,0.15);
   
   /* Bootstrap overrides */
-  --bs-primary: #8B0000;
-  --bs-primary-rgb: 139, 0, 0;
+  --bs-primary: #C41E3A;
+  --bs-primary-rgb: 196, 30, 58;
   --bs-secondary: #2C3E50;
   --bs-secondary-rgb: 44, 62, 80;
-  --bs-light: #ECF0F1;
-  --bs-dark: #2C3E50;
-  --bs-body-color: #2C3E50;
+  --bs-light: #F5F6F8;
+  --bs-dark: #212529;
+  --bs-body-color: #212529;
   --bs-body-bg: #F8F9FA;
-  --bs-border-color: #BDC3C7;
+  --bs-border-color: #DEE2E6;
 }
 
 /* Dark Mode - Adalet Bakanlığı Teması */
 [data-bs-theme="dark"] {
   /* Adalet Bakanlığı Ana Renkler - Dark Mode */
-  --adalet-primary: #C41E3A;        /* Daha parlak kırmızı */
-  --adalet-primary-dark: #000000;   /* Koyu kırmızı */
-  --adalet-secondary: #34495E;      /* Açık gri-mavi */
-  --adalet-light: #2C3E50;          /* Koyu gri */
-  --adalet-white: #1E1E1E;
-  --adalet-text: #E0E0E0;
-  --adalet-text-light: #95A5A6;
-  --adalet-border: #34495E;
-  --adalet-bg: #121212;
-  --adalet-card-bg: #1E1E1E;
-  --adalet-sidebar-bg: #1A1A1A;
-  --adalet-dropdown-bg: #1E1E1E;
-  --adalet-dropdown-shadow: rgba(0,0,0,0.5);
+  --adalet-primary: #DC2F47;        /* Parlak Adalet Kırmızısı */
+  --adalet-primary-dark: #B81E32;   /* Koyu kırmızı */
+  --adalet-secondary: #3E4A59;      /* Açık gri-mavi */
+  --adalet-light: #2B3139;          /* Koyu gri */
+  --adalet-white: #0D0D0D;
+  --adalet-text: #E9ECEF;
+  --adalet-text-light: #ADB5BD;
+  --adalet-border: #495057;
+  --adalet-bg: #0D0D0D;
+  --adalet-card-bg: #1A1D23;
+  --adalet-sidebar-bg: #141518;
+  --adalet-dropdown-bg: #1A1D23;
+  --adalet-dropdown-shadow: rgba(0,0,0,0.7);
   
   /* Bootstrap overrides */
-  --bs-body-color: #E0E0E0;
-  --bs-body-bg: #121212;
-  --bs-border-color: #34495E;
-  --bs-light: #2C3E50;
-  --bs-dark: #E0E0E0;
+  --bs-body-color: #E9ECEF;
+  --bs-body-bg: #0D0D0D;
+  --bs-border-color: #495057;
+  --bs-light: #2B3139;
+  --bs-dark: #E9ECEF;
 }
 
 /* Desaturation Filter - Erişilebilirlik */
@@ -97,19 +97,44 @@ main {
 
 /* Navbar - Adalet Bakanlığı Stili */
 .navbar {
-  background: var(--adalet-primary) !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border-bottom: 3px solid var(--adalet-primary-dark);
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   overflow: visible !important;
 }
 
 .navbar .container-fluid {
   overflow: visible !important;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
+/* Responsive max-width for all container-fluid */
+main .container-fluid,
+footer .container-fluid {
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
+/* Responsive max-width for container-fluid */
+@media (min-width: 1200px) {
+  .navbar .container-fluid,
+  main .container-fluid,
+  footer .container-fluid {
+    max-width: clamp(70vw, 80vw, 2000px);
+  }
+}
+
+@media (min-width: 2000px) {
+  .navbar .container-fluid,
+  main .container-fluid,
+  footer .container-fluid {
+    max-width: 70vw;
+  }
 }
 
 .navbar-brand {
   font-weight: 600;
-  color: white !important;
+  color: var(--adalet-text) !important;
   font-size: 1.1rem;
   transition: all 0.3s ease;
 }
@@ -152,32 +177,257 @@ main {
 }
 
 .navbar .btn-link {
-  color: white !important;
+  color: var(--adalet-text) !important;
   transition: all 0.3s ease;
 }
 
 .navbar .btn-link:hover {
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(196, 30, 58, 0.08);
   border-radius: 8px;
+  color: var(--adalet-primary) !important;
+}
+
+/* Navbar toggler - visible in both light and dark modes */
+.navbar-toggler {
+  border: 1px solid var(--adalet-border) !important;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.navbar-toggler:hover {
+  background-color: rgba(196, 30, 58, 0.08);
+  border-color: var(--adalet-primary) !important;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(196, 30, 58, 0.25);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 37, 41, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+[data-bs-theme="dark"] .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-bs-theme="dark"] .navbar-toggler:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+[data-bs-theme="dark"] .navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+
+[data-bs-theme="dark"] .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+[data-bs-theme="dark"] .navbar-toggler:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 /* Dark mode navbar */
 [data-bs-theme="dark"] .navbar {
-  background: var(--adalet-primary) !important;
-  border-bottom-color: #2d0808;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  background: #000000 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 
 [data-bs-theme="dark"] .navbar-brand {
-  color: #E0E0E0 !important;
+  color: #E9ECEF !important;
 }
 
 [data-bs-theme="dark"] .navbar .btn-link {
-  color: #E0E0E0 !important;
+  color: #E9ECEF !important;
 }
 
 [data-bs-theme="dark"] .navbar .btn-link:hover {
-  background-color: rgba(255,255,255,0.05);
+  background-color: rgba(220, 47, 71, 0.15);
+  color: var(--adalet-primary) !important;
+}
+
+/* Navbar dropdown menus */
+.navbar .dropdown-menu {
+  background-color: var(--adalet-card-bg);
+  border: 1px solid var(--adalet-border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.navbar .dropdown-item {
+  color: var(--adalet-text);
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.navbar .dropdown-item:hover {
+  background-color: rgba(196, 30, 58, 0.08);
+  color: var(--adalet-primary);
+}
+
+.navbar .dropdown-item.active {
+  background-color: var(--adalet-primary);
+  color: white;
+}
+
+.navbar .nav-link {
+  color: var(--adalet-text);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.navbar .nav-link:hover {
+  color: var(--adalet-primary);
+  background-color: rgba(196, 30, 58, 0.08);
+  border-radius: 6px;
+}
+
+.navbar .nav-link.active {
+  color: var(--adalet-primary);
+  background-color: rgba(196, 30, 58, 0.12);
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Dropdown toggle with active items */
+.navbar .nav-item.dropdown:has(.dropdown-item.active) > .nav-link {
+  color: var(--adalet-primary);
+  font-weight: 500;
+}
+
+.navbar .nav-item.dropdown:has(.dropdown-item.active) > .nav-link:hover {
+  color: var(--adalet-primary);
+  background-color: rgba(196, 30, 58, 0.12);
+}
+
+.navbar .nav-item.dropdown .nav-link.dropdown-toggle {
+  color: var(--adalet-text);
+}
+
+.navbar .nav-item.dropdown .nav-link.dropdown-toggle:hover {
+  color: var(--adalet-primary);
+}
+
+[data-bs-theme="dark"] .navbar .nav-link {
+  color: rgba(255,255,255,0.85);
+}
+
+[data-bs-theme="dark"] .navbar .nav-link:hover {
+  color: white;
+  background-color: rgba(220, 47, 71, 0.15);
+}
+
+[data-bs-theme="dark"] .navbar .nav-link.active {
+  color: white;
+}
+
+[data-bs-theme="dark"] .navbar .nav-item.dropdown:has(.dropdown-item.active) > .nav-link {
+  color: white;
+  background-color: rgba(220, 47, 71, 0.2);
+  border-radius: 6px;
+}
+
+[data-bs-theme="dark"] .navbar .nav-item.dropdown:has(.dropdown-item.active) > .nav-link:hover {
+  color: white;
+  background-color: rgba(220, 47, 71, 0.25);
+}
+
+[data-bs-theme="dark"] .navbar .dropdown-menu {
+  background-color: #1a1a1a;
+  border-color: #333;
+}
+
+[data-bs-theme="dark"] .navbar .dropdown-item:hover {
+  background-color: rgba(220, 47, 71, 0.15);
+}
+
+/* Mobile Menu Collapse Styling */
+#navbarNav {
+  background: var(--adalet-card-bg);
+  border-top: 1px solid var(--adalet-border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#navbarNav .nav-link {
+  color: var(--adalet-text);
+  padding: 0.75rem 1rem;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+#navbarNav .nav-link:hover {
+  background-color: rgba(196, 30, 58, 0.08);
+  border-left-color: var(--adalet-primary);
+  color: var(--adalet-primary);
+}
+
+#navbarNav .nav-link.active {
+  background-color: rgba(196, 30, 58, 0.12);
+  border-left-color: var(--adalet-primary);
+  color: var(--adalet-primary);
+  font-weight: 500;
+}
+
+#navbarNav h6 {
+  color: var(--adalet-text-muted, #6c757d);
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  opacity: 0.7;
+}
+
+[data-bs-theme="dark"] #navbarNav {
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+[data-bs-theme="dark"] #navbarNav .nav-link {
+  color: rgba(255,255,255,0.9);
+}
+
+[data-bs-theme="dark"] #navbarNav .nav-link:hover {
+  background-color: rgba(255,255,255,0.1);
+  border-left-color: rgba(255,255,255,0.5);
+  color: white;
+}
+
+[data-bs-theme="dark"] #navbarNav .nav-link.active {
+  background-color: rgba(255,255,255,0.15);
+  border-left-color: white;
+  color: white;
+}
+
+[data-bs-theme="dark"] #navbarNav h6 {
+  color: rgba(255,255,255,0.6);
+}
+
+[data-bs-theme="dark"] #navbarNav {
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+}
+
+[data-bs-theme="dark"] #navbarNav .nav-link {
+  color: rgba(255,255,255,0.85);
+}
+
+[data-bs-theme="dark"] #navbarNav .nav-link:hover {
+  background-color: rgba(220, 47, 71, 0.15);
+  border-left-color: var(--adalet-primary);
+}
+
+[data-bs-theme="dark"] #navbarNav .nav-link.active {
+  background-color: rgba(220, 47, 71, 0.2);
+  border-left-color: var(--adalet-primary);
+}
+
+[data-bs-theme="dark"] #navbarNav h6 {
+  color: rgba(255,255,255,0.5);
 }
 
 /* Sidebar - Adalet Bakanlığı Stili */
@@ -187,11 +437,14 @@ main {
     max-width: 260px;
     background-color: var(--adalet-sidebar-bg);
     border-right: 1px solid var(--adalet-border);
-    position: static !important;
+    position: sticky !important;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
     transform: none !important;
     visibility: visible !important;
     box-shadow: 2px 0 4px rgba(0,0,0,0.05);
-    min-height: 100vh;
   }
   
   #sidebar .offcanvas-header {
@@ -200,8 +453,11 @@ main {
   
   #sidebar .offcanvas-body {
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 1rem 0;
     flex-grow: 1;
+    position: sticky;
+    top: 0;
   }
 
   /* When offcanvas body is used with p-0 (no padding) ensure it still matches the sidebar theme */
@@ -221,12 +477,12 @@ main {
   
   #sidebar .offcanvas-header {
     background: var(--adalet-primary);
-    color: white;
+    color: var(--adalet-white);
     padding: 1rem;
   }
   
   #sidebar .offcanvas-title {
-    color: white;
+    color: var(--adalet-white);
     font-weight: 600;
     font-size: 1rem;
   }
@@ -334,6 +590,32 @@ main {
 /* Inline spinner used during parsing */
 .inline-xls-spinner { margin: 12px 0; }
 
+/* Spinner Dark Mode Uyumluluğu */
+.spinner-border {
+  color: var(--adalet-primary) !important;
+}
+
+[data-bs-theme="dark"] .spinner-border {
+  border-color: rgba(255, 255, 255, 0.1);
+  border-top-color: var(--adalet-primary);
+}
+
+[data-bs-theme="dark"] .text-primary .spinner-border,
+[data-bs-theme="dark"] .spinner-border.text-primary {
+  border-color: rgba(196, 30, 58, 0.2);
+  border-top-color: var(--adalet-primary);
+}
+
+/* XLS Loading Overlay Dark Mode */
+[data-bs-theme="dark"] #xlsLoadingOverlay > div {
+  background-color: var(--adalet-card-bg) !important;
+  color: var(--adalet-text);
+}
+
+[data-bs-theme="dark"] #xlsLoadingOverlay .text-muted {
+  color: var(--adalet-text-light) !important;
+}
+
 /* Offcanvas - Mobile */
 .offcanvas {
   background-color: var(--adalet-sidebar-bg);
@@ -364,7 +646,7 @@ main {
 
 .nav-link.active {
   background-color: var(--adalet-primary);
-  color: white;
+  color: var(--adalet-white);
   font-weight: 500;
   box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2);
 }
@@ -460,7 +742,7 @@ main {
 }
 
 .card-title {
-  color: var(--adalet-primary);
+  color: var(--adalet-text);
   font-weight: 600;
 }
 
@@ -615,19 +897,35 @@ main {
 
 /* Footer - Adalet Bakanlığı Stili */
 footer {
-  background-color: var(--adalet-secondary);
-  color: white;
-  border-top: 3px solid var(--adalet-primary);
+  background-color: #FFFFFF;
+  color: var(--adalet-text);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
 }
 
 footer a {
-  color: white;
+  color: var(--adalet-primary);
   transition: color 0.3s ease;
+  font-weight: 500;
 }
 
 footer a:hover {
-  color: var(--adalet-light);
+  color: var(--adalet-primary-dark);
   text-decoration: underline;
+}
+
+/* Dark mode footer */
+[data-bs-theme="dark"] footer {
+  background-color: #000000;
+  color: #E9ECEF;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.6);
+}
+
+[data-bs-theme="dark"] footer a {
+  color: var(--adalet-primary);
+}
+
+[data-bs-theme="dark"] footer a:hover {
+  color: #DC2F47;
 }
 
 /* Dropzone Hover Effect */
@@ -657,7 +955,7 @@ footer a:hover {
 
 /* Page Headers */
 .h2, h2 {
-  color: var(--adalet-primary);
+  color: var(--adalet-text);
   font-weight: 600;
 }
 
@@ -833,7 +1131,7 @@ footer a:hover {
   gap: 0.5rem;
   padding: 1rem;
   background: var(--adalet-primary);
-  color: white;
+  color: var(--adalet-white);
   font-weight: 600;
   border-bottom: 1px solid var(--adalet-border);
 }
@@ -846,7 +1144,7 @@ footer a:hover {
   margin-left: auto;
   background: transparent;
   border: none;
-  color: white;
+  color: var(--adalet-white);
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 6px;
@@ -980,7 +1278,7 @@ footer a:hover {
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   background: var(--adalet-secondary);
-  color: white;
+  color: var(--adalet-white);
   font-weight: 600;
   border-bottom: 1px solid var(--adalet-border);
 }
@@ -994,7 +1292,7 @@ footer a:hover {
   height: 32px;
   display: grid;
   place-items: center;
-  color: white;
+  color: var(--adalet-white);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -1048,6 +1346,58 @@ footer a:hover {
   border-radius: 8px;
   border: 1px solid var(--adalet-border);
   background: var(--adalet-light);
+}
+
+/* Log type colors - Light mode */
+.log-type-success {
+  color: #0a5;
+  background: #e6f7ef;
+  border-color: #c7efdf;
+}
+
+.log-type-danger,
+.log-type-error {
+  color: #c00;
+  background: #ffeaea;
+  border-color: #ffd0d0;
+}
+
+.log-type-warning {
+  color: #a66b00;
+  background: #fff7e6;
+  border-color: #ffe6b3;
+}
+
+.log-type-info {
+  color: #0a66c2;
+  background: #e6f2ff;
+  border-color: #c7dfff;
+}
+
+/* Log type colors - Dark mode */
+[data-bs-theme="dark"] .log-type-success {
+  color: #90e0b3;
+  background: rgba(64, 160, 112, 0.15);
+  border-color: rgba(64, 160, 112, 0.35);
+}
+
+[data-bs-theme="dark"] .log-type-danger,
+[data-bs-theme="dark"] .log-type-error {
+  color: #ff9a9a;
+  background: rgba(255, 64, 64, 0.12);
+  border-color: rgba(255, 64, 64, 0.3);
+}
+
+[data-bs-theme="dark"] .log-type-warning {
+  color: #ffd27a;
+  background: rgba(255, 191, 0, 0.12);
+  border-color: rgba(255, 191, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .log-type-info {
+  color: #9ecbff;
+  background: rgba(10, 102, 194, 0.12);
+  border-color: rgba(10, 102, 194, 0.3);
 }
 
 .log-msg {
@@ -1291,6 +1641,32 @@ footer a:hover {
   font-weight: 600;
 }
 
+/* Badge Dark Mode Uyumluluğu */
+[data-bs-theme="dark"] .badge.bg-warning {
+  background-color: #FFC107 !important;
+  color: #000 !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-danger {
+  background-color: #DC3545 !important;
+  color: #fff !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-success {
+  background-color: #28A745 !important;
+  color: #fff !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-info {
+  background-color: #17A2B8 !important;
+  color: #fff !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-primary {
+  background-color: var(--adalet-primary) !important;
+  color: #fff !important;
+}
+
 /* Scrollbar Styling */
 .dropdown-panel-body::-webkit-scrollbar,
 .log-panel-body::-webkit-scrollbar {
@@ -1494,7 +1870,7 @@ footer a:hover {
   width: 48px;
   height: 48px;
   background: var(--adalet-primary);
-  color: white;
+  color: var(--adalet-white);
   border: none;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);

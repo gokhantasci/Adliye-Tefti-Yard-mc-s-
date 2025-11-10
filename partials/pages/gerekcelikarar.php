@@ -7,8 +7,8 @@
 	<div class="container-fluid py-4">
 		<header class="page-header d-flex justify-content-between align-items-center mb-4">
 			<div>
-				<h1>Gerekçeli Karar Zaman Kontrolü</h1>
-				<p class="text-muted">Yüklediğiniz tabloyu işler ve denetim cetvelini hazırlar.</p>
+				<h2 class="mb-1">Gerekçeli Karar Zaman Kontrolü</h2>
+				<p class="text-muted mb-0">Yüklediğiniz tabloyu işler ve denetim cetvelini hazırlar.</p>
 			</div>
 		</header>
 
@@ -51,12 +51,12 @@
 					</div>
 					<div class="card-body">
 						<div id="udfDrop" class="border border-2 border-dashed rounded p-4 text-center mb-3" style="cursor:pointer; transition: all 0.2s;">
-							<span class="material-symbols-rounded d-block mb-2" style="font-size: 3rem; opacity: 0.5;">folder_open</span>
-							<div class="mb-1">XLS/XLSX dosyalarını buraya sürükleyip bırakın</div>
-							<small class="text-muted">veya tıklayıp seçin</small>
-							<div class="spinner-border spinner-border-sm text-primary mt-3" id="xlsInlineSpinnerGk" role="status" style="display:none;">
-								<span class="visually-hidden">İşleniyor...</span>
-							</div>
+						<span class="material-symbols-rounded d-block mb-2" style="font-size: 3rem; opacity: 0.5;">folder_open</span>
+						<div class="mb-1">XLS/XLSX dosyalarını buraya sürükleyip bırakın</div>
+						<small class="text-muted">veya tıklayıp seçin</small>
+						<div class="spinner-border mt-3" id="xlsInlineSpinnerGk" role="status" style="display:none; width: 2rem; height: 2rem; border-width: 0.25rem; color: var(--adalet-primary);">
+							<span class="visually-hidden">İşleniyor...</span>
+						</div>
 						</div>
 						<input id="udfInput" type="file" accept=".xls,.xlsx" hidden>
 						<button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" onclick="document.getElementById('udfInput').click()">

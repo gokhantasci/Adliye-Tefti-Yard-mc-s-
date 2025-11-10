@@ -39,18 +39,97 @@
 
   function toastWithIcon(type, title, msg, delay = 5000) {
     if (typeof window.toast !== 'function') {
-      console.warn('[Toast] window.toast fonksiyonu henüz yüklenmedi');
       return;
     }
+    // HTML escape to prevent tag rendering in message
+    const escapeHtml = (text) => {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    };
     const bodyHtml = `<div style="display:flex;align-items:flex-start;gap:.5rem;">
       <span class="material-symbols-rounded" style="font-size:22px;">${iconFor(type)}</span>
-      <div>${msg}</div></div>`;
+      <div>${escapeHtml(msg)}</div></div>`;
     window.toast({
       type,
       title,
       body: bodyHtml,
       delay
     });
+  }
+
+  // Modal için dosya detaylarını göster
+  function showFileDetailsModal(court, column, items) {
+    const modal = new bootstrap.Modal(document.getElementById('istinafDetailModal'));
+    const modalTitle = document.getElementById('istinafDetailModalLabel');
+    const modalBody = document.getElementById('istinafDetailModalBody');
+    
+    const columnNames = {
+      incelemede: 'İncelemede',
+      esastanRed: 'Esastan Red',
+      bozma: 'Bozma',
+      kismen: 'Kısmen'
+    };
+    
+    modalTitle.textContent = `${court} - ${columnNames[column]}`;
+    
+    // İlgili dosyaları filtrele
+    const filtered = items.filter(it => {
+      const itemCourt = extractCourtFromO(it.oRaw);
+      if (itemCourt !== court) return false;
+      
+      const neticeRaw = String(deriveNeticeFromO(it.oRaw) || '');
+      const oRaw = String(it.oRaw || '');
+      
+      function normTR(s) {
+        return String(s || '').toLocaleLowerCase('tr').replace(/\s+/g, ' ').trim();
+      }
+      
+      function isKismen(neticeRaw, oRaw) {
+        const t = normTR(neticeRaw || oRaw);
+        return /kısmen.*hükmün.*bozulmas[ıi]/i.test(t) || /kısmen.*esastan.*ret/i.test(t);
+      }
+      
+      function isIncelemede(neticeRaw, oRaw) {
+        const t = normTR(neticeRaw || oRaw);
+        return /incelemede/i.test(t);
+      }
+      
+      function isEsastanRed(neticeRaw, oRaw) {
+        const t = normTR(neticeRaw || oRaw);
+        // Kısmen varsa Esastan Red sayma
+        if (/kısmen/i.test(t)) return false;
+        return /esastan\s*red(d[iı]|i)?/i.test(t) || /esastan.*ret/i.test(t);
+      }
+      
+      function isBozma(neticeRaw, oRaw) {
+        const t = normTR(neticeRaw || oRaw);
+        if (/kısmen/i.test(t)) return false;
+        const hasBozulma = /hükmün\s*bozulmas[ıi]/i.test(t);
+        const hasKararCekimi = /(karar[ıi]\s*(veril(mi[şs]|miştir)|bağlanmıştır))/i.test(t) || /karar[ıi]/i.test(t);
+        return hasBozulma && hasKararCekimi;
+      }
+      
+      if (column === 'kismen') return isKismen(neticeRaw, oRaw);
+      if (column === 'incelemede') return isIncelemede(neticeRaw, oRaw);
+      if (column === 'esastanRed') return isEsastanRed(neticeRaw, oRaw);
+      if (column === 'bozma') return isBozma(neticeRaw, oRaw);
+      return false;
+    });
+    
+    if (filtered.length === 0) {
+      modalBody.innerHTML = '<p class="text-muted">Bu kategoride dosya bulunamadı.</p>';
+    } else {
+      const listHtml = filtered.map((it, idx) => `
+        <div class="border-bottom py-2">
+          <div class="fw-bold">${idx + 1}. ${escapeHtml(it.esasNo || '-')}</div>
+          <div class="small text-muted">${escapeHtml(it.oRaw || '-')}</div>
+        </div>
+      `).join('');
+      modalBody.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${listHtml}</div>`;
+    }
+    
+    modal.show();
   }
 
   // --- Yardım butonu: yükleme kuralları
@@ -431,6 +510,12 @@
     el.innerHTML = html;
   }
 
+  // Daire Özet Tablosundan Rapor Özeti güncelle - SADECE TABLO
+  function updateRaporOzetFromTable() {
+    // Tablo zaten renderDaireOzetTablo() tarafından gösteriliyor
+    // Bu fonksiyon artık hiçbir şey yapmıyor
+  }
+
   // Şehir + Daire ayıklama (gerekiyorsa üstte tanımlı olanı kullanın)
   function extractCourtFromO(oRaw) {
     const s = String(oRaw || '');
@@ -567,14 +652,27 @@
 
     function drawBody(data) {
       tbody.innerHTML = data.map(r => `
-		  <tr>
+		  <tr data-court="${escapeHtml(r.court)}">
 			<td>${r.court}</td>
-			<td class="num">${r.incelemede}</td>
-			<td class="num">${r.esastanRed}</td>
-			<td class="num">${r.bozma}</td>
-			<td class="num">${r.kismen}</td>
+			<td class="num clickable" data-column="incelemede" style="cursor: pointer; text-decoration: underline;">${r.incelemede}</td>
+			<td class="num clickable" data-column="esastanRed" style="cursor: pointer; text-decoration: underline;">${r.esastanRed}</td>
+			<td class="num clickable" data-column="bozma" style="cursor: pointer; text-decoration: underline;">${r.bozma}</td>
+			<td class="num clickable" data-column="kismen" style="cursor: pointer; text-decoration: underline;">${r.kismen}</td>
 		  </tr>
 		`).join('');
+      
+      // Click event'leri ekle
+      tbody.querySelectorAll('td.clickable').forEach(td => {
+        td.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const court = row.getAttribute('data-court');
+          const column = this.getAttribute('data-column');
+          const count = parseInt(this.textContent);
+          if (count > 0) {
+            showFileDetailsModal(court, column, items);
+          }
+        });
+      });
     }
 
     // İlk çizim
@@ -1497,6 +1595,11 @@
     window.__lastExcelRows = window.__lastExcelRows || {};
     window.__lastExcelRows.rowsUsed = rowsUsedRaw;
 
+    // Hakim filtresine veriyi bildir
+    if (window.istinafHakimFilter && typeof window.istinafHakimFilter.setData === 'function') {
+      window.istinafHakimFilter.setData(ozetData);
+    }
+
     // ✔ 3) Çağrı noktası — tarih alanlarını otomatik doldur
     renderDateFilterZone(rowsUsedRaw);
 
@@ -1508,7 +1611,8 @@
     renderKesinKararTablo(ozetData);
     renderNotSentTablo(ozetData);
 
-    // Toast sadece bir kez
+    // Başarı bildirimi
+    const bodyTxt = `${excelFiles.length} dosya işlendi. ${totalRowsRead} satır okundu, ${dupRemoved} tekrar kaldırıldı.`;
     toastWithIcon('success', 'Rapor Hazır', bodyTxt, 7500);
   }
 
@@ -1629,5 +1733,32 @@
   // Sayfa açılışında bir kere çağır
   // ensureKpiCards(); // artık gerekmiyor, istinaf-kpi.js kullanıyoruz
   updateIslemSayaci();
+
+  // ---- Hakim Filtreleme API (istinaf-hakim-filter.js tarafından çağrılacak)
+  window.istinafFilterByHakim = function(filteredData) {
+    if (filteredData === null) {
+      // Filtreyi kaldır, tüm veriyi göster
+      renderDaireOzetTablo(ozetData);
+      renderKesinKararTablo(ozetData);
+      renderNotSentTablo(ozetData);
+      
+      // KPI'ları güncelle (Rapor Özeti kartını oluşturmadan)
+      const stats = computeStats(ozetData);
+      if (typeof window.istinafRenderKPICards === 'function') {
+        window.istinafRenderKPICards(stats);
+      }
+    } else {
+      // Filtrelenmiş veriyi göster
+      renderDaireOzetTablo(filteredData);
+      renderKesinKararTablo(filteredData);
+      renderNotSentTablo(filteredData);
+      
+      // KPI'ları filtrelenmiş veriye göre güncelle (Rapor Özeti kartını oluşturmadan)
+      const stats = computeStats(filteredData);
+      if (typeof window.istinafRenderKPICards === 'function') {
+        window.istinafRenderKPICards(stats);
+      }
+    }
+  };
 
 })();

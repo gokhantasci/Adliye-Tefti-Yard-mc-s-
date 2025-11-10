@@ -8,16 +8,16 @@ $active = "kesinlestirme";
 	<div class="container-fluid py-4">
 
 		<header class="page-header mb-4">
-			<h1 class="h2">Kesinleştirme ve İnfaza Verme Kontrolü</h1>
-			<p class="text-muted">Karar Defteri ve diğer verileri yükleyerek kesinleşme ve infaz sürelerini kontrol edin.</p>
+			<h2 class="mb-1">Kesinleştirme ve İnfaza Verme Kontrolü</h2>
+			<p class="text-muted mb-0">Karar Defteri ve diğer verileri yükleyerek kesinleşme ve infaz sürelerini kontrol edin.</p>
 		</header>
 
 		<div class="row">
-			<div class="col-12 col-xl-8">
+			<div class="col-12 col-lg-7 col-xl-8">
 				<div id="resultsContainer"></div>
 			</div>
 
-			<div class="col-12 col-xl-4">
+			<div class="col-12 col-lg-5 col-xl-4">
 				<div id="todoListContainer"></div>
 
 				<div id="kesinlestirmeReminderHost"></div>

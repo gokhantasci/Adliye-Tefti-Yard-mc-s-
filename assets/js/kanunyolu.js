@@ -39,9 +39,15 @@
   }
 
   function toastWithIcon(type, title, msg, delay = 5000) {
+    // HTML escape to prevent tag rendering in message
+    const escapeHtml = (text) => {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    };
     const bodyHtml = `<div style="display:flex;align-items:flex-start;gap:.5rem;">
       <span class="material-symbols-rounded" style="font-size:22px;">${iconFor(type)}</span>
-      <div>${msg}</div></div>`;
+      <div>${escapeHtml(msg)}</div></div>`;
     window.toast({
       type,
       title,
@@ -1288,7 +1294,7 @@
     renderNotSentTablo(ozetData);
 
     // Toast
-    const bodyTxt = `<span class=\"material-symbols-rounded\" style=\"vertical-align:middle;font-size:20px;\">task_alt</span> ${totalRowsRead} satır okundu; ${skippedEmpty} boş; ${dupRemoved} mükerrer temizlendi. Kalan: ${deduped.length}. Özet tabloyu açabilirsiniz.`;
+    const bodyTxt = `${totalRowsRead} satır okundu; ${skippedEmpty} boş; ${dupRemoved} mükerrer temizlendi. Kalan: ${deduped.length}. Özet tabloyu açabilirsiniz.`;
     toastWithIcon('success', 'Rapor Hazır', bodyTxt, 7500);
 
   }

@@ -12,7 +12,7 @@
     # ----------------------------------------
     # Error Pages
     # ----------------------------------------
-    ErrorDocument 404 /404.php
+    ErrorDocument 404 /partials/pages/404.php
     
     # ----------------------------------------
     # Clean URL Rewrites (remove .php extension)

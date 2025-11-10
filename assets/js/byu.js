@@ -355,8 +355,7 @@
     host.insertAdjacentHTML('afterend', html);
     document.getElementById('exportDocxBtn')?.addEventListener('click', exportToDocx);
 
-    // Validasyon hatası alert'ini exportInfoCard sonrasına ekle
-    // Önce eski alert'i kaldır
+    // Validasyon hatası alert'ini üst container'a ekle
     const oldGlobal = document.getElementById('byuValidationAlert');
     if (oldGlobal && oldGlobal.parentElement) oldGlobal.parentElement.removeChild(oldGlobal);
 
@@ -369,10 +368,11 @@
       if (typeof window.showAlert === 'function') {
         const alertDiv = document.createElement('div');
         alertDiv.id = 'byuValidationAlert';
-        alertDiv.style.marginTop = '12px';
-        const exportCard = document.getElementById('exportInfoCard');
-        if (exportCard && exportCard.parentElement){
-          exportCard.parentElement.insertBefore(alertDiv, exportCard.nextSibling);
+        alertDiv.className = 'mb-3';
+        const alertContainer = document.getElementById('byuValidationAlertContainer');
+        if (alertContainer){
+          alertContainer.innerHTML = '';
+          alertContainer.appendChild(alertDiv);
           window.showAlert(alertDiv, {
             type: 'danger',
             title: 'Tabloda Hatalar Var',

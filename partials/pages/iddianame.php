@@ -69,14 +69,14 @@
 								<div class="mt-3">
 									<small class="text-muted">İzin verilen türler: <strong>.xls</strong>, <strong>.xlsx</strong></small>
 								</div>
-								
-								<!-- Loading Spinner -->
-								<div id="xlsInlineSpinnerIdd" class="mt-3" style="display: none;">
-									<div class="spinner-border spinner-border-sm text-primary" role="status">
-										<span class="visually-hidden">Yükleniyor...</span>
-									</div>
-									<div class="text-muted small mt-2">İşleniyor…</div>
+							
+							<!-- Loading Spinner -->
+							<div id="xlsInlineSpinnerIdd" class="mt-3" style="display: none;">
+								<div class="spinner-border" role="status" style="width: 2rem; height: 2rem; border-width: 0.25rem; color: var(--adalet-primary);">
+									<span class="visually-hidden">Yükleniyor...</span>
 								</div>
+								<div class="small mt-2" style="color: var(--adalet-text-light);">İşleniyor…</div>
+							</div>
 							</div>
 							
 							<!-- Seçilen Dosya -->

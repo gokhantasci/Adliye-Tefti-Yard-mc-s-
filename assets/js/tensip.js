@@ -267,19 +267,23 @@
     document.getElementById('exportInfoCard')?.remove();
     const birim = state.birimAdi || 'Belirtilmeyen birim'; const aralik = state.denetimAraligi || 'belirtilmeyen aralık'; const count = state.rows.length;
     const html = `
-    <section class="card card-upload" id="exportInfoCard" style="margin-top:12px">
-      <div class="card-head"><span class="material-symbols-rounded">description</span><strong>Word Çıktısı</strong></div>
-      <div class="card-body" style="display:block">
-  <div class="muted" style="margin-bottom:8px">${esc(birim)} – ${esc(aralik)} aralığında <b>${count}</b> satır hazır.</div>
-        <div id="exportPickRow" style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center">
-          <label for="minSureGunInput" class="muted" style="margin-right:4px">Minimum Süre (Gün):</label>
-          <input type="number" id="minSureGunInput" value="0" min="0" step="1" style="width:120px">
-          <button class="btn" id="exportDocxBtn" type="button" style="display:inline-flex;align-items:center;gap:6px;">
-            <span class="material-symbols-rounded">description</span><span>Word'e Aktar</span>
+    <div class="card mt-3" id="exportInfoCard">
+      <div class="card-header d-flex align-items-center gap-2">
+        <span class="material-symbols-rounded">description</span>
+        <strong>Word Çıktısı</strong>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3">${esc(birim)} – ${esc(aralik)} aralığında <strong>${count}</strong> satır hazır.</p>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+          <label for="minSureGunInput" class="text-muted mb-0">Minimum Süre (Gün):</label>
+          <input type="number" id="minSureGunInput" value="0" min="0" step="1" class="form-control form-control-sm" style="width:120px">
+          <button class="btn btn-primary d-inline-flex align-items-center gap-2" id="exportDocxBtn" type="button">
+            <span class="material-symbols-rounded" style="font-size: 1rem;">description</span>
+            <span>Word'e Aktar</span>
           </button>
         </div>
       </div>
-    </section>`;
+    </div>`;
     host.insertAdjacentHTML('afterend', html);
     document.getElementById('exportDocxBtn')?.addEventListener('click', exportToDocx);
   }

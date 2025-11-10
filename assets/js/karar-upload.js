@@ -87,10 +87,8 @@
   }
 
   async function parseXLSX(file){
-    console.debug('[karar-upload] parseXLSX start', file && file.name);
     const ok = await waitForXlsxReady();
     if (!ok || !(window.XLSX && typeof XLSX.read === 'function')){
-      console.error('[karar-upload] XLSX not available');
       throw new Error('XLSX kütüphanesi yüklenemedi. Lütfen internet bağlantınızı veya /assets/js/xlsx.full.min.js dosyasını kontrol edin. Alternatif olarak .csv kullanabilirsiniz.');
     }
     const data = await file.arrayBuffer();
@@ -150,7 +148,6 @@
     return 'Düşme/Cvyo/Diğer';
   }
   function render(header, rows, idx){
-    console.debug('[karar-upload] render', { headerLength: (header||[]).length, rowsLength: (rows||[]).length });
     // Ensure results panel exists before attempting to render
     if (!resultCard || !headEl || !bodyEl) createResultCard();
     headEl.innerHTML = '';
@@ -183,7 +180,6 @@
     resultCard.style.display = '';
   }
   async function runFromFile(f){
-    console.debug('[karar-upload] runFromFile called', f && f.name);
     let parsed;
     const ext = (f.name.split('.').pop() || '').toLowerCase();
     // Helper: show a small inline spinner inside the report container or next to the drop zone
@@ -214,13 +210,12 @@
         parsed = parseCSV(await f.text());
       } else {
         const msg = 'Desteklenen uzantılar: .xlsx, .xls, .csv';
-        if (window.toast) window.toast({type:'warning', title:'Dosya Türü', body: msg}); else console.warn(msg);
+        if (window.toast) window.toast({type:'warning', title:'Dosya Türü', body: msg});
         return;
       }
     } catch (err){
       const msg = err && err.message ? err.message : 'Dosya okunamadı.';
-      console.error('[karar-upload] runFromFile error', err);
-      if (window.toast) window.toast({type:'danger', title:'Hata', body: msg}); else console.error(msg);
+      if (window.toast) window.toast({type:'danger', title:'Hata', body: msg});
       return;
     } finally {
       // Remove spinner regardless of success/failure

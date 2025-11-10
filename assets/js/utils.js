@@ -382,6 +382,9 @@
     if (next) next.disabled = (LOG_PAGER.page === pages);
   }
 
+  // Global olarak erişilebilir yap
+  window.renderLogsPage = renderLogsPage;
+
   function renderAllLogs(){
     renderLogsPage();
   }
